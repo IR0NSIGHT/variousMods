@@ -1,8 +1,8 @@
-package me.iron.fleetCommander.testing;
+package me.iron.newscaster.testing;
 
-import me.iron.fleetCommander.notification.infoTypes.FleetInfo;
-import me.iron.fleetCommander.notification.infoTypes.ShipDestroyedInfo;
-import me.iron.fleetCommander.notification.objectTypes.ShipObject;
+import me.iron.newscaster.notification.infoTypes.FleetInfo;
+import me.iron.newscaster.notification.infoTypes.ShipDestroyedInfo;
+import me.iron.newscaster.notification.objectTypes.ShipObject;
 import org.schema.common.util.linAlg.Vector3i;
 
 /**
@@ -21,5 +21,6 @@ public class main {
         ShipDestroyedInfo report = new ShipDestroyedInfo(victim,attacker,new Vector3i(0,420,69));
 
        System.out.println(report.getNewscast());
+       System.out.println(victim.toString());
     }
 }

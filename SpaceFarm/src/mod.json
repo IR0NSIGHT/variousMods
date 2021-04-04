@@ -1,13 +1,13 @@
 {
-  "name": "FleetCommander",
+  "name": "SpaceFarm",
   "author": "IR0NSIGHT",
-  "description": "better fleet management",
+  "description": "Farming in space",
   "version": "0.1",
   "starmade_version": "0.202.108",
   "client_mod": false,
   "server_mod": false,
-  "main_class": "me.iron.fleetCommander.ModMain",
-  "smd_resource_id": 420691,
+  "main_class": "me.iron.spacefarm.ModMain",
+  "smd_resource_id": 123456789,
   "dependencies": [
     -1
   ],

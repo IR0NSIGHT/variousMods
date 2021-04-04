@@ -1,30 +1,32 @@
-package me.iron.fleetCommander;
+package me.iron.spacefarm;
 
+import api.DebugFile;
 import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
 import api.mod.StarMod;
-import me.iron.fleetCommander.eventListening.ListenerManager;
-import me.iron.fleetCommander.notification.NewsManager;
-import me.iron.fleetCommander.testing.DebugChatListener;
 
 /**
  * STARMADE MOD
  * CREATOR: Max1M
- * DATE: 22.02.2021
- * TIME: 15:41
+ * DATE: 04.04.2021
+ * TIME: 22:36
  */
-public class modMain extends StarMod {
+public class ModMain extends StarMod {
     public static StarMod instance;
+    public ModMain() {
+        super();
+        instance = this;
+    }
+
     @Override
     public void onEnable() {
-        instance = this;
         super.onEnable();
+        DebugFile.log("SpaceFarm was activated");
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
-        NewsManager.saveToPersistenUtil();
     }
 
     @Override
@@ -35,9 +37,7 @@ public class modMain extends StarMod {
     @Override
     public void onServerCreated(ServerInitializeEvent event) {
         super.onServerCreated(event);
-        new ListenerManager();
-        DebugChatListener.addListener();
-        NewsManager.loadFromPersistenUtil();
+        new PlantManager(); //create plant manager that handles anything plant related: collecting plants, growing plants etc.
     }
 
     @Override

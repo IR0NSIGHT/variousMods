@@ -1,6 +1,6 @@
-package me.iron.fleetCommander.notification.infoTypes;
+package me.iron.newscaster.notification.infoTypes;
 
-import me.iron.fleetCommander.notification.objectTypes.ShipObject;
+import me.iron.newscaster.notification.objectTypes.ShipObject;
 import org.schema.common.util.linAlg.Vector3i;
 
 /**

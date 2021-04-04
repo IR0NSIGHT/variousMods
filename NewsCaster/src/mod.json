@@ -1,12 +1,12 @@
 {
-  "name": "FleetCommander",
+  "name": "NewsCaster",
   "author": "IR0NSIGHT",
-  "description": "better fleet management",
+  "description": "Automated newscasting",
   "version": "0.1",
   "starmade_version": "0.202.108",
   "client_mod": false,
   "server_mod": false,
-  "main_class": "me.iron.fleetCommander.modMain",
+  "main_class": "me.iron.newscaster.ModMain",
   "smd_resource_id": 420691,
   "dependencies": [
     -1

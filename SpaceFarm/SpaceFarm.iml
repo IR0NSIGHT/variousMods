@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/starloader.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/StarMade.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/lwjgl.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/slick.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/hsqldb.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jinput.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jbullet.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jgraphx.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/pircbot.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/vecmath.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/CodecWav.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/gson-2.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/poi-3.16.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/proguard.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/tera-ovr.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/uuid-3.4.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/CodecJOgg.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/javassist.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jna-4.1.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/guava-18.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jogg-0.0.7.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jtidy-r938.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/junit-4.10.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/lwjgl_util.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/rudp-1.2.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/CodecJOrbis.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/dom4j-1.6.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jaxen-1.1.4.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/SoundSystem.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/xpp3-1.1.4c.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jasypt-1.9.2.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jovr-0.4.2.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jsr305-1.3.9.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/luaj-jme-3.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/luaj-jse-3.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/swingx-1.6.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jorbis-0.0.15.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/NameGenerator.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-io-2.4.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/curvesapi-1.04.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/fastutil-6.5.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/httpcore-4.3.2.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/httpmime-4.3.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/JavaEWAH-0.8.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/poi-ooxml-3.16.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/xmlbeans-2.6.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/fluent-hc-4.3.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jdo2-api-2.3-eb.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/slf4j-api-1.7.7.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/stax2-api-4.0.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/httpclient-4.3.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/LibraryJavaSound.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/SoundSystemUtils.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/tempus-fugit-1.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-codec-1.6.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-lang3-3.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/LibraryLWJGLOpenAL.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/protobuf-java-2.4.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/transaction-api-1.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/woodstox-core-5.0.4.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-logging-1.1.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/ws-commons-util-1.0.2.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/httpclient-cache-4.3.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/indiespot-media-0.8.09.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/poi-ooxml-schemas-3.16.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-collections4-4.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/java-image-scaling-0.8.6.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/validation-api-1.1.0.Final.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/reflections-0.9.9-RC1-uberjar.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/lwjgl.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/slick.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/hsqldb.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jinput.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jbullet.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jgraphx.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/pircbot.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/vecmath.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/CodecWav.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/gson-2.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/poi-3.16.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/proguard.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/tera-ovr.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/uuid-3.4.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/CodecJOgg.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/javassist.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jna-4.1.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/guava-18.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jogg-0.0.7.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jtidy-r938.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/junit-4.10.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/lwjgl_util.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/rudp-1.2.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/CodecJOrbis.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/dom4j-1.6.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jaxen-1.1.4.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/SoundSystem.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/xpp3-1.1.4c.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jasypt-1.9.2.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jovr-0.4.2.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jsr305-1.3.9.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/luaj-jme-3.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/luaj-jse-3.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/swingx-1.6.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jorbis-0.0.15.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/NameGenerator.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-io-2.4.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/curvesapi-1.04.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/fastutil-6.5.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/httpcore-4.3.2.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/httpmime-4.3.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/JavaEWAH-0.8.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/poi-ooxml-3.16.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/xmlbeans-2.6.0.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/fluent-hc-4.3.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/jdo2-api-2.3-eb.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/slf4j-api-1.7.7.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/stax2-api-4.0.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/httpclient-4.3.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/LibraryJavaSound.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/SoundSystemUtils.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/tempus-fugit-1.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-codec-1.6.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-lang3-3.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/LibraryLWJGLOpenAL.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/protobuf-java-2.4.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/transaction-api-1.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/woodstox-core-5.0.4.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-logging-1.1.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/ws-commons-util-1.0.2.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/httpclient-cache-4.3.3.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/indiespot-media-0.8.09.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/poi-ooxml-schemas-3.16.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/commons-collections4-4.1.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/java-image-scaling-0.8.6.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/validation-api-1.1.0.Final.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib/reflections-0.9.9-RC1-uberjar.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>

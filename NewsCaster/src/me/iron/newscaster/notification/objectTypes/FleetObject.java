@@ -1,4 +1,4 @@
-package me.iron.fleetCommander.notification.objectTypes;
+package me.iron.newscaster.notification.objectTypes;
 
 /**
  * STARMADE MOD

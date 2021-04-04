@@ -2,7 +2,7 @@
   <artifact type="jar" name="FleetManager">
     <output-path>$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/mods</output-path>
     <root id="archive" name="FleetManager.jar">
-      <element id="module-output" name="FleetCommander" />
+      <element id="module-output" name="IRNMultiMod" />
     </root>
   </artifact>
 </component>

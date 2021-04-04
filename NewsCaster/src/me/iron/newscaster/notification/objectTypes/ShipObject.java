@@ -1,7 +1,7 @@
-package me.iron.fleetCommander.notification.objectTypes;
+package me.iron.newscaster.notification.objectTypes;
 
-import api.DebugFile;
 import org.schema.game.common.controller.SegmentController;
+import org.schema.game.common.data.ManagedSegmentController;
 import org.schema.game.common.data.player.faction.Faction;
 
 import java.io.Serializable;
@@ -54,6 +54,8 @@ public class ShipObject implements Serializable {
         setMass((int) ship.getMass());
         //DebugFile.log("created ship object" + toString());
         //TODO get cargo mass
+        double invMass = (this instanceof ManagedSegmentController<?> ? ((ManagedSegmentController<?>) this).getManagerContainer().getMassFromInventories() : 0);
+        this.cargoMass = (int) invMass;
     }
     public String getUID() {
         return UID;

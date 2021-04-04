@@ -1,4 +1,4 @@
-package me.iron.fleetCommander.notification.infoTypes;
+package me.iron.newscaster.notification.infoTypes;
 
 /**
  * STARMADE MOD
@@ -7,7 +7,7 @@ package me.iron.fleetCommander.notification.infoTypes;
  * TIME: 15:46
  */
 
-import me.iron.fleetCommander.notification.objectTypes.ShipObject;
+import me.iron.newscaster.notification.objectTypes.ShipObject;
 import org.schema.common.util.linAlg.Vector3i;
 
 import java.io.Serializable;
@@ -31,6 +31,11 @@ public class FleetInfo implements Serializable {
     //who (this fleetmember)
     ShipObject ship;
     EventType eventType;
+
+    public long getTime() {
+        return time;
+    }
+
     long time;
 
 

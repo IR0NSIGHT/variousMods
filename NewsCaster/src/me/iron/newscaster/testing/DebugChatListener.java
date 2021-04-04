@@ -1,13 +1,13 @@
-package me.iron.fleetCommander.testing;
+package me.iron.newscaster.testing;
 
 import api.DebugFile;
 import api.ModPlayground;
 import api.listener.Listener;
 import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
-import me.iron.fleetCommander.modMain;
-import me.iron.fleetCommander.notification.NewsManager;
-import me.iron.fleetCommander.notification.infoTypes.FleetInfo;
+import me.iron.newscaster.ModMain;
+import me.iron.newscaster.notification.NewsManager;
+import me.iron.newscaster.notification.infoTypes.FleetInfo;
 
 /**
  * STARMADE MOD
@@ -39,7 +39,10 @@ public class DebugChatListener {
                 if (playerChatEvent.getText().contains("load")) {
                     NewsManager.loadFromPersistenUtil();
                 }
+                if (playerChatEvent.getText().contains("clean")) {
+                    NewsManager.cleanPersistentInfo();
+                }
             }
-        }, modMain.instance);
+        }, ModMain.instance);
     }
 }
