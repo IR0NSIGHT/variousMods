@@ -7,36 +7,47 @@ package me.iron.spacefarm;
  * TIME: 23:36
  */
 
+import org.schema.common.util.linAlg.Vector3b;
 import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.data.SegmentPiece;
+import org.schema.game.common.data.world.SegmentData;
 
-import javax.vecmath.Vector3f;
 import java.io.Serializable;
 
 /**
  * represents the plant block/information. is persistent
  */
 public class PlantObject implements Serializable {
-    private Vector3i absPosition;
+    private Vector3b absPosition;
     private short type;
     private String segmentcontrollerUID;
-    private Vector3i segmentAbsPos;
     private int lifeStage;  //how big the plant is in its lifecycle, does nothing atm
 
-    private int data;
+    private int pieceData;
+    private SegmentData segmentData;
 
-    public PlantObject(Vector3i absPosition, short type, String segmentcontrollerUID, Vector3i segmentAbsPos, int lifeStage) {
-        this.absPosition = absPosition;
+    public PlantObject(SegmentPiece block) {
+        Vector3i absPosition = block.getAbsolutePos(new Vector3i());
+        this.absPosition = new Vector3b(absPosition.x,absPosition.y,absPosition.z);
+        this.type = block.getType();
+        this.segmentData = block.getSegment().getSegmentData();
+        this.pieceData = block.getData();
+        this.segmentcontrollerUID = block.getSegmentController().getUniqueIdentifier();
+        this.lifeStage = 0;
+    }
+    public void setPieceData(int data) {
+        this.pieceData = data;
+    }
+
+    public void setSegmentData(SegmentData segmentData) {
+        this.segmentData = segmentData;
+    }
+
+    public void setType(short type) {
         this.type = type;
-        this.segmentcontrollerUID = segmentcontrollerUID;
-        this.segmentAbsPos = segmentAbsPos;
-        this.lifeStage = lifeStage;
     }
 
-    public void setData(int data) {
-        this.data = data;
-    }
-
-    public Vector3i getAbsPosition() {
+    public Vector3b getAbsPosition() {
         return absPosition;
     }
 
@@ -48,15 +59,15 @@ public class PlantObject implements Serializable {
         return segmentcontrollerUID;
     }
 
-    public Vector3i getSegmentAbsPos() {
-        return segmentAbsPos;
-    }
-
     public int getLifeStage() {
         return lifeStage;
     }
 
-    public int getData() {
-        return data;
+    public int getPieceData() {
+        return pieceData;
+    }
+
+    public SegmentData getSegmentData() {
+        return segmentData;
     }
 }
