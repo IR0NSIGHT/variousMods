@@ -7,18 +7,34 @@ package me.iron.newscaster.eventListening;
  * TIME: 16:05
  */
 
+import api.DebugFile;
 import api.listener.Listener;
 import api.listener.events.entity.SegmentControllerOverheatEvent;
+import api.listener.events.entity.SegmentControllerSpawnEvent;
 import api.listener.events.entity.SegmentHitByProjectileEvent;
+import api.listener.events.faction.FactionRelationChangeEvent;
 import api.mod.StarLoader;
+import api.utils.StarRunnable;
 import me.iron.newscaster.*;
+import me.iron.newscaster.notification.NewsManager;
+import me.iron.newscaster.notification.infoTypes.FactionRelationInfo;
+import me.iron.newscaster.notification.infoTypes.ShipCreatedInfo;
+import me.iron.newscaster.notification.infoTypes.ShipDestroyedInfo;
+import me.iron.newscaster.notification.objectTypes.ShipObject;
+import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.SegmentControllerHpController;
 import org.schema.game.common.controller.SendableSegmentController;
+import org.schema.game.common.controller.damage.Damager;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.controller.rails.RailRelation;
 import org.schema.game.common.data.ManagedSegmentController;
+import org.schema.game.common.data.player.PlayerControlledTransformableNotFound;
+import org.schema.game.common.data.player.PlayerState;
+import org.schema.game.common.data.player.faction.Faction;
+import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -26,6 +42,10 @@ import java.util.List;
  * creates and destroyes them.
  */
 public class ListenerManager {
+    HashMap<String, Integer> massLimits = new HashMap<String, Integer>() {{
+        put("destructionLower",2500);
+        put("creationLower",2500);
+    }};
     /**
      * will create a new manager and auto create all relevant eventhandlers.
      */
@@ -35,62 +55,89 @@ public class ListenerManager {
     }
 
     private void InitEHs() {
+        DebugFile.log("initializing eventhandlers.");
         StarLoader.registerListener(SegmentControllerOverheatEvent.class, new Listener<SegmentControllerOverheatEvent>() {
             @Override
             public void onEvent(SegmentControllerOverheatEvent event) {
-                if (event.isServer())
+                if (!event.isServer())
                 {
                     return;
                 }
-                //DebugFile.log("Overheat event detected for: " + event.getEntity().getName());
-                if (!event.isServer()) {
-                    return;
-                }
-                overheatDock(event.getEntity(),true);
-
-                float mass = event.getEntity().getMassWithDocks();
-                if (false) { //TODO make configurable
-                    return;
-                }
+                DebugFile.log("segmentcontroller is overheating.");
                 //make ship object
-        //        SegmentController ship = event.getEntity();
-        //        ShipObject victim = new ShipObject(ship);
-        //        //make attacker object
-        //        ShipObject attacker = null;
-        //        Damager dmg = event.getLastDamager();
-        //        boolean isSC = dmg.isSegmentController();
-        //        boolean isPlayer = (dmg.getOwnerState() instanceof PlayerState);
-//
-        //        String name = dmg.getName();
-        //        SimpleTransformableSendableObject shooter = dmg.getShootingEntity();
-        //        if (isPlayer) {
-        //            try {
-        //                shooter = ((PlayerState) dmg.getOwnerState()).getFirstControlledTransformable();
-        //            } catch (PlayerControlledTransformableNotFound playerControlledTransformableNotFound) {
-        //                playerControlledTransformableNotFound.printStackTrace();
-        //            }
-        //        }
-        //        String UID = shooter.getUniqueIdentifier();
-        //        if (event.getLastDamager().getShootingEntity() instanceof SegmentController) {
-        //            attacker = new ShipObject((SegmentController) event.getLastDamager().getShootingEntity());
-        //        } else {
-//
-        //            attacker = new ShipObject((SegmentController) shooter);
-        //        }
-        //        ShipDestroyedInfo info = new ShipDestroyedInfo(victim,attacker,ship.getSector(new Vector3i()));
-        //        NewsManager.addInfo(info);
+                SegmentController ship = event.getEntity();
+                float mass = ship.getMassWithDocks();
+                float min = massLimits.get("destructionLower");
+                if (ship.getMassWithDocks() < massLimits.get("destructionLower")) {
+                    return;
+                }
+
+                //make attacker object
+                Damager lastDamager = event.getLastDamager();
+
+                if (lastDamager.getFactionId() == ship.getFactionId() && ship.getFactionId() != 0) {
+                    return; //same faction == boring.
+                }
+
+                boolean isPlayer = (lastDamager.getOwnerState() instanceof PlayerState);
+                SimpleTransformableSendableObject shooter = lastDamager.getShootingEntity();
+                if (isPlayer) {
+                    try {
+                        shooter = ((PlayerState) lastDamager.getOwnerState()).getFirstControlledTransformable();
+                    } catch (PlayerControlledTransformableNotFound playerControlledTransformableNotFound) {
+                        playerControlledTransformableNotFound.printStackTrace();
+                    }
+                }
+
+                ShipObject victim = new ShipObject(ship);
+                ShipObject attacker;
+                if (event.getLastDamager().getShootingEntity() instanceof SegmentController) {
+                    attacker = new ShipObject((SegmentController) event.getLastDamager().getShootingEntity());
+                } else {
+                    attacker = new ShipObject((SegmentController) shooter);
+                }
+                ShipDestroyedInfo info = new ShipDestroyedInfo(victim,attacker,ship.getSector(new Vector3i()));
+                NewsManager.addInfo(info);
+
             }
         }, ModMain.instance);
 
-      StarLoader.registerListener(SegmentHitByProjectileEvent.class, new Listener<SegmentHitByProjectileEvent>() {
-          @Override
-          public void onEvent(SegmentHitByProjectileEvent event) {
-              SegmentController victim = event.getShotHandler().hitSegController;
-              killTiny(victim);
-          }
-      }, ModMain.instance);
+        StarLoader.registerListener(SegmentControllerSpawnEvent.class, new Listener<SegmentControllerSpawnEvent>() {
+            @Override
+            public void onEvent(SegmentControllerSpawnEvent event) {
+                QueueForCreationReport(event.getController());
+            }
+        },ModMain.instance);
+
+        StarLoader.registerListener(FactionRelationChangeEvent.class, new Listener<FactionRelationChangeEvent>() {
+            @Override
+            public void onEvent(FactionRelationChangeEvent event) {
+                if (event.getTo().isNPC() && event.getFrom().isNPC()) {
+                    return;//ignore npc spamming each other with peace offers.
+                }
+                FactionRelationInfo info = new FactionRelationInfo(event.getFrom(), event.getTo(),event.getOldRelation(),event.getNewRelation());
+                NewsManager.addInfo(info);
+                DebugFile.log("Faction relation change event: " + info.getNewscast());
+                DebugFile.log(info.toString());
+            }
+        },ModMain.instance);
     }
 
+    private void QueueForCreationReport(final SegmentController sc) {
+        DebugFile.log("queued segmentcontroller for creation report");
+        new StarRunnable() {
+            @Override
+            public void run() {
+                if (sc.getMassWithDocks() < massLimits.get("creationLower")) {
+                    return;
+                }
+                DebugFile.log("delayed log running for " + sc.getName());
+                ShipObject ship = new ShipObject(sc);
+                ShipCreatedInfo report = new ShipCreatedInfo(ship, sc.getSector(new Vector3i()));
+                NewsManager.addInfo(report);
+            }
+        }.runLater(ModMain.instance,10);
+    }
     /**
      * will overheat any docked entities.
      * @param sc mothership

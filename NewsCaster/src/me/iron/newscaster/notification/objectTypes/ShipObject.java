@@ -1,10 +1,13 @@
 package me.iron.newscaster.notification.objectTypes;
 
+import api.common.GameServer;
 import org.schema.game.common.controller.SegmentController;
+import org.schema.game.common.controller.Ship;
 import org.schema.game.common.data.ManagedSegmentController;
 import org.schema.game.common.data.player.faction.Faction;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 /**
  * STARMADE MOD
@@ -17,7 +20,7 @@ public class ShipObject implements Serializable {
     public static int unknownNumber = -1;
     private String UID = unknownString;
     private String name = unknownString;
-    private String faction = unknownString;
+    private FactionObject faction;
     private String pilot = unknownString; //TODO add pilot getter, setter, getStringPretty etc.
     private int mass = unknownNumber;
     private int cargoMass = unknownNumber;
@@ -28,14 +31,14 @@ public class ShipObject implements Serializable {
      * by default the ship is created with "unknown" for strings and -1 for numbers. pass null and zero to keep it that way.
      * @param UID UID of ship
      * @param name name of ship
-     * @param faction belonging faction
+     * @param factionID belonging faction
      * @param mass mass, gets rounded.
      * @param cargoMass total cargo mass (gets rounded)
      */
-    public ShipObject(String UID, String name, String faction, int mass, int cargoMass) {
+    public ShipObject(String UID, String name, int factionID, int mass, int cargoMass) {
         this.setUID(UID);
         this.setName(name);
-        this.setFaction(faction);
+        this.setFaction(factionID);
         this.setMass(mass);
         this.setCargoMass(mass);
         //DebugFile.log("created ship object" + toString());
@@ -44,12 +47,15 @@ public class ShipObject implements Serializable {
 
         setUID(ship.getUniqueIdentifier());
         setName(ship.getName());
+
         //faction
         Faction shipFaction = ship.getFaction();
-        String factionName = "unfactioned";
         if (shipFaction != null) {
-            factionName = shipFaction.getName();
-        }
+            this.faction = new FactionObject(shipFaction);
+        } else {
+            this.faction = new FactionObject();
+        };
+
 
         setMass((int) ship.getMass());
         //DebugFile.log("created ship object" + toString());
@@ -80,14 +86,15 @@ public class ShipObject implements Serializable {
     }
 
     public String getFaction() {
-        return faction;
+        return faction.getFactionName();
     }
 
-    public void setFaction(String faction) {
+    public void setFaction(int factionID) {
+        Faction faction = GameServer.getServerState().getFactionManager().getFaction(factionID);
         if (faction == null) {
             return;
         }
-        this.faction = faction;
+       this.faction = new FactionObject(faction);
     }
 
     /**
@@ -122,7 +129,7 @@ public class ShipObject implements Serializable {
         return "ShipObject{" +
                 "UID='" + UID + '\'' +
                 ", name='" + name + '\'' +
-                ", faction='" + faction + '\'' +
+                ", faction='" + faction.factionName + '\'' +
                 ", pilot='" + pilot + '\'' +
                 ", mass=" + mass +
                 ", cargoMass=" + cargoMass +
@@ -136,7 +143,7 @@ public class ShipObject implements Serializable {
         } else {
             s += mass + "k ";
         };
-        s += "mass) " + "[" + faction + "]";
+        s += "mass) " + "[" + getFaction() + "]";
         return s;
     }
 }

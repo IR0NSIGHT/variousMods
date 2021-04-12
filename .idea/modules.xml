@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/IRNMultiMod.iml" filepath="$PROJECT_DIR$/IRNMultiMod.iml" />
       <module fileurl="file://$PROJECT_DIR$/NewsCaster/NewsCaster.iml" filepath="$PROJECT_DIR$/NewsCaster/NewsCaster.iml" />
       <module fileurl="file://$PROJECT_DIR$/SpaceFarm/SpaceFarm.iml" filepath="$PROJECT_DIR$/SpaceFarm/SpaceFarm.iml" />
     </modules>

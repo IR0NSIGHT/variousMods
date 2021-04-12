@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="FleetManager">
+  <artifact type="jar" name="NewsCaster">
     <output-path>$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/mods</output-path>
-    <root id="archive" name="FleetManager.jar">
-      <element id="module-output" name="IRNMultiMod" />
+    <root id="archive" name="NewsCaster.jar">
+      <element id="module-output" name="NewsCaster" />
     </root>
   </artifact>
 </component>

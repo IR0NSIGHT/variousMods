@@ -4,7 +4,8 @@ import api.DebugFile;
 import api.mod.config.PersistentObjectUtil;
 import api.utils.StarRunnable;
 import me.iron.newscaster.ModMain;
-import me.iron.newscaster.notification.infoTypes.FleetInfo;
+import me.iron.newscaster.notification.infoTypes.EntityInfo;
+import me.iron.newscaster.notification.infoTypes.GenericInfo;
 import me.iron.newscaster.notification.infoTypes.ShipDestroyedInfo;
 
 import java.util.ArrayList;
@@ -17,21 +18,21 @@ import java.util.List;
  * TIME: 16:56
  */
 public class NewsManager {
-    private static List<FleetInfo> newsStorage = new ArrayList();
-    private static Class[] newsTypes = new Class[]{FleetInfo.class,ShipDestroyedInfo.class};
+    private static List<GenericInfo> newsStorage = new ArrayList();
+    private static Class[] newsTypes = new Class[]{EntityInfo.class,ShipDestroyedInfo.class};
     private static boolean saveTimerOn = false;
     /**
      * add a news-infoObject to the news storage
      * @param info info object
      * @return index in list.
      */
-    public static int addInfo(FleetInfo info) {
+    public static int addInfo(GenericInfo info) {
         //DebugFile.log("addInfo: " + info.getNewscast());
         newsStorage.add(info);
         return newsStorage.size(); //add to end of list => size = index
     }
 
-    public static FleetInfo getInfo(int index) {
+    public static GenericInfo getInfo(int index) {
         try {
             return newsStorage.get(index);
         } catch (IndexOutOfBoundsException ex) {
@@ -40,13 +41,13 @@ public class NewsManager {
         }
     }
 
-    public static List<FleetInfo> getNewsStorage() {
+    public static List<GenericInfo> getNewsStorage() {
         return newsStorage;
     }
 
     public static void saveToPersistenUtil() {
         DebugFile.log("saving newsStorage to persistenObjectUtil");
-        for (FleetInfo info: newsStorage) {
+        for (GenericInfo info: newsStorage) {
             PersistentObjectUtil.addObject(ModMain.instance.getSkeleton(),info);
         }
         PersistentObjectUtil.save(ModMain.instance.getSkeleton());
@@ -56,12 +57,12 @@ public class NewsManager {
         //fired at onServerCreated
         createSaveTimer();
         for (Class type: newsTypes) {
-            ArrayList<FleetInfo> list = PersistentObjectUtil.getCopyOfObjects(ModMain.instance.getSkeleton(),type); //TODO does this work: list fleetinfo with other type obj?
+            ArrayList<EntityInfo> list = PersistentObjectUtil.getCopyOfObjects(ModMain.instance.getSkeleton(),type);
             DebugFile.log("loading newsStorage from persistent obj Util: class: "+ type.toString() + ".size: " + list.size());
-
-            for (FleetInfo info: list) {
+            //TODO dont loop a bruteforce test on all existing infos.
+            for (EntityInfo info: list) {
                 boolean isClone = false;
-                for (FleetInfo clone: newsStorage) {
+                for (GenericInfo clone: newsStorage) {
                     if (clone.getTime() == info.getTime()) {
                         isClone = true;
                         break;
@@ -93,9 +94,11 @@ public class NewsManager {
         for (Class cl: newsTypes) {
             ArrayList<Object> list = PersistentObjectUtil.getCopyOfObjects(ModMain.instance.getSkeleton(),cl);
             for (Object obj: list) {
+                newsStorage.remove(obj);
                 PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),obj);
                 DebugFile.log("removing object");
             }
         }
     }
+
 }

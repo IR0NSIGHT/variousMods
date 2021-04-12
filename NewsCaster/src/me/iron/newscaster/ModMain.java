@@ -47,29 +47,4 @@ public class ModMain extends StarMod {
         super.onClientCreated(event);
     }
 
-    @Override
-    public byte[] onClassTransform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] byteCode) {
- //      if(className.equals("SegmentController")){
- //          byte[] bytes = null;
- //          try {
- //              ZipInputStream file = new ZipInputStream(new FileInputStream(this.getSkeleton().getJarFile()));
- //              while (true){
- //                  ZipEntry nextEntry = file.getNextEntry();
- //                  if(nextEntry == null) break;
- //                  if(nextEntry.getName().equals("SegmentController.class")){
- //                      bytes = IOUtils.toByteArray(file);
- //                  }
- //              }
- //              file.close();
- //          } catch (IOException e) {
- //              e.printStackTrace();
- //          }
- //          if(bytes != null){
- //              System.err.println("[fleetcommander] Overwrote Segmentcontroller class.");
- //              return bytes;
- //          }
- //      }
-
-        return super.onClassTransform(loader, className, classBeingRedefined, protectionDomain, byteCode);
-    }
 }

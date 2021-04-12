@@ -7,7 +7,8 @@ import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
 import me.iron.newscaster.ModMain;
 import me.iron.newscaster.notification.NewsManager;
-import me.iron.newscaster.notification.infoTypes.FleetInfo;
+import me.iron.newscaster.notification.infoTypes.EntityInfo;
+import me.iron.newscaster.notification.infoTypes.GenericInfo;
 
 /**
  * STARMADE MOD
@@ -28,10 +29,13 @@ public class DebugChatListener {
                     return;
                 }
                 if (playerChatEvent.getText().contains("news")) {
-                    for (FleetInfo info: NewsManager.getNewsStorage()) {
+                    ModPlayground.broadcastMessage("listing all news:");
+                    for (GenericInfo info: NewsManager.getNewsStorage()) {
+                        String report = info.getNewscast();
                         ModPlayground.broadcastMessage(info.getNewscast());
                         DebugFile.log(info.getNewscast());
                     }
+
                 }
                 if (playerChatEvent.getText().contains("save")) {
                     NewsManager.saveToPersistenUtil();
