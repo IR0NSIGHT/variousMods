@@ -13,6 +13,7 @@ import api.listener.events.entity.SegmentControllerOverheatEvent;
 import api.listener.events.entity.SegmentControllerSpawnEvent;
 import api.listener.events.entity.SegmentHitByProjectileEvent;
 import api.listener.events.faction.FactionRelationChangeEvent;
+import api.listener.events.faction.SystemClaimEvent;
 import api.mod.StarLoader;
 import api.utils.StarRunnable;
 import me.iron.newscaster.*;
@@ -33,6 +34,7 @@ import org.schema.game.common.data.player.PlayerControlledTransformableNotFound;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.faction.Faction;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
+import org.schema.game.mod.Mod;
 
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +123,13 @@ public class ListenerManager {
                 DebugFile.log(info.toString());
             }
         },ModMain.instance);
+
+        StarLoader.registerListener(SystemClaimEvent.class, new Listener<SystemClaimEvent>() {
+            @Override
+            public void onEvent(SystemClaimEvent event) {
+               
+            }
+        }, ModMain.instance);
     }
 
     private void QueueForCreationReport(final SegmentController sc) {
@@ -128,7 +137,7 @@ public class ListenerManager {
         new StarRunnable() {
             @Override
             public void run() {
-                if (sc.getMassWithDocks() < massLimits.get("creationLower")) {
+                if (sc.getMassWithDocks() < massLimits.get("creationLower") || sc.getFaction().isNPC()) {
                     return;
                 }
                 DebugFile.log("delayed log running for " + sc.getName());
