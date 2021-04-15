@@ -5,15 +5,14 @@ import api.ModPlayground;
 import api.common.GameServer;
 import api.listener.Listener;
 import api.listener.events.entity.SegmentControllerInstantiateEvent;
+import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
+import api.utils.StarRunnable;
 import com.bulletphysics.linearmath.Transform;
-import org.newdawn.slick.util.pathfinding.navmesh.Space;
-import org.schema.common.LogUtil;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.data.element.ElementDocking;
 import org.schema.game.common.data.player.PlayerState;
-import org.schema.game.common.data.player.catalog.CatalogManager;
 import org.schema.game.common.data.player.catalog.CatalogPermission;
 import org.schema.game.server.controller.BluePrintController;
 import org.schema.game.server.controller.EntityAlreadyExistsException;
@@ -23,11 +22,12 @@ import org.schema.game.server.data.blueprint.ChildStats;
 import org.schema.game.server.data.blueprint.SegmentControllerOutline;
 import org.schema.game.server.data.blueprint.SegmentControllerSpawnCallbackDirect;
 import org.schema.schine.graphicsengine.core.settings.StateParameterNotFoundException;
+import org.schema.schine.network.objects.Sendable;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * STARMADE MOD
@@ -36,7 +36,6 @@ import java.util.List;
  * TIME: 21:31
  */
 public class NPCStationReplacer {
-    //Test if valid blueprint //TODO
     /**
      * maps: original, unwanted blueprint vs new, wanted blueprint.
      * new replaces original
@@ -78,13 +77,86 @@ public class NPCStationReplacer {
                 ModPlayground.broadcastMessage("Instantiation: " + event.getController().getName() + " of : " + event.getController().getFaction().getName());
                 SpaceStation station = (SpaceStation) event.getController();
                 DebugFile.log("Logging NPC station:/n UID: " + station.getUniqueIdentifier() + "/n blueprint: " +station.blueprintIdentifier + "/npath: " + station.blueprintSegmentDataPath );
-                CheckForReplacement(station);
+                replaceFromList(station);
 
+            }
+        },ModMain.instance);
+
+        //add chat listener for "admin commands"
+        StarLoader.registerListener(PlayerChatEvent.class, new Listener<PlayerChatEvent>() {
+            @Override
+            public void onEvent(PlayerChatEvent event) {
+                if (!event.isServer()) {
+                    return;
+                }
+                PlayerState player = GameServer.getServerState().getPlayerFromNameIgnoreCaseWOException(event.getMessage().sender);
+                if (player == null) {
+                    return;
+                }
+                if (!GameServerState.instance.isAdmin(player.getName())) {
+                    ModPlayground.broadcastMessage("rejected.");
+                    return;
+                }
+                ModPlayground.broadcastMessage("accepted");
+                String text = event.getText();
+                if (text.contains("!station")) {
+                    //get selected object
+                    int selectedID = player.getSelectedEntityId();
+                    Sendable selected = (Sendable)GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalObjects().get(selectedID);
+                    if (!(selected instanceof SpaceStation)) {
+                        ModPlayground.broadcastMessage("not a station!");
+                        return;
+                    }
+                    SpaceStation station = (SpaceStation) selected;
+
+                    if (text.contains("!station add ")) {
+                        //check if already listed
+                        if (blueprintReplacementList.get(station.blueprintIdentifier) != null) {
+                            ModPlayground.broadcastMessage("blueprint " + station.blueprintIdentifier + " already exists in replacement list: " + blueprintReplacementList.get(station.blueprintIdentifier));
+                            return;
+                        }
+
+                        //get replacement blueprint
+                        text = text.replace("!station add ","");
+
+                        //check validity of blueprint
+                        boolean validBlueprint = isValidBlueprint(text);
+                        if (!validBlueprint) {
+                            ModPlayground.broadcastMessage("no blueprint of name '" + text + "' was found.");
+                            return;
+                        }
+                        //add to replacement list
+                        blueprintReplacementList.put(station.blueprintIdentifier,text);
+
+                        //replace selected station
+                        replaceFromList(station);
+                        return;
+                    }
+
+                    //one time replacement operation
+                    if (text.contains("!station replace ")) {
+                        //get replacement blueprint
+                        text = text.replace("!station replace ","");
+                        //check validity of blueprint
+                        boolean validBlueprint = isValidBlueprint(text);
+                        if (!validBlueprint) {
+                            ModPlayground.broadcastMessage("no blueprint of name '" + text + "' was found.");
+                            return;
+                        }
+
+                        replaceFromBlueprint(station,text);
+                    }
+                }
             }
         },ModMain.instance);
     }
 
-    private static SpaceStation CheckForReplacement(SpaceStation original) {
+    /**
+     * will try to replace the given station with a blueprint from its internal list. will do nothing if station original blueprint is not in list.
+     * @param original
+     * @return
+     */
+    private static SpaceStation replaceFromList(SpaceStation original) {
         if (original.blueprintIdentifier != null) {
             //test if original is actually a new station
             if (clones.contains(original.getUniqueIdentifier())) {
@@ -98,21 +170,31 @@ public class NPCStationReplacer {
                 //TODO test if replacement is valid blueprint entry
 
                 //replace original with new station
-                return replaceStationWith(original, replacement);
+                return replaceFromBlueprint(original, replacement);
             }
         }
         return original;
     }
-    private static SpaceStation replaceStationWith(SpaceStation original, String newBlueprint) {
+
+    /**
+     * replace spacestation with new station of this blueprint.
+     * inherits faction, name, position, but not complex attributes like inventory or docks.
+     * station is always placed at world 0,0,0.
+     * @param original
+     * @param newBlueprint
+     * @return
+     */
+    private static SpaceStation replaceFromBlueprint(SpaceStation original, String newBlueprint) {
         //get transform = worldposition wrapper
         Transform transform = new Transform();
         transform.setIdentity();
         transform = original.getWorldTransform();
         transform.origin.set(original.getWorldTransform().origin);
 
-        //log sector
+        //log sector and blueprint
         Vector3i sector = original.getSector(new Vector3i());
         ModPlayground.broadcastMessage("spawning at: " + transform.origin);
+        String originalBlueprint = original.blueprintIdentifier;
 
         //create outline = loaded but not yet spawned entity
         SegmentControllerOutline scOutline = null;
@@ -120,12 +202,12 @@ public class NPCStationReplacer {
             scOutline = BluePrintController.active.loadBluePrint(
                     GameServerState.instance,
                     newBlueprint, //catalog entry name
-                    "REPLACEMENT" + original.getName(), //ship name
+                    "REPLACEMENT" + original.getRealName(), //ship name
                     transform, //transform position
                     -1, //credits to spend
                     original.getFactionId(), //faction ID
                     sector, //sector
-                    "uwuBoy8000", //spawner
+                    "Station VCS", //spawner
                     PlayerState.buffer, //buffer (?) no idea what that is, worked fine for me as is
                     null,   //segmentpiece, no idea either
                     false, //active ai -> basically fleet AI ship. attacks enemies.
@@ -168,8 +250,32 @@ public class NPCStationReplacer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
+        newStation.blueprintIdentifier = originalBlueprint;
+        final SpaceStation s = newStation;
+        new StarRunnable() {
+            @Override
+            public void run() {
+                s.warpTransformable(0,0,0, true, null);
+                ModPlayground.broadcastMessage("station blueprint: " + s.blueprintIdentifier);
+            }
+        }.runLater(ModMain.instance,10);
         return newStation;
+    }
+
+    /**
+     * checks blueprint catalog for given entry. tests if entry with that name exists.
+     * @param blueprintName
+     * @return
+     */
+    private static boolean isValidBlueprint(String blueprintName) {
+        //TODO find better way than bruteforce search
+        Collection<CatalogPermission> allEntries = GameServer.getServerState().getCatalogManager().getCatalog();
+        for (CatalogPermission entry: allEntries) {
+            if(entry.getUid().equals(blueprintName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
