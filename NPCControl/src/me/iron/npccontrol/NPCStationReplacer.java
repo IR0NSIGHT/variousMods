@@ -9,11 +9,19 @@ import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
 import api.utils.StarRunnable;
 import com.bulletphysics.linearmath.Transform;
+import it.unimi.dsi.fastutil.objects.ObjectCollection;
+import org.schema.common.LogUtil;
 import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.controller.SegmentController;
+import org.schema.game.common.controller.SegmentControllerHpController;
+import org.schema.game.common.controller.SendableSegmentController;
 import org.schema.game.common.controller.SpaceStation;
+import org.schema.game.common.controller.rails.RailRelation;
+import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementDocking;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.catalog.CatalogPermission;
+import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.server.controller.BluePrintController;
 import org.schema.game.server.controller.EntityAlreadyExistsException;
 import org.schema.game.server.controller.EntityNotFountException;
@@ -21,13 +29,15 @@ import org.schema.game.server.data.GameServerState;
 import org.schema.game.server.data.blueprint.ChildStats;
 import org.schema.game.server.data.blueprint.SegmentControllerOutline;
 import org.schema.game.server.data.blueprint.SegmentControllerSpawnCallbackDirect;
+import org.schema.schine.common.language.Lng;
 import org.schema.schine.graphicsengine.core.settings.StateParameterNotFoundException;
 import org.schema.schine.network.objects.Sendable;
+import org.schema.schine.network.server.ServerMessage;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 
 /**
  * STARMADE MOD
@@ -36,28 +46,44 @@ import java.util.HashSet;
  * TIME: 21:31
  */
 public class NPCStationReplacer {
+    public static void addStrainToMap(EvolutionStrain strain) {
+        NPCStationReplacer.strainHashMap.put(strain.getOriginalBlueprint(),strain);
+    }
+
     /**
      * maps: original, unwanted blueprint vs new, wanted blueprint.
      * new replaces original
      */
-    private static HashMap<String,String> blueprintReplacementList = new HashMap<String,String>() {{
-        put("ENTITY_SPACESTATION_Refueling Platform","REFUELING-PLATFORM");
-        put("Small Refueling Platform","SMALL-REFUELING-PLATFORM");
-        put("ENTITY_SPACESTATION_trading guild temporary factory_1481325355945","KOMBINAT-100");
-        put("temporary shop_1481328648280","TG_TRADE_HUB");
-        put("ENTITY_SPACESTATION_Trade Post_1481338111718","TG_TRADE_HUB");
-        //    put("ENTITY_SPACESTATION_Vault Station","TBD");
+    private static HashMap<String, EvolutionStrain> strainHashMap = new HashMap<String, EvolutionStrain>() {{
+    //    put("ENTITY_SPACESTATION_Refueling Platform",new EvolutionStrain("ENTITY_SPACESTATION_Refueling Platform", "REFUELING-PLATFORM"));
+    //    put("Small Refueling Platform","SMALL-REFUELING-PLATFORM");
+    //    put("ENTITY_SPACESTATION_trading guild temporary factory_1481325355945","KOMBINAT-100");
+    //    put("temporary shop_1481328648280","TG_TRADE_HUB");
+    //    put("ENTITY_SPACESTATION_Trade Post_1481338111718","TG_TRADE_HUB");
+    //    //    put("ENTITY_SPACESTATION_Vault Station","TBD");
         //ENTITY_SPACESTATION_outcast temporary shop_1481328648280
         //ENTITY_SPACESTATION_Trade Post_1481338111718
         //Research Station
     }};
 
     /**
-     * stores the UIDs of the clones which replaced unwanted stations. is used to test if a station was already replaced.
+     * get a collection of the active evolution strains
+     * @return collection of evolution strains used by the instantiation listener
      */
-    private static HashSet<String> clones = new HashSet<String>(){{
-            add("uwuEmpirePrimeStation");
-        }};
+    public static Collection<EvolutionStrain> getActiveStrains() {
+        return strainHashMap.values();
+    }
+
+    /**
+     * sets strains to be used in instantiation listener. only to be used by persistence object util!!
+     * @param strainCollection
+     */
+    public static void setActiveStrains(EvolutionStrain[] strainCollection) {
+        strainHashMap.clear();
+        for (EvolutionStrain strain: strainCollection) {
+            strainHashMap.put(strain.getOriginalBlueprint(),strain);
+        }
+    }
 
     /**
      * initialises eventhandlers that detect the instantiation of spacestations.
@@ -74,7 +100,7 @@ public class NPCStationReplacer {
                 if (!(event.getController() instanceof SpaceStation) || ((event.getController().getFaction() != null && !event.getController().getFaction().isNPC()))) {
                     return;
                 }
-                ModPlayground.broadcastMessage("Instantiation: " + event.getController().getName() + " of : " + event.getController().getFaction().getName());
+                ModPlayground.broadcastMessage("Instantiation: " + event.getController().getName() + " of : " + event.getController().getFactionId());
                 SpaceStation station = (SpaceStation) event.getController();
                 DebugFile.log("Logging NPC station:/n UID: " + station.getUniqueIdentifier() + "/n blueprint: " +station.blueprintIdentifier + "/npath: " + station.blueprintSegmentDataPath );
                 replaceFromList(station);
@@ -94,25 +120,55 @@ public class NPCStationReplacer {
                     return;
                 }
                 if (!GameServerState.instance.isAdmin(player.getName())) {
-                    ModPlayground.broadcastMessage("rejected.");
+        //            ModPlayground.broadcastMessage("rejected.");
                     return;
                 }
-                ModPlayground.broadcastMessage("accepted");
                 String text = event.getText();
                 if (text.contains("!station")) {
                     //get selected object
                     int selectedID = player.getSelectedEntityId();
                     Sendable selected = (Sendable)GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalObjects().get(selectedID);
-                    if (!(selected instanceof SpaceStation)) {
-                        ModPlayground.broadcastMessage("not a station!");
+
+                    SpaceStation station = null;
+                    if (selected instanceof  SpaceStation) {
+                        station = (SpaceStation) selected;
+                    }
+
+                    if (text.contains("!station info")) {
+                        String bp = station.blueprintIdentifier;
+                        EvolutionStrain strain = strainHashMap.get(bp);
+                        if (bp == null) {
+                            bp = "null";
+                        }
+                        if (strain == null) {
+                            ModPlayground.broadcastMessage("station BP: " + bp + " strain: null");
+                            return;
+                        }
+                         ModPlayground.broadcastMessage("station BP: " + bp + " strain: " + strain.toString());
                         return;
                     }
-                    SpaceStation station = (SpaceStation) selected;
 
+                    if (text.contains("!station set ")) {
+                        text = text.replace("!station set ","");
+                        if (station != null) {
+                            station.blueprintIdentifier = text;
+                            ModPlayground.broadcastMessage("set blueprint identifier to " + text);
+                            return;
+                        }
+                    }
                     if (text.contains("!station add ")) {
+                        if (station == null) { //TODO handle pirates and other "nulL" stations
+                            if (station.blueprintIdentifier == null) {
+                                ModPlayground.broadcastMessage("null ancestor");
+                                return;
+                            }
+                            ModPlayground.broadcastMessage("not a station!");
+                            return;
+                        }
+
                         //check if already listed
-                        if (blueprintReplacementList.get(station.blueprintIdentifier) != null) {
-                            ModPlayground.broadcastMessage("blueprint " + station.blueprintIdentifier + " already exists in replacement list: " + blueprintReplacementList.get(station.blueprintIdentifier));
+                        if (strainHashMap.get(station.blueprintIdentifier) != null) {
+                            ModPlayground.broadcastMessage("blueprint " + station.blueprintIdentifier + " already exists in replacement list: " + strainHashMap.get(station.blueprintIdentifier));
                             return;
                         }
 
@@ -125,16 +181,33 @@ public class NPCStationReplacer {
                             ModPlayground.broadcastMessage("no blueprint of name '" + text + "' was found.");
                             return;
                         }
-                        //add to replacement list
-                        blueprintReplacementList.put(station.blueprintIdentifier,text);
 
+                        //create strain object                         //add to replacement list (automatic)
+                        EvolutionStrain strain = new EvolutionStrain(station.blueprintIdentifier,text);
+                        EvolutionStrain control = strainHashMap.get(station.blueprintIdentifier);
+                        if (strain.equals(control)) {
+                            ModPlayground.broadcastMessage("new evolution strain created: " + control.toString());
+                        } else {
+                            ModPlayground.broadcastMessage("something went wrong creating the evolution strain.");
+                            return;
+                        }
                         //replace selected station
                         replaceFromList(station);
                         return;
                     }
 
+                    if (text.contains("!station clear all")) {
+                        strainHashMap.clear();
+                        ModPlayground.broadcastMessage("deleted all evolution strains.");
+                    }
+
                     //one time replacement operation
                     if (text.contains("!station replace ")) {
+                        if (!(selected instanceof SpaceStation)) {
+                            ModPlayground.broadcastMessage("not a station!");
+                            return;
+                        }
+
                         //get replacement blueprint
                         text = text.replace("!station replace ","");
                         //check validity of blueprint
@@ -146,6 +219,58 @@ public class NPCStationReplacer {
 
                         replaceFromBlueprint(station,text);
                     }
+
+                    //update selected station
+                    if (text.contains("!station update")) {
+                        if (station != null) {
+                            replaceFromList(station);
+                            return;
+                        }
+                        //Fallthrough
+                    }
+
+                    //update an evolution strain to a new blueprint
+                    if (text.contains("!station update ")) {//strainname newBP OR selected
+                        text = text.replace("!station update ","");
+                        String oldBP, newBP;
+                        if (!(selected instanceof SpaceStation)) {
+                            String[] inputValues = text.split(" ");
+                            if (inputValues.length != 2) {
+                                ModPlayground.broadcastMessage("not station selected/ expects 2 inputs");
+                                return;
+                            }
+                            oldBP = inputValues[0]; newBP = inputValues[1];
+                        } else {
+                            oldBP = ((SpaceStation) selected).blueprintIdentifier;
+                            newBP = text;
+                        }
+                        //get replacement blueprint
+                        if (!isValidBlueprint(newBP)) {
+                            ModPlayground.broadcastMessage("replacement is not a valid blueprint: '" + text + "'");
+                            return;
+                        }
+                        EvolutionStrain strain = strainHashMap.get(oldBP);
+                        if (strain == null) {
+                            ModPlayground.broadcastMessage(oldBP + " not listed in evolution map");
+                            return;
+                        }
+                        strain.updateStrain(newBP);
+                        ModPlayground.broadcastMessage("updated strain to " + strain.toString());
+                        if (selected != null) {
+                            replaceFromList((SpaceStation) selected);
+                        }
+                        return;
+                    }
+
+                    if (text.contains("!station list")) {
+                        for (EvolutionStrain strain: strainHashMap.values()) {
+                            ModPlayground.broadcastMessage(strain.toString());
+                        }
+                        return;
+                    }
+
+                    //default
+                    ModPlayground.broadcastMessage("command not recognized");
                 }
             }
         },ModMain.instance);
@@ -158,22 +283,80 @@ public class NPCStationReplacer {
      */
     private static SpaceStation replaceFromList(SpaceStation original) {
         if (original.blueprintIdentifier != null) {
-            //test if original is actually a new station
-            if (clones.contains(original.getUniqueIdentifier())) {
+            //test if this blueprint is part of the evolution map
+            EvolutionStrain strain =  strainHashMap.get(original.blueprintIdentifier);
+            if (strain == null) {
+                //not part of evolution.
+                return original;
+            }
+
+            //get stationVersion of this station
+            Integer stationVersion = strain.getStationVersion(original.getUniqueIdentifier());
+
+            //its versioned, get current stationVersion, compare to most recent available blueprint
+            int currentVersion = strain.getVersion();
+            if (stationVersion >= currentVersion) { //station is up to date, dont replace
                 return original;
             }
 
             //is this one on the "to be replaced list"?
             //get name of new blueprint
-            String replacement = blueprintReplacementList.get(original.blueprintIdentifier);
-            if (replacement != null) {
-                //TODO test if replacement is valid blueprint entry
-
+            String replacementBlueprint = strainHashMap.get(original.blueprintIdentifier).getCurrentBlueprint();
+            if (replacementBlueprint != null) {
+                //TODO test if replacementBlueprint is valid blueprint entry
                 //replace original with new station
-                return replaceFromBlueprint(original, replacement);
+                SpaceStation newStation = replaceFromBlueprint(original, replacementBlueprint);
+                strain.UpdateStation(original.getUniqueIdentifier(),newStation.getUniqueIdentifier());
+                return newStation;
             }
         }
         return original;
+    }
+
+    public static void deleteDocked(SegmentController entity) {
+        List<RailRelation> next = entity.railController.next;
+        for (RailRelation railRelation : next) {
+            SegmentController dockedEntity = railRelation.docked.getSegmentController();
+
+            //recurse
+            deleteDocked(dockedEntity);
+        }
+        entity.markForPermanentDelete(true);
+        entity.setMarkedForDeleteVolatile(true);
+        entity.setMarkedForDeletePermanentIncludingDocks(true);
+    }
+
+    /**
+     * loops over all entities in a sector and deletes the ones that contain the given string in their UID.
+     * this is a very jank solution in hopes of getting a reference to old docking system turrets on pirate stations.
+     * Does NOT delete the given UID itself.
+     * @param name
+     * @param sector
+     * @param factionID
+     */
+    public static void deleteByName(String name, Vector3i sector, int factionID) {
+        ObjectCollection<Sendable> list = GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalObjects().values();
+        for (Sendable entity: list) {
+
+            if (entity instanceof SegmentController && ((SegmentController) entity).getUniqueIdentifier().contains(name)) {
+                if (((SegmentController) entity).getName().equals(name)) {
+                    continue; //dont destroy original.
+                }
+                //only destroy ship in this sector
+                if (!((SegmentController) entity).getSector(new Vector3i()).equals(sector)) {
+                    continue;
+                };
+                //dont destroy ships that dont match the given faction.
+                if (((SegmentController) entity).getFactionId() != factionID) {
+                    continue;
+                }
+                //kill entity
+                DebugFile.log("DESTROY segmentcontroller: " + ((SegmentController) entity).getName() + " matches on: " + name);
+                SegmentController thingy = (SegmentController) entity;
+                entity.markForPermanentDelete(true);
+                entity.setMarkedForDeleteVolatile(true);
+            }
+        }
     }
 
     /**
@@ -184,7 +367,7 @@ public class NPCStationReplacer {
      * @param newBlueprint
      * @return
      */
-    private static SpaceStation replaceFromBlueprint(SpaceStation original, String newBlueprint) {
+    public static SpaceStation replaceFromBlueprint(SpaceStation original, String newBlueprint) {
         //get transform = worldposition wrapper
         Transform transform = new Transform();
         transform.setIdentity();
@@ -202,7 +385,7 @@ public class NPCStationReplacer {
             scOutline = BluePrintController.active.loadBluePrint(
                     GameServerState.instance,
                     newBlueprint, //catalog entry name
-                    "REPLACEMENT" + original.getRealName(), //ship name
+                    original.getRealName(), //ship name
                     transform, //transform position
                     -1, //credits to spend
                     original.getFactionId(), //faction ID
@@ -268,7 +451,7 @@ public class NPCStationReplacer {
      * @param blueprintName
      * @return
      */
-    private static boolean isValidBlueprint(String blueprintName) {
+    public static boolean isValidBlueprint(String blueprintName) {
         //TODO find better way than bruteforce search
         Collection<CatalogPermission> allEntries = GameServer.getServerState().getCatalogManager().getCatalog();
         for (CatalogPermission entry: allEntries) {

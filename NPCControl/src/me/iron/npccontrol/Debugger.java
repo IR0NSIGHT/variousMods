@@ -1,6 +1,5 @@
 package me.iron.npccontrol;
 
-import api.DebugFile;
 import api.ModPlayground;
 import api.common.GameClient;
 import api.common.GameServer;
@@ -10,22 +9,9 @@ import api.mod.StarLoader;
 import api.utils.StarRunnable;
 import com.bulletphysics.linearmath.Transform;
 import org.schema.game.client.data.GameClientState;
-import org.schema.game.common.data.player.PlayerCharacter;
 import org.schema.game.common.data.player.PlayerState;
-import org.schema.game.common.data.player.catalog.CatalogManager;
-import org.schema.game.common.data.player.faction.FactionManager;
-import org.schema.game.server.controller.BluePrintController;
-import org.schema.game.server.controller.EntityAlreadyExistsException;
-import org.schema.game.server.controller.EntityNotFountException;
-import org.schema.game.server.data.GameServerState;
-import org.schema.game.server.data.blueprint.ChildStats;
-import org.schema.game.server.data.blueprint.SegmentControllerOutline;
-import org.schema.game.server.data.blueprint.SegmentControllerSpawnCallbackDirect;
-import org.schema.schine.common.language.Lng;
-import org.schema.schine.graphicsengine.core.settings.StateParameterNotFoundException;
 
 import javax.vecmath.Vector3f;
-import java.io.IOException;
 
 /**
  * STARMADE MOD
@@ -41,62 +27,6 @@ public class Debugger {
                 ModPlayground.broadcastMessage("received chat event.");
                 if (!event.isServer()) {
                     return;
-                }
-                //get player who sent message
-                PlayerState sender = GameServer.getServerState().getPlayerFromNameIgnoreCaseWOException(event.getMessage().sender);
-                //get transform = worldposition wrapper
-                Transform transform = new Transform();
-                transform.setIdentity();
-                sender.getWordTransform(transform);
-                transform.origin.set(sender.getFirstControlledTransformableWOExc().getWorldTransform().origin);
-
-                ModPlayground.broadcastMessage("spawning at: " + transform.origin);
-
-                //create outline = loaded but not yet spawned entity
-                SegmentControllerOutline scOutline = null;
-                try {
-                    scOutline = BluePrintController.active.loadBluePrint(
-                            GameServerState.instance,
-                            "pirate-drone-01", //catalog entry name
-                            "uwuBoy9000", //ship name
-                            transform, //transform position
-                            -1, //credits to spend
-                            10001, //faction ID
-                            sender.getCurrentSector(), //sector
-                            "uwuBoy8000", //spawner
-                            PlayerState.buffer, //buffer (?) no idea what that is, worked fine for me as is
-                            null,   //segmentpiece, no idea either
-                            true, //active ai -> basically fleet AI ship. attacks enemies.
-                            new ChildStats(false)); //childstats, no idea what it does
-                } catch (EntityNotFountException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (EntityAlreadyExistsException e) {
-                    e.printStackTrace();
-                }
-                
-                if (scOutline != null) {
-                    DebugFile.log("outline was loaded, not null!");
-                    //spawn the outline
-                    try {
-                        scOutline.spawn(
-                                sender.getCurrentSector(), //dont know what happens if you put loadsector != spawnsector
-                                false, //check block counts (?) no idea
-                                new ChildStats(false), //no idea again
-                        new SegmentControllerSpawnCallbackDirect(GameServerState.instance, sender.getCurrentSector()) { //idk what that is
-                            @Override
-                            public void onNoDocker() { //in vanilla used to write a debug line.
-                            }
-                        });
-                    } catch (EntityAlreadyExistsException e) {
-                        e.printStackTrace();
-                    } catch (StateParameterNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
                 }
             }
         },ModMain.instance);

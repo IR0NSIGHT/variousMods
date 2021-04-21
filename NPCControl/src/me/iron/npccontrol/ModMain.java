@@ -4,6 +4,7 @@ import api.DebugFile;
 import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
 import api.mod.StarMod;
+import me.iron.npccontrol.commands.CommandCommander;
 
 /**
  * STARMADE MOD
@@ -21,12 +22,16 @@ public class ModMain extends StarMod {
     @Override
     public void onEnable() {
         super.onEnable();
+        StationReplacer.loadPersistentAll(); //load persistent data for pirates
+        CommandCommander.init(); //admin command adding
         DebugFile.log("npc tester was activated");
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
+        StationReplacer.savePersistentAll();
+    //    PersistenceManager.SaveStrains();
     }
 
     @Override
@@ -37,14 +42,13 @@ public class ModMain extends StarMod {
     @Override
     public void onServerCreated(ServerInitializeEvent event) {
         super.onServerCreated(event);
+        StationReplacer.deployListener();
         Debugger.addChatListener();
-        NPCStationReplacer.init();
+
     }
 
     @Override
     public void onClientCreated(ClientInitializeEvent event) {
         super.onClientCreated(event);
-        Debugger.positionLogger();
-
     }
 }
