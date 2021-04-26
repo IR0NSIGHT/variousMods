@@ -159,7 +159,7 @@ public class StationCommand implements CommandInterface {
 
             if (action.equalsIgnoreCase("clear")) {
                 if (factionID == 0) {
-                    PlayerUtils.sendMessage(sender,  arguments[3] + " is not a valid faction ID.");
+                    PlayerUtils.sendMessage(sender,  factionID + " is not a valid faction ID.");
                     return;
                 }
 
@@ -183,7 +183,7 @@ public class StationCommand implements CommandInterface {
         //station list
         if (arguments.length == 1 && arguments[0].equalsIgnoreCase("list")) {
             String list = "";
-            for (StationReplacer replacer : StationReplacer.allReplacersDEBUG) {
+            for (StationReplacer replacer : StationReplacer.getList().values()) {
                 int factionID = replacer.factionID;
                 String name = GameServerState.instance.getFactionManager().getFactionName(factionID);
                 if (name == null) {

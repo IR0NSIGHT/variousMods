@@ -22,7 +22,6 @@ import java.util.HashMap;
 public class StationReplacer {
     private static boolean hasListener = false;
     private static HashMap<Integer,StationReplacer> replacerList = new HashMap<>();
-    public static ArrayList<StationReplacer> allReplacersDEBUG = new ArrayList<>();
     public static StationReplacer getFromList(int factionID) {
         return replacerList.get(factionID);
     }
@@ -199,7 +198,6 @@ public class StationReplacer {
     public StationReplacer(int factionID) {
         this.factionID = factionID;
         replacerList.put(factionID,this);
-        allReplacersDEBUG.add(this);
     }
 
     /**
@@ -232,6 +230,11 @@ public class StationReplacer {
             DebugFile.log("station " + station.getRealName() + "is in managed list with known blueprint");
             return;
         }
+        //save for later use.
+        boolean replaceManaged = false;
+        if (existsInList(stationBlueprintName)) {
+            replaceManaged = true;
+        }
 
         //get new blueprint
         String newBlueprint = GetRandomBlueprint();
@@ -244,7 +247,10 @@ public class StationReplacer {
         //delete old docking system turrets that are not registered in sc.getDockedOnThis
         //TODO make safer method
         String stationUID = station.getUniqueIdentifier();
-        managedStations.put(stationUID,"vanilla spawned");
+        if (replaceManaged) {
+            managedStations.remove(stationUID);
+        }
+        //managedStations.put(stationUID,"vanilla spawned");
         stationUID = stationUID.replace("ENTITY_SPACESTATION_","");
         DebugFile.log("delete pirate ships by UID: " + stationUID);
         StationHelper.deleteByName(stationUID,station.getSector(new Vector3i()), factionID);
