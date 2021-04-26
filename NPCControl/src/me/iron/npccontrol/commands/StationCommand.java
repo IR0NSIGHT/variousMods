@@ -27,13 +27,13 @@ public class StationCommand implements CommandInterface {
 
     @Override
     public String[] getAliases() {
-        return new String[] {"stationcontrol"};
+        return new String[] {"stationcontrol","station"};
     }
 
     @Override
     public String getDescription() {
         return "command interface for automated station replacement. \n" +
-                "subcommands are: stcn \n" +
+                "subcommands are: station \n" +
                 "station add blueprintname factionID \n" +
                 "station list \n" +
                 "station list factionID \n" +
@@ -52,12 +52,13 @@ public class StationCommand implements CommandInterface {
     @Override
     public boolean onCommand(PlayerState sender, String[] arguments) {
 
-        //pirate station add blueprintname -1
-        if (arguments.length == 4 && arguments[0].equalsIgnoreCase("station")) {
-            if (arguments[1].equalsIgnoreCase("add") || arguments[1].equalsIgnoreCase("remove")) {
+        //station add blueprintname -1
+        if (arguments.length == 3) {
+            if (arguments[0].equalsIgnoreCase("add") || arguments[0].equalsIgnoreCase("remove")) {
                 //get blueprint and faction ID
-                String blueprintName = arguments[2];
-                int factionID = tryParseInt(arguments[3]);
+                String action = arguments[0];
+                String blueprintName = arguments[1];
+                int factionID = tryParseInt(arguments[2]);
                 if (factionID == 0) {
                     PlayerUtils.sendMessage(sender,  arguments[3] + " is not a valid faction ID.");
                     return false;
@@ -76,7 +77,7 @@ public class StationCommand implements CommandInterface {
                     return false;
                 }
 
-                switch (arguments[1]) {
+                switch (action) {
                     case "add":
                     {
                         if (replacer.addBlueprint(blueprintName)) {
@@ -104,10 +105,12 @@ public class StationCommand implements CommandInterface {
 
         }
 
-        //pirate station list -1
-        if (arguments.length == 3 && arguments[0].equalsIgnoreCase("station")) {
-            if (arguments[1].equalsIgnoreCase("list")) {
-                int factionID = tryParseInt(arguments[2]);
+        //station list -1
+        if (arguments.length == 2) {
+            String action = arguments[0];
+            int factionID = tryParseInt(arguments[1]);
+
+            if (action.equalsIgnoreCase("list")) {
                 if (factionID == 0) {
                     PlayerUtils.sendMessage(sender,  arguments[3] + " is not a valid faction ID.");
                     return false;
@@ -128,8 +131,7 @@ public class StationCommand implements CommandInterface {
                 return true;
             }
 
-            if (arguments[1].equalsIgnoreCase("clear")) {
-                int factionID = tryParseInt(arguments[2]);
+            if (action.equalsIgnoreCase("clear")) {
                 if (factionID == 0) {
                     PlayerUtils.sendMessage(sender,  arguments[3] + " is not a valid faction ID.");
                     return false;
@@ -152,8 +154,8 @@ public class StationCommand implements CommandInterface {
             }
         }
 
-        //pirate station list
-        if (arguments.length == 2 && arguments[0].equalsIgnoreCase("station") && arguments[1].equalsIgnoreCase("list")) {
+        //station list
+        if (arguments.length == 1 && arguments[0].equalsIgnoreCase("list")) {
             String list = "";
             for (StationReplacer replacer : StationReplacer.allReplacersDEBUG) {
                 int factionID = replacer.factionID;
@@ -168,15 +170,17 @@ public class StationCommand implements CommandInterface {
             return true;
         }
 
-        //pirate station add_replacer -1 || remove_replacer
-        if (arguments.length == 3 && arguments[0].equalsIgnoreCase("station")) {
+        //station add_replacer -1 || remove_replacer
+        if (arguments.length == 3) {
+            String action = arguments[0];
             int factionID = tryParseInt(arguments[2]);
+
             if (factionID == 0) {
                 PlayerUtils.sendMessage(sender,  "invalid faction id given:" + arguments[2]);
                 return false;
             }
 
-            if (arguments[1].equalsIgnoreCase("add_replacer")) {
+            if (action.equalsIgnoreCase("add_replacer")) {
                 //test if replacer already exists
                 if (StationReplacer.getFromList(factionID) != null) {
                     PlayerUtils.sendMessage(sender,  "Faction " + factionID + " already has a replacer.");
@@ -197,7 +201,7 @@ public class StationCommand implements CommandInterface {
                 return true;
             }
 
-            if (arguments[1].equalsIgnoreCase("remove_replacer")) {
+            if (action.equalsIgnoreCase("remove_replacer")) {
                 //test if replacer exists
                 StationReplacer replacer = StationReplacer.getFromList(factionID);
                 if (replacer == null) {
@@ -215,24 +219,25 @@ public class StationCommand implements CommandInterface {
 
         }
 
-        //pirate station save
-        if (arguments[0].equalsIgnoreCase("station") && arguments[1].equalsIgnoreCase("save")) {
+        //station save
+        if (arguments[0].equalsIgnoreCase("save")) {
             PlayerUtils.sendMessage(sender,  "saving all replacers to moddata");
             StationReplacer.savePersistentAll();
             return true;
         }
 
         //pirate station load
-        if (arguments[0].equalsIgnoreCase("station") && arguments[1].equalsIgnoreCase("load")) {
+        if (arguments[0].equalsIgnoreCase("load")) {
             PlayerUtils.sendMessage(sender,  "loading replacers from moddata");
             StationReplacer.loadPersistentAll();
             return true;
         }
 
         //debug direct replace:
-        //pirate replace bpName
-        if (arguments[0].equalsIgnoreCase("replace")) {
+        //station replace bpName
+        if (arguments.length == 2 && arguments[0].equalsIgnoreCase("replace")) {
             String blueprint = arguments[1];
+
             if (!NPCStationReplacer.isValidBlueprint(blueprint)) {
                 PlayerUtils.sendMessage(sender,  "Not a valid blueprint");
                 return false;

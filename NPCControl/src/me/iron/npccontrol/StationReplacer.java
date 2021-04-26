@@ -292,8 +292,4 @@ public class StationReplacer {
         list.addAll(replacementBlueprints);
         return list;
     }
-
-    public void destroyListener() {
-
-    }
  }
