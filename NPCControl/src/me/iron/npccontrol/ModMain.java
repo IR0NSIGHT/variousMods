@@ -25,8 +25,6 @@ public class ModMain extends StarMod {
     public void onEnable() {
         super.onEnable();
         DebugFile.log("on enable",this);
-
-        StationReplacer.loadPersistentAll(); //load persistent data for pirates
         CommandCommander.init();
     }
 
@@ -45,6 +43,7 @@ public class ModMain extends StarMod {
     public void onServerCreated(ServerInitializeEvent event) {
         super.onServerCreated(event);
         DebugFile.log("server created",this);
+        StationReplacer.loadPersistentAll(); //load persistent data for pirates
         StationReplacer.deployListener();
     }
 
