@@ -65,10 +65,8 @@ public class StationReplacer {
             if (!(event.getController() instanceof SpaceStation)) {
                 return;
             }
-            String name = " idk some bullshit probably ";
-            if (event.getController() != null && event.getController().getName() != null) {
-                name = event.getController().getName();
-            }
+                if (event.getController() != null && event.getController().getName() != null) {
+                }
             DebugFile.log("firing onInstantiaton method for replacers for " + event.getController().getName());
 
           for (StationReplacer replacer: StationReplacer.replacerList.values()) {
