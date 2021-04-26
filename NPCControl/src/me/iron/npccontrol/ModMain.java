@@ -24,9 +24,10 @@ public class ModMain extends StarMod {
     @Override
     public void onEnable() {
         super.onEnable();
+        DebugFile.log("on enable",this);
+
         StationReplacer.loadPersistentAll(); //load persistent data for pirates
         CommandCommander.init();
-        DebugFile.log("npc tester was activated");
     }
 
     @Override
@@ -43,11 +44,14 @@ public class ModMain extends StarMod {
     @Override
     public void onServerCreated(ServerInitializeEvent event) {
         super.onServerCreated(event);
+        DebugFile.log("server created",this);
         StationReplacer.deployListener();
     }
 
     @Override
     public void onClientCreated(ClientInitializeEvent event) {
         super.onClientCreated(event);
+        DebugFile.log("on client",this);
+
     }
 }

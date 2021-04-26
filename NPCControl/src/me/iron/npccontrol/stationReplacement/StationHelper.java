@@ -1,7 +1,7 @@
 package me.iron.npccontrol.stationReplacement;
 
 import api.DebugFile;
-import api.ModPlayground;
+
 import api.common.GameServer;
 import api.listener.Listener;
 import api.listener.events.entity.SegmentControllerInstantiateEvent;
@@ -113,7 +113,6 @@ public class StationHelper {
 
         //log sector and blueprint
         Vector3i sector = original.getSector(new Vector3i());
-        ModPlayground.broadcastMessage("spawning at: " + transform.origin);
         String originalBlueprint = original.blueprintIdentifier;
 
         //create outline = loaded but not yet spawned entity
@@ -122,7 +121,7 @@ public class StationHelper {
             scOutline = BluePrintController.active.loadBluePrint(
                     GameServerState.instance,
                     newBlueprint, //catalog entry name
-                    "replacer boy" + newBlueprint, //ship name
+                    newBlueprint, //ship name
                     transform, //transform position
                     -1, //credits to spend
                     original.getFactionId(), //faction ID

@@ -7,7 +7,7 @@
   "client_mod": false,
   "server_mod": false,
   "main_class": "me.iron.npccontrol.ModMain",
-  "smd_resource_id": 13,
+  "smd_resource_id": 123456789,
   "dependencies": [
     -1
   ],

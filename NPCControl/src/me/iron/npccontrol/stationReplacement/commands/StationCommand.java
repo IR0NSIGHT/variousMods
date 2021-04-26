@@ -63,7 +63,7 @@ public class StationCommand implements CommandInterface {
                 String blueprintName = arguments[1];
                 int factionID = tryParseInt(arguments[2]);
                 if (factionID == 0) {
-                    PlayerUtils.sendMessage(sender,  arguments[3] + " is not a valid faction ID.");
+                    PlayerUtils.sendMessage(sender,  factionID + " is not a valid faction ID.");
                     return false;
                 }
 
@@ -114,11 +114,16 @@ public class StationCommand implements CommandInterface {
                     PlayerUtils.sendMessage(sender,  factionID + " does not have a replacer.");
                     return false;
                 }
-                String s = "Faction " + factionID + " manages stations: \n";
+                String s = "Faction " + factionID;
+                if (GameServerState.instance.getFactionManager().getFaction(factionID) != null) {
+                    s += " " + GameServerState.instance.getFactionManager().getFaction(factionID).getName();
+                }
+                s += " manages stations: \n";
                 for (Map.Entry<String, String> iterator: replacer.getManagedStations().entrySet()) {
                     s += iterator.getKey() + " || " + iterator.getValue() + "\n";
                 }
                 PlayerUtils.sendMessage(sender,  s);
+                return true;
             }
         }
 
@@ -188,12 +193,12 @@ public class StationCommand implements CommandInterface {
         }
 
         //station add_replacer -1 || remove_replacer
-        if (arguments.length == 3) {
+        if (arguments.length == 2) {
             String action = arguments[0];
-            int factionID = tryParseInt(arguments[2]);
+            int factionID = tryParseInt(arguments[1]);
 
             if (factionID == 0) {
-                PlayerUtils.sendMessage(sender,  "invalid faction id given:" + arguments[2]);
+                PlayerUtils.sendMessage(sender,  "invalid faction id given:" + factionID);
                 return false;
             }
 

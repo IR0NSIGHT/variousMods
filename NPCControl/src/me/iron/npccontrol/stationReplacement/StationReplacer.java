@@ -1,7 +1,6 @@
 package me.iron.npccontrol.stationReplacement;
 
 import api.DebugFile;
-import api.ModPlayground;
 import api.listener.Listener;
 import api.listener.events.entity.SegmentControllerInstantiateEvent;
 import api.mod.StarLoader;
@@ -9,9 +8,10 @@ import api.mod.config.PersistentObjectUtil;
 import me.iron.npccontrol.ModMain;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SpaceStation;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+
+//TODO automatic cleaing fully deleted UIDs from "managed stations"
 
 /**
  * STARMADE MOD
@@ -180,8 +180,17 @@ public class StationReplacer {
      * @param UID
      * @return
      */
-    public boolean isManaged(String UID) {
-        return (managedStations.get(UID)==null);
+    public String getManaged(String UID) {
+        return managedStations.get(UID);
+    }
+
+    /**
+     * test if a blueprint is listed for this repalcers allowed blueprints.
+     * @param blueprintName
+     * @return
+     */
+    public boolean existsInList(String blueprintName) {
+        return (this.replacementBlueprints.contains(blueprintName));
     }
 
     /**
@@ -220,13 +229,9 @@ public class StationReplacer {
 
         //sort out already managed, up to date stations
         //fall through: unmanaged stations, managed stations with a blueprint that isn't in the list anymore
-        String stationsBP = managedStations.get(station.getUniqueIdentifier());
-        if (stationsBP != null) {
-            DebugFile.log("station " + station.getRealName() + "is in managed list");
-            if (replacementBlueprints.contains(stationsBP)) {
-                DebugFile.log("stations blueprint is up to date.");
-                return;
-            }
+        String stationBlueprintName = getManaged(station.getUniqueIdentifier());
+        if (stationBlueprintName != null && existsInList(stationBlueprintName)) {
+            DebugFile.log("station " + station.getRealName() + "is in managed list with known blueprint");
             return;
         }
 
@@ -241,7 +246,7 @@ public class StationReplacer {
         //delete old docking system turrets that are not registered in sc.getDockedOnThis
         //TODO make safer method
         String stationUID = station.getUniqueIdentifier();
-        managedStations.put(stationUID,"uwu");
+        managedStations.put(stationUID,"vanilla spawned");
         stationUID = stationUID.replace("ENTITY_SPACESTATION_","");
         DebugFile.log("delete pirate ships by UID: " + stationUID);
         StationHelper.deleteByName(stationUID,station.getSector(new Vector3i()), factionID);
@@ -254,7 +259,6 @@ public class StationReplacer {
         //write to persistence map
         managedStations.put(newStation.getUniqueIdentifier(),newBlueprint);
         DebugFile.log("adding " + newStation.getRealName() + " to managed stations");
-        ModPlayground.broadcastMessage("station " + stationUID + " was replaced with " + newStation.getRealName());
     }
 
     /**
