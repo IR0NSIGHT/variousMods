@@ -30,10 +30,18 @@ public class StationReplacer {
         replacerList.put(replacer.factionID,replacer);
     }
 
+    /**
+     * removes a factions replacer from the list of active replacers.
+     * @param factionID
+     */
     public static void removeFromList(int factionID) {
         replacerList.remove(factionID);
     }
 
+    /**
+     * returns value copy of the list of active replacer objects.
+     * @return
+     */
     public static HashMap<Integer,StationReplacer> getList() {
         HashMap<Integer, StationReplacer> map = new HashMap<>(replacerList);
         return map;
@@ -70,23 +78,106 @@ public class StationReplacer {
             }
         },ModMain.instance);
     }
+
+    /**
+     * gets rid of all saves that dont have a loaded counterpart ingame (used when server is shutting down to kill obsolete replacers)
+     */
+    private static void clearOldSaves() {
+        ArrayList<Object> containers = new ArrayList<>();
+        containers.addAll(PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class));
+        for (Object obj: containers) {
+            StationFactionContainer container = (StationFactionContainer) obj;
+            //find old saves that dont exist in game anymore and double entries.
+            if (StationReplacer.replacerList.get(container.factionID) == null) {
+                DebugFile.log("[DELETE] killing obsolete replacer: " + container.toString());
+                PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),container);
+            }
+        }
+    }
+
+    /**
+     * removes double entries with the same faction ID from the permanent data
+     */
+    private static void removeDoubleSaves() {
+        ArrayList<Object> containers = new ArrayList<>();
+        containers.addAll(PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class));
+        ArrayList<Integer> blackList = new ArrayList<>();
+        for (Object obj: containers) {
+            StationFactionContainer container = (StationFactionContainer) obj;
+            //find old saves that dont exist in game anymore and double entries.
+            if (blackList.contains(container.factionID)) {
+                PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),container);
+                continue;
+            }
+            blackList.add(container.factionID);
+        }
+    }
+
+    /**
+     * saves all existing replacers to persisntent data
+     */
+    public static void savePersistentAll() {
+        clearOldSaves();
+        removeDoubleSaves();
+        //--------------------------------------------------------------
+        for (StationReplacer replacer: replacerList.values()) {
+            replacer.savePersistent();
+        }
+    }
+
+    /**
+     * replaces all replacers with new, loaded ones from persistnent data
+     */
+    public static void loadPersistentAll() {
+        removeDoubleSaves();
+        ArrayList<Object> l1 = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),Object.class);
+        ArrayList<Object> containers = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class);
+        for (Object container: containers) {
+            StationFactionContainer dataContainer = (StationFactionContainer) container;
+            StationReplacer replacer = StationReplacer.replacerList.get(dataContainer.factionID);
+            if (replacer == null) {
+                replacer = new StationReplacer(dataContainer.factionID);
+            }
+            replacer.loadPersistent(dataContainer.factionID);
+        }
+    }
     //----------------------------- non static stuff
 
     public int factionID;
 
+    /**
+     * list of available replacement blueprints for this faction. names of the entries in catalogmanager.
+     */
     private ArrayList<String> replacementBlueprints = new ArrayList<String>();
 
     //stores stations that were replaced, to avoid double replacement operations
     //stores UID vs blueprint of station
     private HashMap<String,String> managedStations = new HashMap<>();
 
+    /**
+     * add this station to the replacers list of managed stations, citing its construction blueprint (for future updates).
+     * will stop the replacer in the future from touching that station.
+     * @param station
+     * @param blueprint
+     */
     public void addToManaged(SpaceStation station, String blueprint) {
         managedStations.put(station.getUniqueIdentifier(),blueprint);
     }
 
+    /**
+     * test if the given station UID is listed as an already replaced station.
+     * @param UID
+     * @return
+     */
     public boolean isManaged(String UID) {
         return (managedStations.get(UID)==null);
     }
+
+    /**
+     * construct a replacer for this faction. adds it to the static map for listening, saving, loading.
+     * Does not contain any replacement blueprints by default.
+     * @param factionID
+     */
     public StationReplacer(int factionID) {
         this.factionID = factionID;
         replacerList.put(factionID,this);
@@ -100,8 +191,6 @@ public class StationReplacer {
     public String GetRandomBlueprint() {
         return replacementBlueprints.get((int) (Math.random() * replacementBlueprints.size()));
     }
-
-
 
     /**
      * fires if a segmentcontroller of that faction is instantiated.
@@ -134,7 +223,7 @@ public class StationReplacer {
         String newBlueprint = GetRandomBlueprint();
 
         //test if blueprint exists
-        if (!NPCStationReplacer.isValidBlueprint(newBlueprint)) {
+        if (!StationHelper.isValidBlueprint(newBlueprint)) {
             return;
         }
 
@@ -144,12 +233,12 @@ public class StationReplacer {
         managedStations.put(stationUID,"uwu");
         stationUID = stationUID.replace("ENTITY_SPACESTATION_","");
         DebugFile.log("delete pirate ships by UID: " + stationUID);
-        NPCStationReplacer.deleteByName(stationUID,station.getSector(new Vector3i()), factionID);
+        StationHelper.deleteByName(stationUID,station.getSector(new Vector3i()), factionID);
         //delete new system docks
-        NPCStationReplacer.deleteDocked(station);
+        StationHelper.deleteDocked(station);
 
         //create new station
-        SpaceStation newStation = NPCStationReplacer.replaceFromBlueprint(station,newBlueprint);
+        SpaceStation newStation = StationHelper.replaceFromBlueprint(station,newBlueprint);
 
         //write to persistence map
         managedStations.put(newStation.getUniqueIdentifier(),newBlueprint);
@@ -158,58 +247,8 @@ public class StationReplacer {
     }
 
     /**
-     * gets rid of all saves that dont have a loaded counterpart ingame (used when server is shutting down to kill obsolete replacers)
+     * saves this instance of replacer to persistent data
      */
-    private static void clearOldSaves() {
-        ArrayList<Object> containers = new ArrayList<>();
-        containers.addAll(PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class));
-        for (Object obj: containers) {
-            StationFactionContainer container = (StationFactionContainer) obj;
-            //find old saves that dont exist in game anymore and double entries.
-            if (StationReplacer.replacerList.get(container.factionID) == null) {
-                DebugFile.log("[DELETE] killing obsolete replacer: " + container.toString());
-                PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),container);
-            }
-        }
-    }
-    private static void removeDoubleSaves() {
-        ArrayList<Object> containers = new ArrayList<>();
-        containers.addAll(PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class));
-        ArrayList<Integer> blackList = new ArrayList<>();
-        for (Object obj: containers) {
-            StationFactionContainer container = (StationFactionContainer) obj;
-            //find old saves that dont exist in game anymore and double entries.
-            if (blackList.contains(container.factionID)) {
-                PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),container);
-                continue;
-            }
-            blackList.add(container.factionID);
-        }
-    }
-
-    public static void savePersistentAll() {
-        clearOldSaves();
-        removeDoubleSaves();
-        //--------------------------------------------------------------
-        for (StationReplacer replacer: replacerList.values()) {
-            replacer.savePersistent();
-        }
-    }
-
-    public static void loadPersistentAll() {
-        removeDoubleSaves();
-        ArrayList<Object> l1 = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),Object.class);
-        ArrayList<Object> containers = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class);
-        for (Object container: containers) {
-            StationFactionContainer dataContainer = (StationFactionContainer) container;
-            StationReplacer replacer = StationReplacer.replacerList.get(dataContainer.factionID);
-            if (replacer == null) {
-                replacer = new StationReplacer(dataContainer.factionID);
-            }
-            replacer.loadPersistent(dataContainer.factionID);
-        }
-    }
-
     public void savePersistent() {
         DebugFile.log("[SAVE] stationreplacer for: " + factionID);
         //get container
@@ -240,6 +279,10 @@ public class StationReplacer {
         PersistentObjectUtil.save(ModMain.instance.getSkeleton());
     }
 
+    /**
+     * loads + overwrites managed stations and replacementblueprints into this instance.
+     * @param factionID
+     */
     public void loadPersistent(int factionID) {
         //get container
         StationFactionContainer myContainer = null, iteratorContainer;
@@ -287,6 +330,10 @@ public class StationReplacer {
         return true;
     }
 
+    /**
+     * get list of available blueprints
+     * @return
+     */
     public ArrayList<String> getBlueprints() {
         ArrayList<String> list = new ArrayList<>();
         list.addAll(replacementBlueprints);

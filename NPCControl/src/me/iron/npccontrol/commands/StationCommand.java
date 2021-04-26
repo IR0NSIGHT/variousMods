@@ -4,7 +4,7 @@ import api.mod.StarMod;
 import api.utils.game.PlayerUtils;
 import api.utils.game.chat.CommandInterface;
 import me.iron.npccontrol.ModMain;
-import me.iron.npccontrol.NPCStationReplacer;
+import me.iron.npccontrol.StationHelper;
 import me.iron.npccontrol.StationReplacer;
 import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.data.player.PlayerState;
@@ -65,7 +65,7 @@ public class StationCommand implements CommandInterface {
                 }
 
                 //test blueprint validity
-                if (!NPCStationReplacer.isValidBlueprint(blueprintName)) {
+                if (!StationHelper.isValidBlueprint(blueprintName)) {
                     PlayerUtils.sendMessage(sender,  blueprintName + " is not a valid blueprint in the catalogmanager.");
 
                     return false;
@@ -238,7 +238,7 @@ public class StationCommand implements CommandInterface {
         if (arguments.length == 2 && arguments[0].equalsIgnoreCase("replace")) {
             String blueprint = arguments[1];
 
-            if (!NPCStationReplacer.isValidBlueprint(blueprint)) {
+            if (!StationHelper.isValidBlueprint(blueprint)) {
                 PlayerUtils.sendMessage(sender,  "Not a valid blueprint");
                 return false;
             }
@@ -255,7 +255,7 @@ public class StationCommand implements CommandInterface {
                 return false;
             }
 
-            SpaceStation spaceStation = NPCStationReplacer.replaceFromBlueprint(station,blueprint);
+            SpaceStation spaceStation = StationHelper.replaceFromBlueprint(station,blueprint);
             if (spaceStation == null) {
                 return false;
             }

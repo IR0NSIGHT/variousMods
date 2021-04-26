@@ -31,7 +31,6 @@ public class ModMain extends StarMod {
     public void onDisable() {
         super.onDisable();
         StationReplacer.savePersistentAll();
-    //    PersistenceManager.SaveStrains();
     }
 
     @Override
@@ -43,7 +42,6 @@ public class ModMain extends StarMod {
     public void onServerCreated(ServerInitializeEvent event) {
         super.onServerCreated(event);
         StationReplacer.deployListener();
-        Debugger.addChatListener();
     }
 
     @Override
