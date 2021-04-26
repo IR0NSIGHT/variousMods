@@ -11,6 +11,7 @@ import java.util.HashMap;
  * TIME: 20:50
  */
 public class StationFactionContainer implements Serializable {
+    ArrayList<String> replacementBlueprints;
     HashMap<String,String> stations;
     int factionID;
 }

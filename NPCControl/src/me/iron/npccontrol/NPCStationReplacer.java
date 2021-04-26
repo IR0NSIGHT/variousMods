@@ -313,6 +313,10 @@ public class NPCStationReplacer {
         return original;
     }
 
+    /**
+     * deletes new-system docked entities. doesnt work for old docked.
+     * @param entity
+     */
     public static void deleteDocked(SegmentController entity) {
         List<RailRelation> next = entity.railController.next;
         for (RailRelation railRelation : next) {
@@ -320,10 +324,9 @@ public class NPCStationReplacer {
 
             //recurse
             deleteDocked(dockedEntity);
+            dockedEntity.markForPermanentDelete(true);
+            dockedEntity.setMarkedForDeleteVolatile(true);
         }
-        entity.markForPermanentDelete(true);
-        entity.setMarkedForDeleteVolatile(true);
-        entity.setMarkedForDeletePermanentIncludingDocks(true);
     }
 
     /**
@@ -368,6 +371,7 @@ public class NPCStationReplacer {
      * @return
      */
     public static SpaceStation replaceFromBlueprint(SpaceStation original, String newBlueprint) {
+        DebugFile.log("replacing " + original.getName() + " with " + newBlueprint);
         //get transform = worldposition wrapper
         Transform transform = new Transform();
         transform.setIdentity();
@@ -385,7 +389,7 @@ public class NPCStationReplacer {
             scOutline = BluePrintController.active.loadBluePrint(
                     GameServerState.instance,
                     newBlueprint, //catalog entry name
-                    original.getRealName(), //ship name
+                    "replacer boy" + newBlueprint, //ship name
                     transform, //transform position
                     -1, //credits to spend
                     original.getFactionId(), //faction ID
@@ -435,14 +439,14 @@ public class NPCStationReplacer {
             }
         }
         newStation.blueprintIdentifier = originalBlueprint;
-        final SpaceStation s = newStation;
-        new StarRunnable() {
-            @Override
-            public void run() {
-                s.warpTransformable(0,0,0, true, null);
-                ModPlayground.broadcastMessage("station blueprint: " + s.blueprintIdentifier);
-            }
-        }.runLater(ModMain.instance,10);
+    //    final SpaceStation s = newStation;
+    //    new StarRunnable() {
+    //        @Override
+    //        public void run() {
+    //            s.warpTransformable(0,0,0, true, null);
+    //            ModPlayground.broadcastMessage("station blueprint: " + s.blueprintIdentifier);
+    //        }
+    //    }.runLater(ModMain.instance,10);
         return newStation;
     }
 

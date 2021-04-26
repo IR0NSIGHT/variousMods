@@ -44,7 +44,6 @@ public class ModMain extends StarMod {
         super.onServerCreated(event);
         StationReplacer.deployListener();
         Debugger.addChatListener();
-
     }
 
     @Override

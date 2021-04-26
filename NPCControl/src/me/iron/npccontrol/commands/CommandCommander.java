@@ -2,7 +2,6 @@ package me.iron.npccontrol.commands;
 
 import api.DebugFile;
 import api.mod.StarLoader;
-import api.utils.game.chat.commands.HelpCommand;
 
 /**
  * STARMADE MOD
@@ -13,6 +12,6 @@ import api.utils.game.chat.commands.HelpCommand;
 public class CommandCommander {
     public static void init() {
         DebugFile.log("command commander init");
-        StarLoader.registerCommand(new PirateCommand());
+        StarLoader.registerCommand(new StationCommand());
     }
 }

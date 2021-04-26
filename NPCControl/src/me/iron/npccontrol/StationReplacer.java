@@ -19,22 +19,79 @@ import java.util.HashMap;
  * TIME: 20:23
  */
 public class StationReplacer {
-    public static HashMap<Integer,StationReplacer> replacerList = new HashMap<>();
+    private static boolean hasListener = false;
+    private static HashMap<Integer,StationReplacer> replacerList = new HashMap<>();
+    public static ArrayList<StationReplacer> allReplacersDEBUG = new ArrayList<>();
+    public static StationReplacer getFromList(int factionID) {
+        return replacerList.get(factionID);
+    }
+
+    public static void addToList(StationReplacer replacer) {
+        replacerList.put(replacer.factionID,replacer);
+    }
+
+    public static void removeFromList(int factionID) {
+        replacerList.remove(factionID);
+    }
+
+    public static HashMap<Integer,StationReplacer> getList() {
+        HashMap<Integer, StationReplacer> map = new HashMap<>(replacerList);
+        return map;
+    }
+
+    /**
+     * creates a listener that will replace any pirate station upon loading the station with a random available blueprint, if it wasnt already replaced. replace stations get saved persistently.
+     */
+    public static void deployListener() {
+        if (hasListener) {
+            return;
+        }
+        DebugFile.log("deploying instantiation listener for StationReplacer.class");
+        StarLoader.registerListener(SegmentControllerInstantiateEvent.class, new Listener<SegmentControllerInstantiateEvent>() {
+            @Override
+            public void onEvent(SegmentControllerInstantiateEvent event) {
+            if (!event.isServer()) {
+                return;
+            }
+            if (!(event.getController() instanceof SpaceStation)) {
+                return;
+            }
+            String name = " idk some bullshit probably ";
+            if (event.getController() != null && event.getController().getName() != null) {
+                name = event.getController().getName();
+            }
+            DebugFile.log("firing onInstantiaton method for replacers for " + event.getController().getName());
+
+          for (StationReplacer replacer: StationReplacer.replacerList.values()) {
+              if (replacer.factionID == event.getController().getFactionId()) {
+                  replacer.onInstantiation(event);
+              }
+          }
+            }
+        },ModMain.instance);
+    }
+    //----------------------------- non static stuff
 
     public int factionID;
 
-    public StationReplacer(int factionID) {
-        this.factionID = factionID;
-        replacerList.put(factionID,this);
-    }
-
-    private ArrayList<String> replacementBlueprints = new ArrayList<String>(){{
-        add("UwU Station");
-    }};
+    private ArrayList<String> replacementBlueprints = new ArrayList<String>();
 
     //stores stations that were replaced, to avoid double replacement operations
     //stores UID vs blueprint of station
     private HashMap<String,String> managedStations = new HashMap<>();
+
+    public void addToManaged(SpaceStation station, String blueprint) {
+        managedStations.put(station.getUniqueIdentifier(),blueprint);
+    }
+
+    public boolean isManaged(String UID) {
+        return (managedStations.get(UID)==null);
+    }
+    public StationReplacer(int factionID) {
+        this.factionID = factionID;
+        replacerList.put(factionID,this);
+        allReplacersDEBUG.add(this);
+    }
 
     /**
      * gets random string of available pirate stations.
@@ -44,38 +101,32 @@ public class StationReplacer {
         return replacementBlueprints.get((int) (Math.random() * replacementBlueprints.size()));
     }
 
+
+
     /**
-     * creates a listener that will replace any pirate station upon loading the station with a random available blueprint, if it wasnt already replaced. replace stations get saved persistently.
+     * fires if a segmentcontroller of that faction is instantiated.
+     * @param event
      */
-    public static void deployListener() {
-        StarLoader.registerListener(SegmentControllerInstantiateEvent.class, new Listener<SegmentControllerInstantiateEvent>() {
-            @Override
-            public void onEvent(SegmentControllerInstantiateEvent event) {
-            if (!event.isServer()) {
-                return;
-            }
-
-            for (StationReplacer replacer: StationReplacer.replacerList.values()) {
-                replacer.onInstantiation(event);
-            }
-            }
-        },ModMain.instance);
-    }
-
     public void onInstantiation(SegmentControllerInstantiateEvent event) {
-        //sort out non-stations and non-pirates
-        if (!(event.getController() instanceof SpaceStation) || (event.getController().getFaction() == null) || ((event.getController().getFaction() != null && event.getController().getFactionId() != factionID))) {
+        if (event.getController() == null) {
             return;
         }
 
-        ModPlayground.broadcastMessage("Instantiation: " + event.getController().getName() + " of pirate: " + event.getController().getFactionId());
+        //sort out non-stations and unwanted faction
+        if (!(event.getController() instanceof SpaceStation) || (event.getController().getFaction() == null) || ((event.getController().getFaction() != null && event.getController().getFactionId() != factionID))) {
+            return;
+        }
         SpaceStation station = (SpaceStation) event.getController();
-        DebugFile.log("Pirate station: UID: " + station.getUniqueIdentifier());
 
         //sort out already managed, up to date stations
         //fall through: unmanaged stations, managed stations with a blueprint that isn't in the list anymore
-        String stationsBP =managedStations.get(station.getUniqueIdentifier());
-        if (stationsBP != null && replacementBlueprints.contains(stationsBP)) {
+        String stationsBP = managedStations.get(station.getUniqueIdentifier());
+        if (stationsBP != null) {
+            DebugFile.log("station " + station.getRealName() + "is in managed list");
+            if (replacementBlueprints.contains(stationsBP)) {
+                DebugFile.log("stations blueprint is up to date.");
+                return;
+            }
             return;
         }
 
@@ -90,18 +141,37 @@ public class StationReplacer {
         //delete old docking system turrets that are not registered in sc.getDockedOnThis
         //TODO make safer method
         String stationUID = station.getUniqueIdentifier();
+        managedStations.put(stationUID,"uwu");
         stationUID = stationUID.replace("ENTITY_SPACESTATION_","");
         DebugFile.log("delete pirate ships by UID: " + stationUID);
         NPCStationReplacer.deleteByName(stationUID,station.getSector(new Vector3i()), factionID);
+        //delete new system docks
+        NPCStationReplacer.deleteDocked(station);
 
         //create new station
         SpaceStation newStation = NPCStationReplacer.replaceFromBlueprint(station,newBlueprint);
 
-
         //write to persistence map
         managedStations.put(newStation.getUniqueIdentifier(),newBlueprint);
+        DebugFile.log("adding " + newStation.getRealName() + " to managed stations");
+        ModPlayground.broadcastMessage("station " + stationUID + " was replaced with " + newStation.getRealName());
     }
 
+    /**
+     * gets rid of all saves that dont have a loaded counterpart ingame (used when server is shutting down to kill obsolete replacers)
+     */
+    private static void clearOldSaves() {
+        ArrayList<Object> containers = new ArrayList<>();
+        containers.addAll(PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class));
+        for (Object obj: containers) {
+            StationFactionContainer container = (StationFactionContainer) obj;
+            //find old saves that dont exist in game anymore and double entries.
+            if (StationReplacer.replacerList.get(container.factionID) == null) {
+                DebugFile.log("[DELETE] killing obsolete replacer: " + container.toString());
+                PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),container);
+            }
+        }
+    }
     private static void removeDoubleSaves() {
         ArrayList<Object> containers = new ArrayList<>();
         containers.addAll(PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class));
@@ -109,8 +179,8 @@ public class StationReplacer {
         for (Object obj: containers) {
             StationFactionContainer container = (StationFactionContainer) obj;
             //find old saves that dont exist in game anymore and double entries.
-            if (StationReplacer.replacerList.get(container.factionID) == null || blackList.contains(container.factionID)) {
-                PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),obj);
+            if (blackList.contains(container.factionID)) {
+                PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),container);
                 continue;
             }
             blackList.add(container.factionID);
@@ -118,8 +188,8 @@ public class StationReplacer {
     }
 
     public static void savePersistentAll() {
+        clearOldSaves();
         removeDoubleSaves();
-
         //--------------------------------------------------------------
         for (StationReplacer replacer: replacerList.values()) {
             replacer.savePersistent();
@@ -128,9 +198,8 @@ public class StationReplacer {
 
     public static void loadPersistentAll() {
         removeDoubleSaves();
-
+        ArrayList<Object> l1 = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),Object.class);
         ArrayList<Object> containers = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class);
-
         for (Object container: containers) {
             StationFactionContainer dataContainer = (StationFactionContainer) container;
             StationReplacer replacer = StationReplacer.replacerList.get(dataContainer.factionID);
@@ -142,10 +211,12 @@ public class StationReplacer {
     }
 
     public void savePersistent() {
+        DebugFile.log("[SAVE] stationreplacer for: " + factionID);
         //get container
-        StationFactionContainer myContainer = null;
+        StationFactionContainer myContainer = null, iteratorContainer = null;
+
         ArrayList<Object> containers = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class);
-        StationFactionContainer iteratorContainer = null;
+
         for (Object x : containers) { //TODO autocast whole arraylist
             iteratorContainer = (StationFactionContainer) x;
             if (iteratorContainer.factionID == factionID) {
@@ -163,6 +234,7 @@ public class StationReplacer {
         //write data
         myContainer.factionID = factionID;
         myContainer.stations = managedStations;
+        myContainer.replacementBlueprints = replacementBlueprints;
 
         //save
         PersistentObjectUtil.save(ModMain.instance.getSkeleton());
@@ -170,9 +242,8 @@ public class StationReplacer {
 
     public void loadPersistent(int factionID) {
         //get container
-        StationFactionContainer myContainer = null;
+        StationFactionContainer myContainer = null, iteratorContainer;
         ArrayList<Object> containers = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class);
-        StationFactionContainer iteratorContainer = null;
         for (Object x : containers) { //TODO autocast whole arraylist
             iteratorContainer = (StationFactionContainer) x;
             if (iteratorContainer.factionID == factionID) {
@@ -186,6 +257,8 @@ public class StationReplacer {
         }
 
         managedStations = myContainer.stations;
+        replacementBlueprints = myContainer.replacementBlueprints;
+
     }
 
     /**

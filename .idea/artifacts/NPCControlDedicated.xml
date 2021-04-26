@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="NPCControlDedicated">
+    <output-path>$USER_HOME$/Desktop/Starmade/server testarea/dedicated starmade/StarMade/mods</output-path>
+    <root id="archive" name="NPCControl.jar">
+      <element id="module-output" name="NPCControl" />
+    </root>
+  </artifact>
+</component>
