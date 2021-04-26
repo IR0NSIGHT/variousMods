@@ -1,4 +1,4 @@
-package me.iron.npccontrol.commands;
+package me.iron.npccontrol.stationReplacement.commands;
 
 import api.DebugFile;
 import api.mod.StarLoader;

@@ -1,17 +1,20 @@
-package me.iron.npccontrol.commands;
+package me.iron.npccontrol.stationReplacement.commands;
 
 import api.mod.StarMod;
 import api.utils.game.PlayerUtils;
 import api.utils.game.chat.CommandInterface;
 import me.iron.npccontrol.ModMain;
-import me.iron.npccontrol.StationHelper;
-import me.iron.npccontrol.StationReplacer;
+import me.iron.npccontrol.stationReplacement.StationHelper;
+import me.iron.npccontrol.stationReplacement.StationReplacer;
+import org.apache.commons.collections4.iterators.EntrySetMapIterator;
 import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.server.data.GameServerState;
 import org.schema.schine.network.objects.Sendable;
 
 import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * STARMADE MOD
@@ -103,6 +106,20 @@ public class StationCommand implements CommandInterface {
                 return true;
             }
 
+            //station list -1 -s
+            if (arguments[0].equalsIgnoreCase("list") && arguments[2].equalsIgnoreCase("-s")) {
+                int factionID = tryParseInt(arguments[1]);
+                StationReplacer replacer = StationReplacer.getFromList(factionID);
+                if (replacer == null) {
+                    PlayerUtils.sendMessage(sender,  factionID + " does not have a replacer.");
+                    return false;
+                }
+                String s = "Faction " + factionID + " manages stations: \n";
+                for (Map.Entry<String, String> iterator: replacer.getManagedStations().entrySet()) {
+                    s += iterator.getKey() + " || " + iterator.getValue() + "\n";
+                }
+                PlayerUtils.sendMessage(sender,  s);
+            }
         }
 
         //station list -1

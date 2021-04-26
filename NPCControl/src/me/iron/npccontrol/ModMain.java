@@ -4,7 +4,9 @@ import api.DebugFile;
 import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
 import api.mod.StarMod;
-import me.iron.npccontrol.commands.CommandCommander;
+import me.iron.npccontrol.stationReplacement.*;
+import me.iron.npccontrol.stationReplacement.commands.CommandCommander;
+
 
 /**
  * STARMADE MOD
@@ -23,7 +25,7 @@ public class ModMain extends StarMod {
     public void onEnable() {
         super.onEnable();
         StationReplacer.loadPersistentAll(); //load persistent data for pirates
-        CommandCommander.init(); //admin command adding
+        CommandCommander.init();
         DebugFile.log("npc tester was activated");
     }
 

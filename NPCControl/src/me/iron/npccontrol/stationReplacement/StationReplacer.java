@@ -1,4 +1,4 @@
-package me.iron.npccontrol;
+package me.iron.npccontrol.stationReplacement;
 
 import api.DebugFile;
 import api.ModPlayground;
@@ -6,6 +6,7 @@ import api.listener.Listener;
 import api.listener.events.entity.SegmentControllerInstantiateEvent;
 import api.mod.StarLoader;
 import api.mod.config.PersistentObjectUtil;
+import me.iron.npccontrol.ModMain;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SpaceStation;
 
@@ -76,7 +77,7 @@ public class StationReplacer {
               }
           }
             }
-        },ModMain.instance);
+        }, ModMain.instance);
     }
 
     /**
@@ -117,6 +118,7 @@ public class StationReplacer {
      * saves all existing replacers to persisntent data
      */
     public static void savePersistentAll() {
+        DebugFile.log("attempting to save all replacers to POU.");
         clearOldSaves();
         removeDoubleSaves();
         //--------------------------------------------------------------
@@ -129,6 +131,7 @@ public class StationReplacer {
      * replaces all replacers with new, loaded ones from persistnent data
      */
     public static void loadPersistentAll() {
+        DebugFile.log("attempting to load station replacers from persistent data");
         removeDoubleSaves();
         ArrayList<Object> l1 = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),Object.class);
         ArrayList<Object> containers = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(),StationFactionContainer.class);
@@ -153,6 +156,14 @@ public class StationReplacer {
     //stores stations that were replaced, to avoid double replacement operations
     //stores UID vs blueprint of station
     private HashMap<String,String> managedStations = new HashMap<>();
+
+    /**
+     * get value copy of managed stations: UID vs blueprintname
+     * @return
+     */
+    public HashMap<String,String> getManagedStations() {
+        return new HashMap<>(managedStations);
+    }
 
     /**
      * add this station to the replacers list of managed stations, citing its construction blueprint (for future updates).
@@ -277,6 +288,7 @@ public class StationReplacer {
 
         //save
         PersistentObjectUtil.save(ModMain.instance.getSkeleton());
+        DebugFile.log("saved station replacer for " + factionID + " to POU");
     }
 
     /**
@@ -301,7 +313,7 @@ public class StationReplacer {
 
         managedStations = myContainer.stations;
         replacementBlueprints = myContainer.replacementBlueprints;
-
+        DebugFile.log("Loaded station replacer for " + factionID + " from POU");
     }
 
     /**

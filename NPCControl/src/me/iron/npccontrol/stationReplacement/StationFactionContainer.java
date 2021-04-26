@@ -1,4 +1,4 @@
-package me.iron.npccontrol;
+package me.iron.npccontrol.stationReplacement;
 
 import java.io.Serializable;
 import java.util.ArrayList;
