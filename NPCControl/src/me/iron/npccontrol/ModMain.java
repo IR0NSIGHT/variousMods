@@ -3,9 +3,11 @@ package me.iron.npccontrol;
 import api.DebugFile;
 import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
+import api.mod.StarLoader;
 import api.mod.StarMod;
 import me.iron.npccontrol.stationReplacement.*;
 import me.iron.npccontrol.stationReplacement.commands.CommandCommander;
+import org.junit.Test;
 
 
 /**
@@ -25,7 +27,9 @@ public class ModMain extends StarMod {
     public void onEnable() {
         super.onEnable();
         DebugFile.log("on enable",this);
-        CommandCommander.init();
+        //debug
+        StarLoader.registerCommand(new TestCommand());
+        //CommandCommander.init();
     }
 
     @Override
@@ -45,6 +49,8 @@ public class ModMain extends StarMod {
         DebugFile.log("server created",this);
         StationReplacer.loadPersistentAll(); //load persistent data for pirates
         StationReplacer.deployListener();
+        //Debug
+        CommandListener.addListener();
     }
 
     @Override

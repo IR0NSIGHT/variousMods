@@ -1,13 +1,13 @@
 {
   "name": "NPCControl",
   "author": "IR0NSIGHT",
-  "description": "testplatform",
-  "version": "0.0.1",
-  "starmade_version": "0.202.108",
+  "description": "testplatform updated",
+  "version": "0.1",
+  "starmade_version": "0.202.110",
   "client_mod": false,
   "server_mod": false,
   "main_class": "me.iron.npccontrol.ModMain",
-  "smd_resource_id": 123456789,
+  "smd_resource_id": 8258,
   "dependencies": [
     -1
   ],
