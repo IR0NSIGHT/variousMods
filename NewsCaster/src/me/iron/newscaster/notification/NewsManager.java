@@ -28,7 +28,13 @@ public class NewsManager {
      */
     public static int addInfo(GenericInfo info) {
         //DebugFile.log("addInfo: " + info.getNewscast());
+        if (newsStorage.size() >= 50) {
+            for(int i = 0; i < newsStorage.size() - 50; i++) {
+                newsStorage.remove(0);
+            }
+        }
         newsStorage.add(info);
+        Broadcaster.queueAdd(info);
         return newsStorage.size(); //add to end of list => size = index
     }
 

@@ -144,12 +144,16 @@ public class ListenerManager {
                 if (sc.getMassWithDocks() < massLimits.get("creationLower") || sc.getFaction().isNPC()) {
                     return;
                 }
+                if (!sc.isFullyLoadedWithDock()) {
+                    return;
+                }
                 DebugFile.log("delayed log running for " + sc.getName());
                 ShipObject ship = new ShipObject(sc);
                 ShipCreatedInfo report = new ShipCreatedInfo(ship, sc.getSector(new Vector3i()));
                 NewsManager.addInfo(report);
+                cancel();
             }
-        }.runLater(ModMain.instance,10);
+        }.runTimer(ModMain.instance,50);
     }
 
     /**

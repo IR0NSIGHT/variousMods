@@ -1,18 +1,23 @@
 package me.iron.newscaster.notification;
 
 import api.DebugFile;
-import api.ModPlayground;
 import api.common.GameServer;
-import api.mod.StarLoader;
 import api.utils.StarRunnable;
 import me.iron.newscaster.ModMain;
 import me.iron.newscaster.notification.infoTypes.GenericInfo;
+import me.iron.newscaster.notification.infoTypes.ShipCreatedInfo;
 import me.iron.newscaster.notification.infoTypes.ShipDestroyedInfo;
+import me.iron.newscaster.notification.objectTypes.ShipObject;
 import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.server.data.Galaxy;
 import org.schema.game.server.data.GameServerState;
+import org.schema.schine.common.language.Lng;
+import org.schema.schine.network.RegisteredClientOnServer;
+import org.schema.schine.network.server.ServerMessage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * STARMADE MOD
@@ -24,8 +29,33 @@ public class Broadcaster {
     /**
      * time between broadcasts in millis
      */
-    public static int broadcastLoopTime;
+    public static int broadcastLoopTime = 1000*60*5;
+    public static int threshold = 5;
+    private static long lastBroadcast = System.currentTimeMillis() + 1000;
 
+    private static ArrayList<GenericInfo> queue = new ArrayList<>();
+    //removes and returns 0 idx (oldest) entry.
+    private static GenericInfo queueShift() {
+        return queue.remove(0);
+    }
+
+    /**
+     * adds info to queue. auto aborts on outdated info.
+     * @param info info object to add to queue
+     */
+    public static void queueAdd(GenericInfo info) {
+        if (queue.size() != 0 && queue.get(queue.size()-1).getTime() > info.getTime()) {
+            //only allow newer entries than newest.
+            return;
+        }
+        if(info.getTime() < lastBroadcast) {
+            //no events older than last broadcast.
+            return;
+        }
+        queue.add(info);
+
+
+    }
     /**
      * if true, system will automatically broadcast new events
      */
@@ -34,49 +64,64 @@ public class Broadcaster {
     /**
      * Initializes a loop that prints interesting news to the chat.
      */
-    public static void initBroadcastingCycle(int time) {
-        broadcastLoopTime = time;
+    public static void initBroadcastingCycle() {
         new StarRunnable() {
-            private long lastBroadcast = System.currentTimeMillis() + 30000;
-            private GenericInfo info;
             private boolean timeToBroadcast = true;
             @Override
             public void run() {
                 if (!autobroadcast) {
                     return;
                 }
-                //TODO bundle multiple events into one broadcast
-                //get latest event, broadcast to chat.
-                info = NewsManager.getInfo(-1);
-                if (info == null) {
-                    return;
-                }
-                assert info != null;
                 if (System.currentTimeMillis() > lastBroadcast + broadcastLoopTime) {
                     timeToBroadcast = true;
                 }
-                if (info.getTime() > lastBroadcast + broadcastLoopTime && timeToBroadcast) {
+                if (queue.size() >= threshold || timeToBroadcast) {
                     timeToBroadcast = false;
                     lastBroadcast = System.currentTimeMillis();
                     //was created after last broadcast.
-                    broadcastToChat(info);
+                    flushQueue();
                 }
             }
         }.runTimer(ModMain.instance, 10);
     }
 
-    public static void broadcastToChat(GenericInfo info) {
+    /**
+     * flushes broadcasters queue of events out to chat.
+     */
+    public static void flushQueue() {
+        //bundle events
+        int length = queue.size();
+        String s = "";
+        for (int i = 0; i<length; i++) {
+            s += broadcastToChat(queueShift()) + "\n";
+        }
+        if (s.equals("")) return;
+        s = "--------- ENN BREAKING NEWS ---------\n " + s +
+                "\n-------------------------------------\n";
+        sendToAll(s);
+    }
+
+    public static String broadcastToChat(GenericInfo info) {
         DebugFile.log("broadcasting message for event" + info.getTime());
         if (info instanceof ShipDestroyedInfo) {
             ShipDestroyedInfo dInfo = (ShipDestroyedInfo) info;
             if (dInfo.getAttacker().getFaction().equals("Pirates")) {
-                ModPlayground.broadcastMessage("Pirates claim yet another victim ("+dInfo.getShip().getMass()+"k) from ["+dInfo.getShip().getFaction()+"] in "+getSystemName(dInfo.getSector(),true)+"!");
-                return;
+                return "Pirates claim yet another victim ("+dInfo.getShip().getMass()+"k) from ["+dInfo.getShip().getFaction()+"] in "+getSystemName(dInfo.getSector(),true)+"!";
+
             }
-            ModPlayground.broadcastMessage("["+dInfo.getShip().getFaction() + "] lost a " + dInfo.getShip().getMass() + "k ship to [" + dInfo.getAttacker().getFaction()+"] in "+getSystemName(dInfo.getSector(),true)+".");
-            return;
+            return("["+dInfo.getShip().getFaction() + "] lost a " + dInfo.getShip().getMass() + "k ship to [" + dInfo.getAttacker().getFaction()+"] in "+getSystemName(dInfo.getSector(),true)+".");
         }
-        ModPlayground.broadcastMessage(info.getNewscast(),false);
+        if (info instanceof ShipCreatedInfo) {
+            ShipCreatedInfo sinfo = (ShipCreatedInfo) info;
+            ShipObject s = sinfo.getShip();
+            if (sinfo.getShip().getFaction().equals("Pirates") || s.getFaction().equals("")) {
+
+            }
+            String string = "["+s.getFaction()+"] has deployed a "+getShipType(s.getMass())+" (" + s.getMass() + "k) in " + getSystemName(sinfo.getSector(),true);
+            return(string            );
+
+        }
+        return(info.getNewscast());
     }
 
     /**
@@ -106,5 +151,23 @@ public class Broadcaster {
             ex.printStackTrace();
         }
         return "unknown system";
+    }
+
+    public static String getShipType(int mass) {
+        if(mass <=  15) return "Fast Attack Craft";
+        if(mass <=  30) return "Escort";
+        if(mass <=  50) return "Corvette";
+        if(mass <= 100) return "Frigate";
+        if(mass <= 200) return "Destroyer";
+        if(mass <= 300) return "Cruiser";
+        if(mass <= 500) return "Battleship";
+        return "Titan";
+    }
+
+    private static void sendToAll(String mssg) {
+        for(RegisteredClientOnServer client : GameServerState.instance.getClients().values()) {
+            PlayerState player = GameServerState.instance.getPlayerStatesByName().get(client.getPlayerName());
+            player.sendServerMessage(Lng.astr(mssg),ServerMessage.MESSAGE_TYPE_SIMPLE);
+        }
     }
 }

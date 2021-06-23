@@ -41,7 +41,7 @@ public class ModMain extends StarMod {
         new ListenerManager();
         DebugChatListener.addListener();
         NewsManager.loadFromPersistenUtil();
-        Broadcaster.initBroadcastingCycle(1000 * 30);
+        Broadcaster.initBroadcastingCycle();
     }
 
     @Override

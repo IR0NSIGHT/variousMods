@@ -2,7 +2,7 @@
   "name": "NewsCaster",
   "author": "IR0NSIGHT",
   "description": "Automated newscasting",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "starmade_version": "0.202.110",
   "client_mod": false,
   "server_mod": false,

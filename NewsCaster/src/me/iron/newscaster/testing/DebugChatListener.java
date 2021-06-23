@@ -13,6 +13,10 @@ import me.iron.newscaster.notification.infoTypes.EntityInfo;
 import me.iron.newscaster.notification.infoTypes.GenericInfo;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.server.data.GameServerState;
+import org.schema.schine.common.language.Lng;
+import org.schema.schine.network.server.ServerMessage;
+
+import java.util.Arrays;
 
 /**
  * STARMADE MOD
@@ -40,24 +44,45 @@ public class DebugChatListener {
                     ModPlayground.broadcastMessage("listing all news:");
                     for (GenericInfo info: NewsManager.getNewsStorage()) {
                         String report = info.getNewscast();
-                        ModPlayground.broadcastMessage(info.getNewscast() + "systemname:" + Broadcaster.getSystemName(info.getSector(),true));
-                    //    ModPlayground.broadcastMessage();
+                        sender.sendServerMessage(Lng.astr(info.getNewscast() + "systemname:" + Broadcaster.getSystemName(info.getSector(),true)), 0);
                         DebugFile.log(info.getNewscast());
                     }
+                    return;
                 }
                 if (playerChatEvent.getText().contains("!news save")) {
+                    sender.sendServerMessage(Lng.astr("saving news."),0);
                     NewsManager.saveToPersistenUtil();
+                    return;
                 }
                 if (playerChatEvent.getText().contains("!news load")) {
-                    ModPlayground.broadcastMessage("loading news from persistent data, overwriting runtime list");
+                    sender.sendServerMessage(Lng.astr("loading news from persistent data, overwriting runtime list"),0);
                     NewsManager.loadFromPersistenUtil();
+                    return;
                 }
                 if (playerChatEvent.getText().contains("!news clean")) {
-                    ModPlayground.broadcastMessage("deleting all news, persistent and runtime");
+                    sender.sendServerMessage(Lng.astr("deleting all news, persistent and runtime"),0);
                     //TODO make confirmation input necessary
                     NewsManager.cleanPersistentInfo();
+                    return;
                 }
-                //TODO allow selecting specific info
+                if (playerChatEvent.getText().contains("!news flush")) {
+                    Broadcaster.flushQueue();
+                    return;
+                }
+                if (playerChatEvent.getText().contains("!news info")) {
+                    sender.sendServerMessage(Lng.astr(NewsManager.getNewsStorage().size() + " news in storage. \n" +
+                            " news cycle for broadcasting: " + Broadcaster.broadcastLoopTime/1000 + " seconds. \n" +
+                            " threshold causing autoflush: " + Broadcaster.threshold
+                    ),0);
+                    return;
+                }
+                if (playerChatEvent.getText().contains("!news")) {
+                    String[] s = new String[]{"!news all","!news clean","!news save","!news load","!news flush","!news info"};
+                    sender.sendServerMessage(Lng.astr("unrecognized command. Available commands are: "+ Arrays.toString(s)),0);
+                    return;
+                }
+
+                //TODO interface for auto broadcasting
             }
         }, ModMain.instance);
     }
