@@ -132,6 +132,10 @@ public class ListenerManager {
         }, ModMain.instance);
     }
 
+    /**
+     * queues SC for creation of report, to give game time to fully initialize SC on spawning.
+     * @param sc
+     */
     private void QueueForCreationReport(final SegmentController sc) {
         DebugFile.log("queued segmentcontroller for creation report");
         new StarRunnable() {
@@ -147,6 +151,7 @@ public class ListenerManager {
             }
         }.runLater(ModMain.instance,10);
     }
+
     /**
      * will overheat any docked entities.
      * @param sc mothership
@@ -172,6 +177,7 @@ public class ListenerManager {
         }
     }
 
+    //TODO export me into my own mod
     public static void forceOverheatSC(SegmentController sc) {
         if ((sc.getHpController() == null)) {
             return;

@@ -22,6 +22,9 @@ import java.util.TimeZone;
 public class EntityInfo extends GenericInfo {
     //who (this fleetmember)
     ShipObject ship;
+    public ShipObject getShip() {
+        return ship;
+    };
 
     public EntityInfo(ShipObject ship, EventType event, Vector3i sector) {
         super(sector,event);

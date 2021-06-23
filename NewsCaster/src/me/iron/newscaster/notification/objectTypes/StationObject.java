@@ -7,4 +7,5 @@ package me.iron.newscaster.notification.objectTypes;
  * TIME: 15:59
  */
 public class StationObject {
+    //TODO log station events too
 }

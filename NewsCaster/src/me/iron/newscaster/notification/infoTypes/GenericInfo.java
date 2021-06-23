@@ -1,6 +1,7 @@
 package me.iron.newscaster.notification.infoTypes;
 
 import me.iron.newscaster.notification.objectTypes.ShipObject;
+import org.lwjgl.util.vector.Vector;
 import org.schema.common.util.linAlg.Vector3i;
 
 import java.text.SimpleDateFormat;
@@ -53,6 +54,12 @@ public class GenericInfo {
         return time;
     }
 
+    /**
+     * @return sector of event
+     */
+    public Vector3i getSector() {
+        return sector;
+    }
     /**
      * creates humanely readable string.
      * @return string

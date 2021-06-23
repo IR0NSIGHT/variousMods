@@ -4,6 +4,7 @@ import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
 import api.mod.StarMod;
 import me.iron.newscaster.eventListening.ListenerManager;
+import me.iron.newscaster.notification.Broadcaster;
 import me.iron.newscaster.notification.NewsManager;
 import me.iron.newscaster.testing.DebugChatListener;
 
@@ -40,6 +41,7 @@ public class ModMain extends StarMod {
         new ListenerManager();
         DebugChatListener.addListener();
         NewsManager.loadFromPersistenUtil();
+        Broadcaster.initBroadcastingCycle(1000 * 30);
     }
 
     @Override

@@ -32,7 +32,18 @@ public class NewsManager {
         return newsStorage.size(); //add to end of list => size = index
     }
 
+    /**
+     * returns info at index. use -1 for last entry.
+     * @param index
+     * @return
+     */
     public static GenericInfo getInfo(int index) {
+        if (index == -1) {
+            if (newsStorage.isEmpty()) {
+                return null;
+            }
+            index = newsStorage.size()-1;
+        }
         try {
             return newsStorage.get(index);
         } catch (IndexOutOfBoundsException ex) {

@@ -15,6 +15,9 @@ public class ShipDestroyedInfo extends EntityInfo {
         this.attacker = attacker;
     }
     private ShipObject attacker;
+    public ShipObject getAttacker() {
+        return attacker;
+    }
 
     @Override
     public String getNewscast() {
