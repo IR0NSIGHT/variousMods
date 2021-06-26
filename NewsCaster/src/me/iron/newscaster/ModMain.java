@@ -4,11 +4,9 @@ import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
 import api.mod.StarMod;
 import me.iron.newscaster.eventListening.ListenerManager;
-import me.iron.newscaster.notification.Broadcaster;
-import me.iron.newscaster.notification.NewsManager;
+import me.iron.newscaster.notification.broadcasting.Broadcaster;
+import me.iron.newscaster.notification.infoGeneration.NewsManager;
 import me.iron.newscaster.testing.DebugChatListener;
-
-import java.security.ProtectionDomain;
 
 /**
  * STARMADE MOD
@@ -41,7 +39,7 @@ public class ModMain extends StarMod {
         new ListenerManager();
         DebugChatListener.addListener();
         NewsManager.loadFromPersistenUtil();
-        Broadcaster.initBroadcastingCycle();
+        Broadcaster.init();
     }
 
     @Override

@@ -1,9 +1,9 @@
 package me.iron.newscaster.testing;
 
-import me.iron.newscaster.notification.infoTypes.EntityInfo;
-import me.iron.newscaster.notification.infoTypes.ShipCreatedInfo;
-import me.iron.newscaster.notification.infoTypes.ShipDestroyedInfo;
-import me.iron.newscaster.notification.objectTypes.ShipObject;
+import me.iron.newscaster.notification.infoGeneration.infoTypes.EntityInfo;
+import me.iron.newscaster.notification.infoGeneration.infoTypes.ShipCreatedInfo;
+import me.iron.newscaster.notification.infoGeneration.infoTypes.ShipDestroyedInfo;
+import me.iron.newscaster.notification.infoGeneration.objectTypes.ShipObject;
 import org.schema.common.util.linAlg.Vector3i;
 
 /**

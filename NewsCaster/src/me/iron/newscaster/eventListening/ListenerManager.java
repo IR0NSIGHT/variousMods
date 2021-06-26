@@ -11,17 +11,15 @@ import api.DebugFile;
 import api.listener.Listener;
 import api.listener.events.entity.SegmentControllerOverheatEvent;
 import api.listener.events.entity.SegmentControllerSpawnEvent;
-import api.listener.events.entity.SegmentHitByProjectileEvent;
 import api.listener.events.faction.FactionRelationChangeEvent;
 import api.listener.events.faction.SystemClaimEvent;
 import api.mod.StarLoader;
 import api.utils.StarRunnable;
 import me.iron.newscaster.*;
-import me.iron.newscaster.notification.NewsManager;
-import me.iron.newscaster.notification.infoTypes.FactionRelationInfo;
-import me.iron.newscaster.notification.infoTypes.ShipCreatedInfo;
-import me.iron.newscaster.notification.infoTypes.ShipDestroyedInfo;
-import me.iron.newscaster.notification.objectTypes.ShipObject;
+import me.iron.newscaster.notification.infoGeneration.NewsManager;
+import me.iron.newscaster.notification.infoGeneration.infoTypes.*;
+import me.iron.newscaster.notification.infoGeneration.objectTypes.FactionObject;
+import me.iron.newscaster.notification.infoGeneration.objectTypes.ShipObject;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.SegmentControllerHpController;
@@ -32,9 +30,8 @@ import org.schema.game.common.controller.rails.RailRelation;
 import org.schema.game.common.data.ManagedSegmentController;
 import org.schema.game.common.data.player.PlayerControlledTransformableNotFound;
 import org.schema.game.common.data.player.PlayerState;
-import org.schema.game.common.data.player.faction.Faction;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
-import org.schema.game.mod.Mod;
+import org.schema.game.server.data.GameServerState;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +45,23 @@ public class ListenerManager {
         put("destructionLower",2500);
         put("creationLower",2500);
     }};
+
+    private static int info_ship_minMass;
+    private static boolean info_threshold ;
+    private static boolean info_log_ship_destruct;
+    private static boolean info_log_ship_spawn;
+    private static boolean info_log_faction_relationchange;
+    private static boolean info_log_faction_systemclaim;
+
+    public static void updateFromConfig() {
+        info_ship_minMass                      = configManager.getValue("info_ship_minMass");
+        info_threshold                         = configManager.getValue("info_threshold")==1;
+        info_log_ship_destruct                 = configManager.getValue("info_log_ship_destruct")==1;
+        info_log_ship_spawn                    = configManager.getValue("info_log_ship_spawn")==1;
+        info_log_faction_relationchange        = configManager.getValue("info_log_faction_relationchange")==1;
+        info_log_faction_systemclaim           = configManager.getValue("info_log_faction_systemclaim")==1;
+    }
+
     /**
      * will create a new manager and auto create all relevant eventhandlers.
      */
@@ -61,7 +75,7 @@ public class ListenerManager {
         StarLoader.registerListener(SegmentControllerOverheatEvent.class, new Listener<SegmentControllerOverheatEvent>() {
             @Override
             public void onEvent(SegmentControllerOverheatEvent event) {
-                if (!event.isServer())
+                if (!event.isServer() || !info_log_ship_destruct)
                 {
                     return;
                 }
@@ -107,6 +121,7 @@ public class ListenerManager {
         StarLoader.registerListener(SegmentControllerSpawnEvent.class, new Listener<SegmentControllerSpawnEvent>() {
             @Override
             public void onEvent(SegmentControllerSpawnEvent event) {
+                if(!info_log_ship_spawn) return;
                 QueueForCreationReport(event.getController());
             }
         },ModMain.instance);
@@ -117,6 +132,7 @@ public class ListenerManager {
                 if (event.getTo().isNPC() && event.getFrom().isNPC()) {
                     return;//ignore npc spamming each other with peace offers.
                 }
+                if(!info_log_faction_relationchange) return;
                 FactionRelationInfo info = new FactionRelationInfo(event.getFrom(), event.getTo(),event.getOldRelation(),event.getNewRelation());
                 NewsManager.addInfo(info);
                 DebugFile.log("Faction relation change event: " + info.getNewscast());
@@ -127,7 +143,15 @@ public class ListenerManager {
         StarLoader.registerListener(SystemClaimEvent.class, new Listener<SystemClaimEvent>() {
             @Override
             public void onEvent(SystemClaimEvent event) {
-               
+                if(!info_log_faction_systemclaim || !event.isServer()) return;
+                //new faction = event.change.factionID
+                //old = event.change.intiator.getFaction
+                FactionObject newF = new FactionObject(event.getFaction());
+                PlayerState initiator = GameServerState.instance.getPlayerFromNameIgnoreCaseWOException(event.getOwnershipChange().initiator);
+                FactionObject oldF = new FactionObject(GameServerState.instance.getFactionManager().getFaction(initiator.getFactionId()));
+                GenericInfo.EventType type = newF.getFactionID()==oldF.getFactionID()? GenericInfo.EventType.SYSTEM_LOST:GenericInfo.EventType.SYSTEM_CONQUERED;
+                FactionSystemClaimInfo info = new FactionSystemClaimInfo(newF,oldF, type, event.getSystem().getPos());
+                NewsManager.addInfo(info);
             }
         }, ModMain.instance);
     }
