@@ -149,7 +149,7 @@ public class ListenerManager {
                 FactionObject newF = new FactionObject(event.getFaction());
                 PlayerState initiator = GameServerState.instance.getPlayerFromNameIgnoreCaseWOException(event.getOwnershipChange().initiator);
                 FactionObject oldF = new FactionObject(GameServerState.instance.getFactionManager().getFaction(initiator.getFactionId()));
-                GenericInfo.EventType type = newF.getFactionID()==oldF.getFactionID()? GenericInfo.EventType.SYSTEM_LOST:GenericInfo.EventType.SYSTEM_CONQUERED;
+                GenericInfo.EventType type = newF.getFactionID()!=oldF.getFactionID()? GenericInfo.EventType.SYSTEM_LOST:GenericInfo.EventType.SYSTEM_CONQUERED;
                 FactionSystemClaimInfo info = new FactionSystemClaimInfo(newF,oldF, type, event.getSystem().getPos());
                 NewsManager.addInfo(info);
             }

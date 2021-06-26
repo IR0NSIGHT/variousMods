@@ -4,6 +4,7 @@ import api.DebugFile;
 import api.utils.StarRunnable;
 import me.iron.newscaster.ModMain;
 import me.iron.newscaster.configManager;
+import me.iron.newscaster.notification.infoGeneration.infoTypes.FactionSystemClaimInfo;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.GenericInfo;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.ShipCreatedInfo;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.ShipDestroyedInfo;
@@ -184,6 +185,18 @@ public class Broadcaster {
             String string = "["+s.getFaction()+"] has deployed a "+getShipType(s.getMass())+" (" + s.getMass() + "k) in " + getSystemName(sinfo.getSector(),true);
             return(string            );
 
+        }
+        if (info.getType().equals(GenericInfo.EventType.SYSTEM_CONQUERED)) {
+            String s = "";
+            FactionSystemClaimInfo fInfo = (FactionSystemClaimInfo) info;
+            s += "[" + fInfo.getFaction().getFactionName() + "] has conquered " + getSystemName(fInfo.getSystem(),true);
+            return s;
+        }
+        if (info.getType().equals(GenericInfo.EventType.SYSTEM_LOST)) {
+            String s = "";
+            FactionSystemClaimInfo fInfo = (FactionSystemClaimInfo) info;
+            s += "[" + fInfo.getOldOwner().getFactionName() + "] no longer controls " + getSystemName(fInfo.getSystem(),true);
+            return s;
         }
         return(info.getNewscast());
     }

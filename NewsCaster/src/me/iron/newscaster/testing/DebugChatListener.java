@@ -76,15 +76,6 @@ public class DebugChatListener {
                     return;
                 }
 
-                if (playerChatEvent.getText().contains("!news config")) {
-                    String s = "CONFIG: \n";
-                    for (Map.Entry<String,Object> e: configManager.getAll().entrySet()) {
-                        s += e.getKey() + ": " + e.getValue().toString() + " \n";
-                    }
-                    sender.sendServerMessage(Lng.astr(s),0);
-                    return;
-                }
-
                 if (playerChatEvent.getText().contains("!news set ")) {
                     String input = playerChatEvent.getText().replace("!news set ","");
                     input = input.replace(" ","");
@@ -110,6 +101,21 @@ public class DebugChatListener {
                     sender.sendServerMessage(Lng.astr("set config value: " + vars[0]  +": " + configManager.getValue(vars[0])),0);
 
                     configManager.updateGameValues();
+                    return;
+                }
+
+                if (playerChatEvent.getText().contains("!news config default")) {
+                    configManager.resetDefault();
+                    sender.sendServerMessage(Lng.astr("set config to its default"),0);
+
+                }
+
+                if (playerChatEvent.getText().contains("!news config")) {
+                    String s = "CONFIG: \n";
+                    for (Map.Entry<String,Object> e: configManager.getAll().entrySet()) {
+                        s += e.getKey() + ": " + e.getValue().toString() + " \n";
+                    }
+                    sender.sendServerMessage(Lng.astr(s),0);
                     return;
                 }
 

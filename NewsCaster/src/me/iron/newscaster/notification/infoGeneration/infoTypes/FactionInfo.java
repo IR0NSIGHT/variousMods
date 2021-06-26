@@ -10,6 +10,10 @@ import org.schema.common.util.linAlg.Vector3i;
  * TIME: 20:01
  */
 public class FactionInfo extends GenericInfo {
+    public FactionObject getFaction() {
+        return faction;
+    }
+
     FactionObject faction;
     public FactionInfo(FactionObject faction, EventType type) {
         super(new Vector3i(), type);

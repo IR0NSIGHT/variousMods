@@ -44,6 +44,11 @@ public class GenericInfo {
         this.eventType = type;
         this.time = System.currentTimeMillis();
     }
+
+    public EventType getType() {
+        return eventType;
+    }
+
     /**
      * return timestamp of info creation.
      * @return

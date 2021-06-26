@@ -64,6 +64,17 @@ public class configManager {
         return config.getKeys().contains(path);
     }
 
+    /**
+     * resets config to default.
+     */
+    public static void resetDefault() {
+        for (String x: defaultConfig.get()) {
+            String[] xs = x.split(": ");
+            config.set(xs[0],Integer.parseInt(xs[1]));
+        };
+        config.saveConfig();
+        updateGameValues();
+    }
     public static void updateGameValues() {
         Broadcaster.updateFromConfig();
         ListenerManager.updateFromConfig();
