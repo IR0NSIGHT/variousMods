@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PVE_rand">
+    <output-path>$PROJECT_DIR$/out/artifacts/PVE_rand</output-path>
+    <root id="archive" name="PVE_rand.jar">
+      <element id="module-output" name="PVE_rand" />
+    </root>
+  </artifact>
+</component>
