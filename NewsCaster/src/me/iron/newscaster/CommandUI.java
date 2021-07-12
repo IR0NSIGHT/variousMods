@@ -1,4 +1,4 @@
-package me.iron.newscaster.testing;
+package me.iron.newscaster;
 
 import api.DebugFile;
 import api.ModPlayground;
@@ -13,6 +13,7 @@ import me.iron.newscaster.notification.infoGeneration.infoTypes.GenericInfo;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.server.data.GameServerState;
 import org.schema.schine.common.language.Lng;
+import org.schema.schine.network.server.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.Map;
 /**
  * debug stuff like printing the newsStorage into the chat, runs 100% serverside
  */
-public class DebugChatListener {
+public class CommandUI {
     public static void addListener() {
         StarLoader.registerListener(PlayerChatEvent.class, new Listener<PlayerChatEvent>() {
             @Override
@@ -40,26 +41,26 @@ public class DebugChatListener {
                     return;
                 }
                 if (playerChatEvent.getText().contains("!news all")) {
-                    ModPlayground.broadcastMessage("listing all news:");
+                    sendMssg(sender,"listing all news:");
                     for (GenericInfo info: NewsManager.getNewsStorage()) {
                         String report = info.getNewscast();
-                        sender.sendServerMessage(Lng.astr(info.getNewscast() + "systemname:" + Broadcaster.getSystemName(info.getSector(),true)), 0);
+                        sendMssg(sender,info.getNewscast() + "systemname:" + Broadcaster.getSystemName(info.getSector(),true));
                         DebugFile.log(info.getNewscast());
                     }
                     return;
                 }
                 if (playerChatEvent.getText().contains("!news save")) {
-                    sender.sendServerMessage(Lng.astr("saving news."),0);
+                    sendMssg(sender,"saving news.");
                     NewsManager.saveToPersistenUtil();
                     return;
                 }
                 if (playerChatEvent.getText().contains("!news load")) {
-                    sender.sendServerMessage(Lng.astr("loading news from persistent data, overwriting runtime list"),0);
+                    sendMssg(sender,"loading news from persistent data, overwriting runtime list");
                     NewsManager.loadFromPersistenUtil();
                     return;
                 }
                 if (playerChatEvent.getText().contains("!news clean")) {
-                    sender.sendServerMessage(Lng.astr("deleting all news, persistent and runtime"),0);
+                    sendMssg(sender,"deleting all news, persistent and runtime");
                     //TODO make confirmation input necessary
                     NewsManager.cleanPersistentInfo();
                     return;
@@ -69,10 +70,10 @@ public class DebugChatListener {
                     return;
                 }
                 if (playerChatEvent.getText().contains("!news info")) {
-                    sender.sendServerMessage(Lng.astr(NewsManager.getNewsStorage().size() + " news in storage. \n" +
+                    sendMssg(sender,NewsManager.getNewsStorage().size() + " news in storage. \n" +
                             " news cycle for broadcasting: " + Broadcaster.broadcastLoopTime/1000 + " seconds. \n" +
                             " threshold causing autoflush: " + Broadcaster.threshold
-                    ),0);
+                    );
                     return;
                 }
 
@@ -82,23 +83,23 @@ public class DebugChatListener {
                     String[] vars = input.split(":");
                     String s = " setting config value: "; //TODO implement
                     if(vars.length != 2) {
-                        sender.sendServerMessage(Lng.astr("invalid input, expects: path: value"),0);
+                        sendMssg(sender,"invalid input, expects: path: value");
                         return;
                     }
                     //test if valid entry
                     if (!configManager.exists(vars[0])) {
-                        sender.sendServerMessage(Lng.astr("invalid input, entry does not exist."),0);
+                        sendMssg(sender,"invalid input, entry does not exist.");
                         return;
                     }
                     int value;
                     try {
                         value = Integer.parseInt(vars[1]);
                     } catch (NumberFormatException ex) {
-                        sender.sendServerMessage(Lng.astr("invalid input, value has to be an integer."),0);
+                        sendMssg(sender,"invalid input, value has to be an integer.");
                         return;
                     }
                     configManager.setValue(vars[0],value);
-                    sender.sendServerMessage(Lng.astr("set config value: " + vars[0]  +": " + configManager.getValue(vars[0])),0);
+                    sendMssg(sender,"set config value: " + vars[0]  +": " + configManager.getValue(vars[0]));
 
                     configManager.updateGameValues();
                     return;
@@ -106,7 +107,7 @@ public class DebugChatListener {
 
                 if (playerChatEvent.getText().contains("!news config default")) {
                     configManager.resetDefault();
-                    sender.sendServerMessage(Lng.astr("set config to its default"),0);
+                    sendMssg(sender,"set config to its default");
 
                 }
 
@@ -115,18 +116,21 @@ public class DebugChatListener {
                     for (Map.Entry<String,Object> e: configManager.getAll().entrySet()) {
                         s += e.getKey() + ": " + e.getValue().toString() + " \n";
                     }
-                    sender.sendServerMessage(Lng.astr(s),0);
+                    sendMssg(sender,s);
                     return;
                 }
 
                 if (playerChatEvent.getText().contains("!news")) {
                     String[] s = new String[]{"!news all","!news clean","!news save","!news load","!news flush","!news info","!news config","!news set"};
-                    sender.sendServerMessage(Lng.astr("unrecognized command. Available commands are: "+ Arrays.toString(s)),0);
+                    sendMssg(sender,"unrecognized command. Available commands are: "+ Arrays.toString(s));
                     return;
                 }
 
 
             }
         }, ModMain.instance);
+    }
+    public static void sendMssg(PlayerState receiver,String mssg) {
+        receiver.sendServerMessage(new ServerMessage(Lng.astr(mssg), ServerMessage.MESSAGE_TYPE_SIMPLE, receiver.getId()));
     }
 }

@@ -1,6 +1,7 @@
 package me.iron.newscaster.notification.infoGeneration.objectTypes;
 
 import api.common.GameServer;
+import org.luaj.vm2.ast.Str;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.data.ManagedSegmentController;
 import org.schema.game.common.data.player.faction.Faction;

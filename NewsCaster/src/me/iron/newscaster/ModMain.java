@@ -6,7 +6,6 @@ import api.mod.StarMod;
 import me.iron.newscaster.eventListening.ListenerManager;
 import me.iron.newscaster.notification.broadcasting.Broadcaster;
 import me.iron.newscaster.notification.infoGeneration.NewsManager;
-import me.iron.newscaster.testing.DebugChatListener;
 
 /**
  * STARMADE MOD
@@ -37,7 +36,7 @@ public class ModMain extends StarMod {
     public void onServerCreated(ServerInitializeEvent event) {
         super.onServerCreated(event);
         new ListenerManager();
-        DebugChatListener.addListener();
+        CommandUI.addListener();
         NewsManager.loadFromPersistenUtil();
         Broadcaster.init();
     }

@@ -1,5 +1,6 @@
-package me.iron.pve_rand.Action;
+package me.iron.pve_rand.Action.checks;
 
+import me.iron.pve_rand.Action.CustomAction;
 import org.schema.common.util.linAlg.Vector3i;
 
 import java.io.Serializable;
@@ -19,7 +20,7 @@ public class BooleanAction extends CustomAction implements Serializable {
         super(argument, description);
     }
 
-    public boolean test() {
+    public boolean test(Vector3i sector) {
         return false;
     }
 

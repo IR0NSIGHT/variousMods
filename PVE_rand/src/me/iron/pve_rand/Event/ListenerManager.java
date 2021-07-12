@@ -1,10 +1,13 @@
-package me.iron.pve_rand;
+package me.iron.pve_rand.Event;
 
 import api.DebugFile;
 import api.listener.Listener;
 import api.listener.events.entity.SegmentControllerFullyLoadedEvent;
 import api.listener.events.entity.SegmentControllerOverheatEvent;
+import api.listener.events.entity.SegmentControllerSpawnEvent;
 import api.mod.StarLoader;
+import me.iron.pve_rand.Action.ActionController;
+import me.iron.pve_rand.ModMain;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SegmentController;
 
@@ -18,6 +21,7 @@ public class ListenerManager {
     public static void init() {
         addLoadListener();
         addOverheatListener();
+        addSpawnListener();
     }
 
     //event type 01
@@ -26,17 +30,14 @@ public class ListenerManager {
             @Override
             public void onEvent(SegmentControllerFullyLoadedEvent event) {
                 if (!event.isServer()) return;
+                if (event.getController().isDocked()) return;
+
                 int condition = 0x01000000;
                 SegmentController loaded = event.getController();
-                int type = ActionController.getShipType(loaded);
-                //debug
-
-                if (type == 0) return;
-                condition |= type;
+                condition = ActionController.addShipInfo(loaded,condition);
                 ActionController.fireEvent(condition, event.getController().getSector(new Vector3i()));
             }
-        },ModMain.instance);
-
+        }, ModMain.instance);
     }
 
     //event type 02
@@ -45,9 +46,30 @@ public class ListenerManager {
             @Override
             public void onEvent(SegmentControllerOverheatEvent event) {
                 if (!event.isServer()) return;
-                ActionController.fireEvent(0x020000FF, event.getEntity().getSector(new Vector3i()));
+                if (event.getEntity().isDocked()) return;
+                int condition = 0x02000000;
+                SegmentController loaded = event.getEntity();
+                condition = ActionController.addShipInfo(loaded,condition);
+
+                ActionController.fireEvent(condition, event.getEntity().getSector(new Vector3i()));
                 DebugFile.log("segmentcontroller is overheating.");
             }
         }, ModMain.instance);
+    }
+
+    //event type 03
+    //TODO is SCSpawnEvent the correct one?
+    private static void addSpawnListener() {
+        StarLoader.registerListener(SegmentControllerSpawnEvent.class, new Listener<SegmentControllerSpawnEvent>() {
+            @Override
+            public void onEvent(SegmentControllerSpawnEvent event) {
+                if (event.isServer()) return;
+                if (event.getController().isDocked()) return;
+
+                int cause = 0x03000000;
+                cause = ActionController.addShipInfo(event.getController(), cause);
+                ActionController.fireEvent(cause,event.getSector());
+            }
+        },ModMain.instance);
     }
 }

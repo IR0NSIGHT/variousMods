@@ -41,10 +41,6 @@ import java.util.List;
  * creates and destroyes them.
  */
 public class ListenerManager {
-    HashMap<String, Integer> massLimits = new HashMap<String, Integer>() {{
-        put("destructionLower",2500);
-        put("creationLower",2500);
-    }};
 
     private static int info_ship_minMass;
     private static boolean info_threshold ;
@@ -83,8 +79,8 @@ public class ListenerManager {
                 //make ship object
                 SegmentController ship = event.getEntity();
                 float mass = ship.getMassWithDocks();
-                float min = massLimits.get("destructionLower");
-                if (ship.getMassWithDocks() < massLimits.get("destructionLower")) {
+                float min = info_ship_minMass;
+                if (ship.getMassWithDocks() < info_ship_minMass) {
                     return;
                 }
 
@@ -165,13 +161,17 @@ public class ListenerManager {
         new StarRunnable() {
             @Override
             public void run() {
-                if (sc.getMassWithDocks() < massLimits.get("creationLower") || sc.getFaction().isNPC()) {
+                if (sc.getMassWithDocks() < info_ship_minMass || sc.getFaction().isNPC()) {
                     return;
                 }
                 if (!sc.isFullyLoadedWithDock()) {
                     return;
                 }
-                DebugFile.log("delayed log running for " + sc.getName());
+                if ((sc.getFaction() != null) && sc.getFaction().isNPC()) {
+                    cancel();
+                    return;
+                }
+            //    DebugFile.log("delayed log running for " + sc.getName());
                 ShipObject ship = new ShipObject(sc);
                 ShipCreatedInfo report = new ShipCreatedInfo(ship, sc.getSector(new Vector3i()));
                 NewsManager.addInfo(report);

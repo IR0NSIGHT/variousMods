@@ -2,6 +2,7 @@ package me.iron.newscaster.notification.broadcasting;
 
 import api.DebugFile;
 import api.utils.StarRunnable;
+import me.iron.newscaster.CommandUI;
 import me.iron.newscaster.ModMain;
 import me.iron.newscaster.configManager;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.FactionSystemClaimInfo;
@@ -250,10 +251,10 @@ public class Broadcaster {
      * sends string directly to all clients to display as simple chat message, no [SERVER] prefix or similar.
      * @param mssg
      */
-    private static void sendToAll(String mssg) {
+    private static void sendToAll(String mssg){
         for(RegisteredClientOnServer client : GameServerState.instance.getClients().values()) {
             PlayerState player = GameServerState.instance.getPlayerStatesByName().get(client.getPlayerName());
-            player.sendServerMessage(Lng.astr(mssg),ServerMessage.MESSAGE_TYPE_SIMPLE);
+            CommandUI.sendMssg(player,mssg);
         }
     }
 }

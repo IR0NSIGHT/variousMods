@@ -1,3 +1,5 @@
+package me.iron.pve_rand;
+
 import api.config.BlockConfig;
 import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
@@ -5,6 +7,8 @@ import api.mod.ModSkeleton;
 import api.mod.StarMod;
 import api.mod.config.FileConfiguration;
 import api.utils.particle.ModParticleUtil;
+import me.iron.pve_rand.Action.ActionController;
+import me.iron.pve_rand.Event.ListenerManager;
 import org.schema.schine.resource.ResourceLoader;
 
 import java.awt.image.BufferedImage;
@@ -43,6 +47,7 @@ public class ModMain extends StarMod {
     @Override
     public void onDisable() {
         super.onDisable();
+        ActionController.savePersistent();
     }
 
     @Override
@@ -53,6 +58,13 @@ public class ModMain extends StarMod {
     @Override
     public void onServerCreated(ServerInitializeEvent event) {
         super.onServerCreated(event);
+        ListenerManager.init();
+  //      ActionController.loadPersistent();
+        PlayerInterface.init();
+        ScriptTemplates.derelictGuardian();
+        ScriptTemplates.lostCargo();
+   //     ActionController.addDebugEvent();
+    //    ActionController.savePersistent();
     }
 
     @Override
