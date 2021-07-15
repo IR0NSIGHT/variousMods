@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/IRNMultiMod.iml" filepath="$PROJECT_DIR$/IRNMultiMod.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MiningStations/MiningStations.iml" filepath="$PROJECT_DIR$/MiningStations/MiningStations.iml" />
       <module fileurl="file://$PROJECT_DIR$/NewsCaster/NPCControl.iml" filepath="$PROJECT_DIR$/NewsCaster/NPCControl.iml" />
       <module fileurl="file://$PROJECT_DIR$/NewsCaster/NewsCaster.iml" filepath="$PROJECT_DIR$/NewsCaster/NewsCaster.iml" />
       <module fileurl="file://$PROJECT_DIR$/PVE_rand/PVE_rand.iml" filepath="$PROJECT_DIR$/PVE_rand/PVE_rand.iml" />

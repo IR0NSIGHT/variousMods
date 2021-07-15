@@ -1,13 +1,13 @@
 {
-  "name": "NewsCaster",
+  "name": "MiningStations",
   "author": "IR0NSIGHT",
-  "description": "Automated newscasting",
-  "version": "1.1.1",
+  "description": "Automated mining",
+  "version": "1.0.0",
   "starmade_version": "0.202.110",
   "client_mod": false,
   "server_mod": false,
-  "main_class": "me.iron.newscaster.ModMain",
-  "smd_resource_id": 8252,
+  "main_class": "me.iron.mining_stations.ModMain",
+  "smd_resource_id": 420420,
   "dependencies": [
     -1
   ],
