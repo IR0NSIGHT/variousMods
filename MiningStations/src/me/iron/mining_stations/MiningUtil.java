@@ -37,7 +37,7 @@ import java.util.Map;
  * TIME: 20:58
  */
 public class MiningUtil {
-    static int max_volume_per_crate = 10000; //TODO config
+    static int max_volume_per_crate = 1000; //TODO config
     static int passive_mining_bonus = 10; //multiplier for resources (on top of normal mining bonus)
 
     /**
@@ -127,7 +127,9 @@ public class MiningUtil {
             field.setAccessible(true);
             Object value = field.get(ecm);
             oreCounts = (int[]) value;
-        } catch (IllegalAccessException | NoSuchFieldException ex) {
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+        } catch (NoSuchFieldException ex) {
             ex.printStackTrace();
         }
 
@@ -244,10 +246,11 @@ public class MiningUtil {
             ((FloatingRock)roid).setTouched(true, false);
         }
 
-            //make invulnerable to weapon damage
+        //make invulnerable to weapon damage
         roid.setVulnerable(false);
-        //add to list that will cancle salvage events
-        StationManager.asteroids.add(roid.getUniqueIdentifier());
+
+        //unminable relies on StationManager salvage eventhandler and internal hashmap. added to map in registerAsteroid.
+
         //make immovable but allow rotating
         RigidBody rb = roid.getPhysicsObject();
         rb.setDamping(1.0f,rb.getAngularDamping());

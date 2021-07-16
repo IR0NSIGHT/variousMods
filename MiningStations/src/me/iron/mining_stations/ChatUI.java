@@ -48,13 +48,21 @@ public class ChatUI {
                 }
 
                 if (mssg.contains("list")) {
+                    boolean deep = false;
+                    if (mssg.contains("deep")) {
+                        deep = true;
+                    }
                     StringBuilder s = new StringBuilder("MINERS: \n");
                     for (String UID : StationManager.miners.keySet()) {
-                        s.append(UID).append("\n");
+                        if (deep) {
+                            s.append(StationManager.miners.get(UID).toString());
+                        } else {
+                            s.append(UID).append("\n");
+                        }
                     }
                     s.append("----------");
                     sendMssg(sender, s.toString());
-                    return;
+                    event.setCanceled(true); return;
                 }
 
                 if (mssg.contains("assign")) {
@@ -76,9 +84,20 @@ public class ChatUI {
                     } else {
                         sendMssg(sender,"could not assign roid.");
                     }
-                    return;
+                    event.setCanceled(true); return;
                 }
 
+                if (mssg.contains("save")) {
+                    StationManager.saveToPersistent();
+                    sendMssg(sender," saving to persistent data");
+                    event.setCanceled(true); return;
+                }
+
+                if (mssg.contains("load")) {
+                    StationManager.loadFromPersistent();
+                    sendMssg(sender," loading from persistent data");
+                    event.setCanceled(true); return;
+                }
                 //default expection
                 sendMssg(sender, "not a mining valid command");
             }

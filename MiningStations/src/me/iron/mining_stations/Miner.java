@@ -22,17 +22,17 @@ import java.util.List;
  */
 public class Miner implements Serializable {
 
-    public static int miner_update_time = 60 * 1000; //time for one mining cycle in millis //todo non static
+    public static int miner_update_time = 10 * 1000; //time for one mining cycle in millis //todo non static
 
     private String UID;
     public String roidUID; //registered asteroid
     private long roid_db_ID;
-    private List<Long> crates = new ArrayList<>();
+    private List<Long> crates = new ArrayList<Long>();
     private int maxCrates = 5;
     private int queuedCrates = 0;
     private String crateBlueprint = "cargo-crate-01";
     private long dbID = -1;
-    public ElementCountMap resources = new ElementCountMap();
+    transient public ElementCountMap resources;
 
     private transient long nextUpdate = 0;
     private transient SegmentController sc;
@@ -49,25 +49,42 @@ public class Miner implements Serializable {
      * will delete the old crates.
      */
     public void update() {
-        if (maxCrates > queuedCrates && !resources.isEmpty()) queuedCrates++;
-        SegmentController sc = GameServerState.instance.getSegmentControllersByName().get(UID);
+        ChatUI.sendAll("updating: " + toString());
+
+        //no asteroid, no need to update.
+        if (!hasAsteroid())
+            return;
+
+        //increment (potential) crates
+        if (maxCrates > queuedCrates) queuedCrates++;
+        //get rid of to many crates
         while (crates.size() > maxCrates) deleteOldest();
 
-        //unloaded?
-        if (sc == null || !sc.isFullyLoadedWithDock()) { //TODO figure out how long unloading takes on dedicated
+        //no resource map and unloaded roid => cant get resources, return
+        if (resources == null && GameServerState.instance.getSegmentControllersByName().get(roidUID)==null)
+            return;
+
+        //test if station and roid are loaded -> can spawn crates etc
+        SegmentController station = GameServerState.instance.getSegmentControllersByName().get(UID);
+        if (station == null || !station.isFullyLoadedWithDock()) { //TODO figure out how long unloading takes on dedicated
             ChatUI.sendAll("unloaded update: " + this.UID + " queued: " + queuedCrates);
             return;
         }
-        ChatUI.sendAll("updating: " + sc.getName() + " queued: " + queuedCrates);
-        if (roidUID == null) return;
         SegmentController roid = GameServerState.instance.getSegmentControllersByName().get(roidUID);
         if (roid == null || !roid.isFullyLoadedWithDock()) return; //TODO can this cause bugs?
+
+        //fill element map
+        if (resources == null)
+            resources = MiningUtil.getResources(roid,MiningUtil.passive_mining_bonus);
+        //TODO safeguards so resources == null after persistent load can be handled.
         if (hasAsteroid() && !allowedAsteroid(roid,false)) {
             ChatUI.sendAll("roid is invalid");
             unregisterAsteroid();
         }
+
         for (int i; queuedCrates > 0; queuedCrates--) {
-            MiningUtil.spawnCrate(this, sc.getSector(new Vector3i()));
+            if (resources.isEmpty()) break;
+            MiningUtil.spawnCrate(this, station.getSector(new Vector3i()));
         }
         if (hasAsteroid() && resources.isEmpty()) {
             unregisterAsteroid();
@@ -136,7 +153,7 @@ public class Miner implements Serializable {
         //test if allowed
         if (!allowedAsteroid(roid, true)) return false;
         //register globally
-        StationManager.asteroids.add(roid.getUniqueIdentifier());
+        StationManager.asteroids.put(roid.getUniqueIdentifier(),roid.dbId);
         //register locally
         this.roidUID = roid.getUniqueIdentifier();
         this.roid_db_ID = roid.dbId;
@@ -167,7 +184,7 @@ public class Miner implements Serializable {
             return false;
 
         //already registered
-        if (assign && StationManager.asteroids.contains(roid.getUniqueIdentifier()))
+        if (assign && StationManager.asteroids.get(roid.getUniqueIdentifier())!=null)
             return false;
 
         //miner already has another roid
@@ -198,5 +215,21 @@ public class Miner implements Serializable {
         if (sc == null)
             sc = GameServerState.instance.getSegmentControllersByName().get(UID);
         return sc;
+    }
+
+    @Override
+    public String toString() {
+        return "Miner{" +
+                "UID='" + UID + '\'' +
+                ", roidUID='" + roidUID + '\'' +
+                ", roid_db_ID=" + roid_db_ID +
+                ", crates=" + crates +
+                ", maxCrates=" + maxCrates +
+                ", queuedCrates=" + queuedCrates +
+                ", crateBlueprint='" + crateBlueprint + '\'' +
+                ", dbID=" + dbID +
+                ", resources=" + resources.getAmountListString() +
+                ", nextUpdate=" + nextUpdate +
+                '}';
     }
 }

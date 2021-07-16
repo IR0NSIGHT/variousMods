@@ -2,10 +2,10 @@ package me.iron.mining_stations;
 
 import api.DebugFile;
 import api.listener.Listener;
-import api.listener.events.block.SegmentPieceModifyEvent;
 import api.listener.events.block.SegmentPieceSalvageEvent;
 import api.listener.events.entity.SegmentControllerFullyLoadedEvent;
 import api.mod.StarLoader;
+import api.mod.config.PersistentObjectUtil;
 import org.lwjgl.Sys;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SegmentController;
@@ -14,9 +14,11 @@ import org.schema.game.common.controller.rails.RailRelation;
 import org.schema.game.common.data.world.StellarSystem;
 import org.schema.game.server.data.GameServerState;
 
+import javax.jdo.annotations.Persistent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * STARMADE MOD
@@ -25,8 +27,8 @@ import java.util.HashSet;
  * TIME: 14:40
  */
 public class StationManager {
-    static HashMap<String, Miner> miners = new HashMap<>();
-    static HashSet<String> asteroids = new HashSet<>();
+    static HashMap<String, Miner> miners = new HashMap<String, Miner>();
+    static HashMap<String,Long> asteroids = new HashMap<String,Long>();
     /**
      * initializes stationmanager. adds listener and update cycle
      */
@@ -48,7 +50,7 @@ public class StationManager {
             @Override
             public void onEvent(SegmentPieceSalvageEvent event) {
                 String hitUID = event.getBlockInternal().getSegmentController().getUniqueIdentifier();
-                if (asteroids.contains(hitUID)) event.setCanceled(true);
+                if (asteroids.get(hitUID)!=null) event.setCanceled(true);
                 SegmentController hitter = event.getSegmentController();
                 if (hitter.railController.isDocked()) {
                     RailRelation parent = hitter.railController.previous;
@@ -132,4 +134,48 @@ public class StationManager {
         return true;
     }
 
+    /**
+     * will load asteroids and miners from persistence.
+     */
+    static void loadFromPersistent() {
+        PersistentContainer container = getOrNewContainer();
+        miners.putAll(container.getMiners());
+        asteroids.putAll(container.getAsteroids());
+    }
+
+    /**
+     * gets first container object, will delete the rest of them.
+     * will create and add new one if needed
+     * @return
+     */
+    private static PersistentContainer getOrNewContainer() {
+        List containers = PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(), PersistentContainer.class);
+        PersistentContainer container;
+        if (containers.size() == 0) {
+            //make new container
+            container = new PersistentContainer();
+            PersistentObjectUtil.addObject(ModMain.instance.getSkeleton(),container);
+        } else {
+            container = (PersistentContainer) containers.get(0);
+        }
+        if (containers.size() > 1) {
+            //to many containers
+            for (int i = containers.size(); i > 1; i--) {
+                PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(), containers.get(i));
+            }
+            PersistentObjectUtil.save(ModMain.instance.getSkeleton());
+            assert  PersistentObjectUtil.getObjects(ModMain.instance.getSkeleton(), PersistentContainer.class).size() == 1;
+        }
+        return container;
+    }
+
+    /**
+     * will save asteroids and miners persistently.
+     */
+    static void saveToPersistent() {
+        PersistentContainer container = getOrNewContainer();
+        container.setAsteroids(asteroids);
+        container.setMiners(miners);
+        PersistentObjectUtil.save(ModMain.instance.getSkeleton());
+    }
 }
