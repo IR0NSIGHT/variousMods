@@ -34,11 +34,11 @@ public class CommandUI {
             @Override
             public void onEvent(PlayerChatEvent playerChatEvent) {
                 if (!playerChatEvent.isServer()) {
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
                 PlayerState sender = GameServerState.instance.getPlayerFromNameIgnoreCaseWOException(playerChatEvent.getMessage().sender);
                 if (sender == null || !sender.isAdmin()) {
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
                 if (playerChatEvent.getText().contains("!news all")) {
                     sendMssg(sender,"listing all news:");
@@ -47,34 +47,41 @@ public class CommandUI {
                         sendMssg(sender,info.getNewscast() + "systemname:" + Broadcaster.getSystemName(info.getSector(),true));
                         DebugFile.log(info.getNewscast());
                     }
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
                 if (playerChatEvent.getText().contains("!news save")) {
                     sendMssg(sender,"saving news.");
                     NewsManager.saveToPersistenUtil();
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
                 if (playerChatEvent.getText().contains("!news load")) {
                     sendMssg(sender,"loading news from persistent data, overwriting runtime list");
                     NewsManager.loadFromPersistenUtil();
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
                 if (playerChatEvent.getText().contains("!news clean")) {
-                    sendMssg(sender,"deleting all news, persistent and runtime");
-                    //TODO make confirmation input necessary
-                    NewsManager.cleanPersistentInfo();
-                    return;
+                    String mssg = playerChatEvent.getText().replace("!news clean","");
+                    String answer = "Deleting: ";
+                    if (mssg.contains("all")) {
+                        NewsManager.cleanPersistentInfo();
+                        answer+= "persistent info, ";
+                    }
+                    answer += "runtime info";
+                    NewsManager.cleanLoadedInfo();
+                    sendMssg(sender,answer);
+                    playerChatEvent.setCanceled(true);
+                    playerChatEvent.setCanceled(true);return;
                 }
                 if (playerChatEvent.getText().contains("!news flush")) {
                     Broadcaster.flushQueue();
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
                 if (playerChatEvent.getText().contains("!news info")) {
                     sendMssg(sender,NewsManager.getNewsStorage().size() + " news in storage. \n" +
                             " news cycle for broadcasting: " + Broadcaster.broadcastLoopTime/1000 + " seconds. \n" +
                             " threshold causing autoflush: " + Broadcaster.threshold
                     );
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
 
                 if (playerChatEvent.getText().contains("!news set ")) {
@@ -84,31 +91,32 @@ public class CommandUI {
                     String s = " setting config value: "; //TODO implement
                     if(vars.length != 2) {
                         sendMssg(sender,"invalid input, expects: path: value");
-                        return;
+                        playerChatEvent.setCanceled(true);return;
                     }
                     //test if valid entry
                     if (!configManager.exists(vars[0])) {
-                        sendMssg(sender,"invalid input, entry does not exist.");
-                        return;
+                        sendMssg(sender,"invalid input, entry does not exist. \n" +
+                                "Try setting config to default if an update brought new values.");
+                        playerChatEvent.setCanceled(true);return;
                     }
                     int value;
                     try {
                         value = Integer.parseInt(vars[1]);
                     } catch (NumberFormatException ex) {
                         sendMssg(sender,"invalid input, value has to be an integer.");
-                        return;
+                        playerChatEvent.setCanceled(true);return;
                     }
+                    sendMssg(sender,"setting config value: " + vars[0]  +": " + configManager.getValue(vars[0]));
                     configManager.setValue(vars[0],value);
-                    sendMssg(sender,"set config value: " + vars[0]  +": " + configManager.getValue(vars[0]));
 
                     configManager.updateGameValues();
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
 
                 if (playerChatEvent.getText().contains("!news config default")) {
                     configManager.resetDefault();
                     sendMssg(sender,"set config to its default");
-
+                    playerChatEvent.setCanceled(true);return;
                 }
 
                 if (playerChatEvent.getText().contains("!news config")) {
@@ -117,13 +125,13 @@ public class CommandUI {
                         s += e.getKey() + ": " + e.getValue().toString() + " \n";
                     }
                     sendMssg(sender,s);
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
 
                 if (playerChatEvent.getText().contains("!news")) {
-                    String[] s = new String[]{"!news all","!news clean","!news save","!news load","!news flush","!news info","!news config","!news set"};
+                    String[] s = new String[]{"!news all","!news clean (optional) all","!news save","!news load","!news flush","!news info","!news config default","!news config","!news set"};
                     sendMssg(sender,"unrecognized command. Available commands are: "+ Arrays.toString(s));
-                    return;
+                    playerChatEvent.setCanceled(true);return;
                 }
 
 

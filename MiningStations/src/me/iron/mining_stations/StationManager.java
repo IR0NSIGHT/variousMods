@@ -56,9 +56,13 @@ public class StationManager {
     static void removeMiner(String UID) {
         DebugFile.log("removing miner: "+UID);
         ChatUI.sendAll("removed " + UID);
+        Miner m = miners.get(UID);
+        m.unregisterAsteroid();
+        //TODO invoke deletion of crates
         miners.remove(UID);
     }
 
+    //TOdo pretty way to register miner (apart from chat command)0
     /**
      * attempt to make this segmentcontroller a passive miner.
      * @param sc segmentcontroller

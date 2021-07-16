@@ -23,7 +23,9 @@ public class defaultConfig {
             "info_log_ship_destruct             : 1",
             "info_log_ship_spawn                : 1",
             "info_log_faction_relationchange    : 1",
-            "info_log_faction_systemclaim       : 1"
+            "info_log_faction_systemclaim       : 1",
+            "info_save_persistent               : 0", //save to persistent at all
+            "info_save_timer                    : 30" //time between persistent saves in minutes
 
     };
     public static String[] get() {

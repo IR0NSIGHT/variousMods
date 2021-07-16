@@ -131,9 +131,9 @@ public class Miner implements Serializable {
      * will unregister and destroy the registered asteroid
      */
     public void unregisterAsteroid() {
+        if (roidUID == null || roid_db_ID == -1)  return;
         ChatUI.sendAll("removing roid for miner: " + UID);
         StationManager.asteroids.remove(roidUID);
-        if (roid_db_ID == -1) return;
         SegmentController roid = GameServerState.instance.getSegmentControllersByName().get(roidUID);
         if (roid != null) {
             roid.markForPermanentDelete(true);

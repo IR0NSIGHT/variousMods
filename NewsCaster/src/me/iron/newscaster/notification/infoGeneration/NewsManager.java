@@ -21,6 +21,10 @@ import java.util.List;
  */
 public class NewsManager {
     private static List<GenericInfo> newsStorage = new ArrayList();
+    //config set values
+    private static boolean info_save_persistent = false;
+    private static int info_threshold = 10;
+    private static int info_save_timer = 30;
     private static Class[] newsTypes = new Class[]{EntityInfo.class,ShipDestroyedInfo.class};
     private static boolean saveTimerOn = false;
     /**
@@ -30,8 +34,8 @@ public class NewsManager {
      */
     public static int addInfo(GenericInfo info) {
         //DebugFile.log("addInfo: " + info.getNewscast());
-        if (newsStorage.size() >= 50) {
-            for(int i = 0; i < newsStorage.size() - 50; i++) {
+        if (newsStorage.size() >= info_threshold) {
+            for(int i = 0; i < newsStorage.size() - info_threshold; i++) {
                 newsStorage.remove(0);
             }
         }
@@ -64,13 +68,13 @@ public class NewsManager {
         return newsStorage;
     }
 
-    private static boolean info_threshold ;
-
     public static void updateFromConfig() {
-      info_threshold                         = configManager.getValue("info_threshold")==1;
-
+        info_threshold              = configManager.getValue("info_threshold");
+        info_save_timer             = configManager.getValue("info_save_timer");
+        info_save_persistent        = configManager.getValue("info_save_persistent")==1;
     }
     public static void saveToPersistenUtil() {
+        if (!info_save_persistent) return;
         DebugFile.log("saving newsStorage to persistenObjectUtil");
         for (GenericInfo info: newsStorage) {
             PersistentObjectUtil.addObject(ModMain.instance.getSkeleton(),info);
@@ -114,14 +118,25 @@ public class NewsManager {
         }.runTimer(ModMain.instance,12 * 60 * 5);
     }
 
+    /** deletes all loaded infos
+     *
+     */
+    public static void cleanLoadedInfo() {
+        Broadcaster.flushQueue();
+        newsStorage.clear();
+    }
+
+    /**
+     * deletes the savefiles. use with caution. doesnt touch runtime loaded infos.
+     */
     public static void cleanPersistentInfo() {
-        //TODO
+        //TODO switch to container object instead of single objects
         for (Class cl: newsTypes) {
             ArrayList<Object> list = PersistentObjectUtil.getCopyOfObjects(ModMain.instance.getSkeleton(),cl);
             for (Object obj: list) {
                 newsStorage.remove(obj);
                 PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),obj);
-                DebugFile.log("removing object");
+            //    DebugFile.log("removing object");
             }
         }
     }

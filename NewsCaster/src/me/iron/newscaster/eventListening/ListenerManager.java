@@ -122,13 +122,15 @@ public class ListenerManager {
             }
         },ModMain.instance);
 
+        //FIXME doesnt seem to run on dedicated at all
         StarLoader.registerListener(FactionRelationChangeEvent.class, new Listener<FactionRelationChangeEvent>() {
             @Override
             public void onEvent(FactionRelationChangeEvent event) {
                 if (event.getTo().isNPC() && event.getFrom().isNPC()) {
                     return;//ignore npc spamming each other with peace offers.
                 }
-                if(!info_log_faction_relationchange) return;
+                if(!info_log_faction_relationchange)
+                    return;
                 FactionRelationInfo info = new FactionRelationInfo(event.getFrom(), event.getTo(),event.getOldRelation(),event.getNewRelation());
                 NewsManager.addInfo(info);
                 DebugFile.log("Faction relation change event: " + info.getNewscast());
@@ -159,19 +161,24 @@ public class ListenerManager {
     private void QueueForCreationReport(final SegmentController sc) {
         DebugFile.log("queued segmentcontroller for creation report");
         new StarRunnable() {
+            int i = 0;
             @Override
             public void run() {
-                if (sc.getMassWithDocks() < info_ship_minMass || sc.getFaction().isNPC()) {
-                    return;
-                }
+                i++;
+                if (i > 5) cancel(); //absolute safeguard should everything else fail
                 if (!sc.isFullyLoadedWithDock()) {
                     return;
                 }
-                if ((sc.getFaction() != null) && sc.getFaction().isNPC()) {
+                //kick out small ships
+                if (sc.getMassWithDocks() < info_ship_minMass) {
                     cancel();
                     return;
                 }
-            //    DebugFile.log("delayed log running for " + sc.getName());
+                //dont allow npcs
+                if ((sc.getFaction() != null) && (sc.getFaction().isNPC() || sc.getFactionId() <= 0)) {
+                    cancel();
+                    return;
+                }
                 ShipObject ship = new ShipObject(sc);
                 ShipCreatedInfo report = new ShipCreatedInfo(ship, sc.getSector(new Vector3i()));
                 NewsManager.addInfo(report);

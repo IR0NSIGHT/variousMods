@@ -3,8 +3,10 @@ package me.iron.newscaster;
 import api.DebugFile;
 import api.mod.StarMod;
 import api.mod.config.FileConfiguration;
+import com.sun.deploy.config.DefaultConfig;
 import me.iron.newscaster.eventListening.ListenerManager;
 import me.iron.newscaster.notification.broadcasting.Broadcaster;
+import me.iron.newscaster.notification.infoGeneration.NewsManager;
 
 import java.util.HashMap;
 
@@ -20,9 +22,14 @@ public class configManager {
     static String name = "newscaster_settings";
     static FileConfiguration config;
     public static int getValue(String entryName) {
-        assert config != null;
+        //make sure value is valid path
+        boolean exists = config.getKeys().contains(entryName);
+        if (!exists) {
+            System.out.println("Newscaster config entry doesnt exist: " + entryName);
+            return 0;
+        }
         int value = config.getInt(entryName);
-        DebugFile.log("accessed config: "+entryName+": "+value,mod);
+
         return value;
     }
 
@@ -78,5 +85,6 @@ public class configManager {
     public static void updateGameValues() {
         Broadcaster.updateFromConfig();
         ListenerManager.updateFromConfig();
+        NewsManager.updateFromConfig();
     }
 }
