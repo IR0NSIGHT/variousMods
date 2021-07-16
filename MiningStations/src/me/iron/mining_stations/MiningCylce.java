@@ -31,6 +31,7 @@ public class MiningCylce extends StarRunnable {
      */
     private static void updateAllMiners(long time) {
         Miner.miner_update_time = 5*1000;
+
         for (Map.Entry<String,Miner> entry: StationManager.miners.entrySet()) {
             SegmentController sc = GameServerState.instance.getSegmentControllersByName().get(entry.getKey());
             Miner m = entry.getValue();

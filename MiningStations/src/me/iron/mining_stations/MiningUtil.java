@@ -263,7 +263,7 @@ public class MiningUtil {
      * @param UID sc.getUniqueIdentifier();
      * @return true if exists (loaded or unloaded)
      */
-    static boolean existsInDB(long databaseID, String UID) {
+    static boolean existsInDB(long databaseID, String UID) { //TODO first test seems unreliable for roid?
         if(null == GameServerState.instance.getSegmentControllersByName().get(UID)){
             return true;
         }

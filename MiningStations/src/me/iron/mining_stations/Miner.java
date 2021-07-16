@@ -28,7 +28,7 @@ public class Miner implements Serializable {
     public String roidUID; //registered asteroid
     private long roid_db_ID;
     private List<Long> crates = new ArrayList<>();
-    private int maxCrates = 3;
+    private int maxCrates = 5;
     private int queuedCrates = 0;
     private String crateBlueprint = "cargo-crate-01";
     private long dbID = -1;
@@ -51,7 +51,7 @@ public class Miner implements Serializable {
     public void update() {
         if (maxCrates > queuedCrates && !resources.isEmpty()) queuedCrates++;
         SegmentController sc = GameServerState.instance.getSegmentControllersByName().get(UID);
-        while (crates.size() >= maxCrates) deleteOldest();
+        while (crates.size() > maxCrates) deleteOldest();
 
         //unloaded?
         if (sc == null || !sc.isFullyLoadedWithDock()) { //TODO figure out how long unloading takes on dedicated
@@ -61,13 +61,17 @@ public class Miner implements Serializable {
         ChatUI.sendAll("updating: " + sc.getName() + " queued: " + queuedCrates);
         if (roidUID == null) return;
         SegmentController roid = GameServerState.instance.getSegmentControllersByName().get(roidUID);
-        if (roid == null || !roid.isFullyLoadedWithDock()) return;
-        if (!allowedAsteroid(roid,false) || (roidUID != null && resources.isEmpty())) {
-            ChatUI.sendAll("roid is invalid or empty");
+        if (roid == null || !roid.isFullyLoadedWithDock()) return; //TODO can this cause bugs?
+        if (hasAsteroid() && !allowedAsteroid(roid,false)) {
+            ChatUI.sendAll("roid is invalid");
             unregisterAsteroid();
         }
         for (int i; queuedCrates > 0; queuedCrates--) {
             MiningUtil.spawnCrate(this, sc.getSector(new Vector3i()));
+        }
+        if (hasAsteroid() && resources.isEmpty()) {
+            unregisterAsteroid();
+            ChatUI.sendAll("resources empty.");
         }
         ChatUI.sendAll("resources remaining: " + (int) resources.getVolume());
     }
@@ -114,6 +118,20 @@ public class Miner implements Serializable {
         this.nextUpdate = nextUpdate;
     }
 
+    public boolean hasAsteroid() {
+        if (roidUID != null && roid_db_ID != -1) {
+            if (!MiningUtil.existsInDB(roid_db_ID,roidUID)) {
+                //roid doesnt exist anymore
+                StationManager.asteroids.remove(roidUID);
+                roid_db_ID = -1;
+                roidUID = null;
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
     public boolean registerAsteroid(SegmentController roid) {
         //test if allowed
         if (!allowedAsteroid(roid, true)) return false;
@@ -141,8 +159,6 @@ public class Miner implements Serializable {
         } else {
             GameServerState.instance.destroyEntity(roid_db_ID);
         }
-        roid_db_ID = -1;
-        this.roidUID = null;
     }
 
     private boolean allowedAsteroid(SegmentController roid, boolean assign) {
@@ -155,7 +171,7 @@ public class Miner implements Serializable {
             return false;
 
         //miner already has another roid
-        if (assign && this.roidUID != null)
+        if (assign && this.hasAsteroid())
             return false;
 
         //station unloaded, cant be close

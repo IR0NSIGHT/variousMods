@@ -39,7 +39,7 @@ public class ChatUI {
                         e.printStackTrace();
                         sendMssg(sender, "FAILED: \n" + StationManager.getMinerConditions());
                     }
-                    if (StationManager.makeMiner(sc)) {
+                    if (StationManager.makeMiner(sc) == null) {
                         sendMssg(sender, "SUCCESSFULLY REGISTERED AS MINER: " + sc.getName());
                     } else {
                         sendMssg(sender, "FAILED: \n" + StationManager.getMinerConditions());

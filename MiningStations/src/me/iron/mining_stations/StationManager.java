@@ -6,9 +6,11 @@ import api.listener.events.block.SegmentPieceModifyEvent;
 import api.listener.events.block.SegmentPieceSalvageEvent;
 import api.listener.events.entity.SegmentControllerFullyLoadedEvent;
 import api.mod.StarLoader;
+import org.lwjgl.Sys;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.SpaceStation;
+import org.schema.game.common.controller.rails.RailRelation;
 import org.schema.game.common.data.world.StellarSystem;
 import org.schema.game.server.data.GameServerState;
 
@@ -46,8 +48,28 @@ public class StationManager {
             @Override
             public void onEvent(SegmentPieceSalvageEvent event) {
                 String hitUID = event.getBlockInternal().getSegmentController().getUniqueIdentifier();
-                if (!asteroids.contains(hitUID)) return;
-                event.setCanceled(true);
+                if (asteroids.contains(hitUID)) event.setCanceled(true);
+                SegmentController hitter = event.getSegmentController();
+                if (hitter.railController.isDocked()) {
+                    RailRelation parent = hitter.railController.previous;
+                    while (parent.getRailRController().previous != null) {
+                        parent = parent.getRailRController().previous;
+                    }
+                    hitter = parent.rail.getSegmentController();
+                }
+                if (validMiner(hitter)) {
+                    //register as miner if not already one
+                    Miner m = miners.get(hitter.getUniqueIdentifier());
+                    if (m == null) {
+                        m = makeMiner(hitter);
+                    }
+                    assert m != null;
+                    if (!m.hasAsteroid()) {  //has no registered roid
+                        //attempt to register
+                        m.registerAsteroid(event.getBlockInternal().getSegmentController());
+                    }
+                }
+                    //mining beam comes from a station,
             }
         },ModMain.instance);
 
@@ -68,14 +90,14 @@ public class StationManager {
      * @param sc segmentcontroller
      * @return success
      */
-    static boolean makeMiner(SegmentController sc) {
-        if (!validMiner(sc)) return false;
+    static Miner makeMiner(SegmentController sc) {
+        if (!validMiner(sc)) return null;
         Miner m = miners.get(sc.getUniqueIdentifier());
-        if (m != null) return true;
+        if (m != null) return m;
         m = new Miner(sc);
         miners.put(sc.getUniqueIdentifier(),m);
-        ChatUI.sendAll("made " + sc.getUniqueIdentifier() + " a miner");
-        return true;
+        ChatUI.sendAll("made " + sc.getName() + " a miner");
+        return m;
     }
 
     /**
