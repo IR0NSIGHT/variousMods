@@ -16,11 +16,12 @@ class PersistentContainer implements Serializable {
     }
 
     public HashMap<String, Long> getAsteroids() {
+        for (Miner m: miners.values()) {
+            if (m.hasAsteroid()) {
+                asteroids.put(m.roidUID, m.roid_db_ID);
+            }
+        }
         return asteroids;
-    }
-
-    public void setAsteroids(HashMap<String, Long> asteroids) {
-        this.asteroids = asteroids;
     }
 
     public PersistentContainer() {

@@ -25,6 +25,7 @@ public class ModMain extends StarMod {
     @Override
     public void onDisable() {
         super.onDisable();
+        StationManager.saveToPersistent();
     }
 
     @Override
@@ -36,6 +37,7 @@ public class ModMain extends StarMod {
     public void onServerCreated(ServerInitializeEvent serverInitializeEvent) {
         super.onServerCreated(serverInitializeEvent);
         StationManager.init();
+        StationManager.loadFromPersistent();
         ChatUI.init();
     }
 

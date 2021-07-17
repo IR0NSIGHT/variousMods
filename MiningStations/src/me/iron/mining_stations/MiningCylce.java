@@ -1,5 +1,6 @@
 package me.iron.mining_stations;
 
+import api.DebugFile;
 import api.utils.StarRunnable;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.server.controller.EntityNotFountException;
@@ -16,13 +17,18 @@ import java.util.Map;
  */
 public class MiningCylce extends StarRunnable {
     long last;
-    static int checkFrequency = 1000;
+
     @Override
     public void run() {
         long diff = System.currentTimeMillis() - last;
-        if (diff < checkFrequency) return;
+        if (diff < config_manager.update_check_time) return;
         last = System.currentTimeMillis();
-        updateAllMiners(System.currentTimeMillis());
+        try {
+            updateAllMiners(System.currentTimeMillis());
+        } catch (Exception e) {
+            e.printStackTrace();
+            DebugFile.log(e.getMessage(),ModMain.instance);
+        }
     }
 
     /**
@@ -30,8 +36,6 @@ public class MiningCylce extends StarRunnable {
      * @param time time now
      */
     private static void updateAllMiners(long time) {
-        Miner.miner_update_time = 5*1000;
-
         for (Map.Entry<String,Miner> entry: StationManager.miners.entrySet()) {
             SegmentController sc = GameServerState.instance.getSegmentControllersByName().get(entry.getKey());
             Miner m = entry.getValue();
@@ -66,12 +70,11 @@ public class MiningCylce extends StarRunnable {
             return;
         }
         //check if still valid
-        if (!StationManager.validMiner(sc)) {
+        if (0 != StationManager.validMiner(sc)) {
             StationManager.removeMiner(sc.getUniqueIdentifier());
             ChatUI.sendAll("not a valid miner anymore: " + sc.getUniqueIdentifier());
         }
         miner.update();
-        miner.setNextUpdate(time+ Miner.miner_update_time);
     }
 
 }

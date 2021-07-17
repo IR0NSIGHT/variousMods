@@ -141,6 +141,7 @@ public class ListenerManager {
         StarLoader.registerListener(SystemClaimEvent.class, new Listener<SystemClaimEvent>() {
             @Override
             public void onEvent(SystemClaimEvent event) {
+                //FIXME traders conquering system sometimes gets attributed to a player who passed the system
                 if(!info_log_faction_systemclaim || !event.isServer()) return;
                 //new faction = event.change.factionID
                 //old = event.change.intiator.getFaction

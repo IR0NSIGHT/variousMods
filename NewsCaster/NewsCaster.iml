@@ -10,20 +10,20 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib" />
+          <root url="file://$MODULE_DIR$/../../Starmade/server testarea/client/StarMade/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib" />
+          <root url="file://$MODULE_DIR$/../../Starmade/server testarea/client/StarMade/lib" />
         </SOURCES>
-        <jarDirectory url="file://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib" recursive="false" />
-        <jarDirectory url="file://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/lib" recursive="false" type="SOURCES" />
+        <jarDirectory url="file://$MODULE_DIR$/../../Starmade/server testarea/client/StarMade/lib" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/../../Starmade/server testarea/client/StarMade/lib" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/StarMade.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../Starmade/server testarea/client/StarMade/StarMade.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -32,12 +32,32 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/starloader.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../Starmade/server testarea/client/StarMade/starloader.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/starloader.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../Starmade/server testarea/client/StarMade/starloader.jar!/" />
         </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../server testarea/client/StarMade/starloader.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../../server testarea/client/StarMade/starloader.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../server testarea/client/StarMade/StarMade.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
       </library>
     </orderEntry>
   </component>

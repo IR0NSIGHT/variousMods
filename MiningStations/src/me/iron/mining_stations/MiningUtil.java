@@ -7,8 +7,8 @@ import com.bulletphysics.linearmath.Transform;
 import it.unimi.dsi.fastutil.shorts.Short2FloatOpenHashMap;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.*;
+import org.schema.game.common.controller.elements.InventoryMap;
 import org.schema.game.common.data.ManagedSegmentController;
-import org.schema.game.common.data.element.ElementInformation;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.inventory.Inventory;
@@ -21,12 +21,10 @@ import org.schema.game.server.data.blueprint.ChildStats;
 import org.schema.game.server.data.blueprint.SegmentControllerOutline;
 import org.schema.game.server.data.blueprint.SegmentControllerSpawnCallbackDirect;
 import org.schema.schine.graphicsengine.core.settings.StateParameterNotFoundException;
-import org.schema.schine.network.objects.Sendable;
 
 import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -37,8 +35,6 @@ import java.util.Map;
  * TIME: 20:58
  */
 public class MiningUtil {
-    static int max_volume_per_crate = 1000; //TODO config
-    static int passive_mining_bonus = 10; //multiplier for resources (on top of normal mining bonus)
 
     /**
      * gets weightmap of ECM and multippies by types volume
@@ -208,16 +204,28 @@ public class MiningUtil {
                         new SegmentControllerSpawnCallbackDirect(GameServerState.instance, sector) { //idk what that is
                             @Override
                             public void onSpawn(final SegmentController segmentController) {
-                                final long last = System.currentTimeMillis();
+                                final long start = System.currentTimeMillis();
                                 super.onSpawn(segmentController);
                                 new StarRunnable() {
                                     @Override
                                     public void run() {
                                         if (!segmentController.isFullyLoadedWithDock()) return;
-                                        if (last + 1000 > System.currentTimeMillis()) return;
-                                        thisMiner.getCrates().add(segmentController.dbId);
-                                        MiningUtil.fillCrate(segmentController, thisMiner.getResources(),MiningUtil.max_volume_per_crate);
-                                        cancel();
+                                        double inv = 0;
+                                        if (segmentController instanceof ManagedSegmentController) {
+                                            try {
+                                                InventoryMap map = ((ManagedSegmentController) segmentController).getManagerContainer().getInventories();
+                                                inv = map.values().iterator().next().getCapacity();
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        long diff = System.currentTimeMillis()-start;
+                                        if (inv > 100 || diff > 30000) {
+                                        //    ChatUI.sendAll("inv: " + inv + " after " + diff);
+                                            thisMiner.registerCrate(segmentController);
+                                            MiningUtil.fillCrate(segmentController, thisMiner.getResources(), config_manager.max_volume_per_crate);
+                                            cancel();
+                                        }
                                     }
                                 }.runTimer(ModMain.instance, 1);
                             }
@@ -267,7 +275,7 @@ public class MiningUtil {
      * @return true if exists (loaded or unloaded)
      */
     static boolean existsInDB(long databaseID, String UID) { //TODO first test seems unreliable for roid?
-        if(null == GameServerState.instance.getSegmentControllersByName().get(UID)){
+        if(null != GameServerState.instance.getSegmentControllersByName().get(UID)){
             return true;
         }
         try {

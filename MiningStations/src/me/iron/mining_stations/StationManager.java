@@ -6,16 +6,16 @@ import api.listener.events.block.SegmentPieceSalvageEvent;
 import api.listener.events.entity.SegmentControllerFullyLoadedEvent;
 import api.mod.StarLoader;
 import api.mod.config.PersistentObjectUtil;
-import org.lwjgl.Sys;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.controller.rails.RailRelation;
+import org.schema.game.common.data.world.SectorInformation;
 import org.schema.game.common.data.world.StellarSystem;
 import org.schema.game.server.data.GameServerState;
 
-import javax.jdo.annotations.Persistent;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class StationManager {
     static HashMap<String, Miner> miners = new HashMap<String, Miner>();
-    static HashMap<String,Long> asteroids = new HashMap<String,Long>();
+    transient static HashMap<String,Long> asteroids = new HashMap<String,Long>();
     /**
      * initializes stationmanager. adds listener and update cycle
      */
@@ -39,10 +39,10 @@ public class StationManager {
             public void onEvent(SegmentControllerFullyLoadedEvent event) {
                 Miner m = miners.get(event.getController().getUniqueIdentifier());
                 if (m == null) return;
-                long nextUpdate = m.getNextUpdate();
-                if(nextUpdate <= System.currentTimeMillis()) {
-                    MiningCylce.updateMiner(System.currentTimeMillis(),m);
-                }
+                SegmentController station = event.getController();
+                SegmentController roid = m.getAsteroid();
+                //auto checks that roid and station are loaded
+                m.loadedUpdate(station,roid);
             }
         },ModMain.instance);
         //no salvage for registered roids
@@ -59,16 +59,26 @@ public class StationManager {
                     }
                     hitter = parent.rail.getSegmentController();
                 }
-                if (validMiner(hitter)) {
+                if (validMiner(hitter)==0) {
                     //register as miner if not already one
                     Miner m = miners.get(hitter.getUniqueIdentifier());
                     if (m == null) {
-                        m = makeMiner(hitter);
+                        m = attemptMakeMiner(hitter);
                     }
-                    assert m != null;
-                    if (!m.hasAsteroid()) {  //has no registered roid
-                        //attempt to register
-                        m.registerAsteroid(event.getBlockInternal().getSegmentController());
+                    //Todo send nearby players the error message
+                    assert m != null : "miner is null";
+
+                    int code = m.allowedAsteroid(event.getBlockInternal().getSegmentController());
+                    if (code == 0) {  //has no registered roid
+                        if (!m.hasAsteroid()) {
+                            boolean succ = m.registerAsteroid(event.getBlockInternal().getSegmentController());
+                            ChatUI.sendAll("registered roid" + succ);
+                        } else {
+                            ChatUI.sendAll("dude its already registered, leave me alone!");
+                        }
+
+                    } else {
+                        ChatUI.sendAll("invalid roid:" + code);
                     }
                 }
                     //mining beam comes from a station,
@@ -89,13 +99,18 @@ public class StationManager {
     //TOdo pretty way to register miner (apart from chat command)0
     /**
      * attempt to make this segmentcontroller a passive miner.
+     * returns already existing or new miner
      * @param sc segmentcontroller
-     * @return success
+     * @return created or already existing miner
      */
-    static Miner makeMiner(SegmentController sc) {
-        if (!validMiner(sc)) return null;
+    static Miner attemptMakeMiner(SegmentController sc) {
+        if (sc == null)
+            return null;
+        if (0 != validMiner(sc))
+            return null;
         Miner m = miners.get(sc.getUniqueIdentifier());
-        if (m != null) return m;
+        if (m != null)
+            return m;
         m = new Miner(sc);
         miners.put(sc.getUniqueIdentifier(),m);
         ChatUI.sendAll("made " + sc.getName() + " a miner");
@@ -116,22 +131,26 @@ public class StationManager {
     /**
      * test if station is allowed to be a miner
      * @param sc segmentcontroller
-     * @return true/false
+     * @return 0 for allowed, 1..x for error code. use getError for hurt condition.
      */
-    static boolean validMiner(SegmentController sc) {
-        if (!(sc instanceof SpaceStation)) return false;
-        if (((SpaceStation)sc).isHomeBase()) return false;
+    static int validMiner(SegmentController sc) {
+        if (!(sc instanceof SpaceStation))
+            return 1;
+        if (((SpaceStation)sc).isHomeBase())
+            return 2;
         Vector3i sector = sc.getSector(new Vector3i());
         StellarSystem sys;
         try {
             sys = GameServerState.instance.getUniverse().getStellarSystemFromSecPos(sector);
         }catch (IOException e) {
             e.printStackTrace();
-            return false;
+            return -1; //internal error contant mod author
         }
-        sys.getCenterSectorType();
-        //SectorInformation.SectorType.
-        return true;
+        SectorInformation.SectorType t = sys.getCenterSectorType();
+        if (!config_manager.allowed_system_types.contains(t))
+            return 2; //no star in system
+
+        return 0;
     }
 
     /**
@@ -174,7 +193,6 @@ public class StationManager {
      */
     static void saveToPersistent() {
         PersistentContainer container = getOrNewContainer();
-        container.setAsteroids(asteroids);
         container.setMiners(miners);
         PersistentObjectUtil.save(ModMain.instance.getSkeleton());
     }
