@@ -92,7 +92,7 @@ public class Miner implements Serializable {
         }
         ChatUI.sendAll("resources remaining: " + (int) resources.getVolume());
     }
-uwu
+
     private void deleteOldest() {
         if (crates.size() == 0) return;
 
