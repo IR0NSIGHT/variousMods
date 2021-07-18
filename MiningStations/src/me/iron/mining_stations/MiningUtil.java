@@ -4,10 +4,13 @@ import api.DebugFile;
 import api.utils.StarRunnable;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.linearmath.Transform;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.shorts.Short2FloatOpenHashMap;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.*;
 import org.schema.game.common.controller.elements.InventoryMap;
+import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.ManagedSegmentController;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.player.PlayerState;
@@ -80,19 +83,31 @@ public class MiningUtil {
         resources.getWeights(weightmap);
 
         //fill inventory
-        try {
-            int slot = inv.getFreeSlot();
-            for (short type : ElementKeyMap.keySet) {
-                if (resources.get(type) == 0) continue;
-                int total = resources.get(type);
-                int max = (int) Math.min(weightmap.get(type) * units, inv.canPutInHowMuch(type, total, -1));
-                slot = inv.incExistingOrNextFreeSlot(type, max);
-                inv.sendInventoryModification(slot);
-                resources.put(type, total - max);
-            }
-            //    inv.sendAll();
-        } catch (NoSlotFreeException e) {
-            e.printStackTrace();
+
+        IntArrayList slotsChanged = new IntArrayList();
+        IntOpenHashSet slotsChangedSet = new IntOpenHashSet();
+        int slot;
+        for (short type : ElementKeyMap.keySet) {
+            if (resources.get(type) == 0) continue;
+            int total = resources.get(type);
+            int max = (int) Math.min(weightmap.get(type) * units, inv.canPutInHowMuch(type, total, -1));
+            slot = inv.incExistingOrNextFreeSlot(type, max);
+        //   inv.sendAll();
+        //   slotsChangedSet.add(slot);
+        //   inv.sendAllWithExtraSlots(slotsChangedSet);
+        //   for (PlayerState p: GameServerState.instance.getPlayerStatesByName().values()) {
+        //       p.sendInventoryModification(new IntOpenHashSet(inv.getMap().size()),inv.getParameter());
+
+        //   }
+
+            //decrease queued resources
+        //    resources.put(type, total - max);
+        }
+        for (int slotX : inv.getSlots()) {
+        //    ManagerContainer mc = ((ManagedSegmentController<?>) crate).getManagerContainer();
+        //    mc.sendInventoryModification(slotX,inv.getParameter());
+        //    mc.sendInventoryDelayed(inv,slotX);
+            inv.sendInventoryModification(slotX);
         }
     }
 
@@ -149,7 +164,7 @@ public class MiningUtil {
      */
     static void spawnCrate(final Miner thisMiner, Vector3i sector) {
         //test for blueprint validitiy
-
+        ChatUI.sendAll("spawning a crate for "+ thisMiner.getUID());
         String blueprint = thisMiner.getCrateBlueprint();
         //get transform = worldposition wrapper
         Transform transform = new Transform();
@@ -223,7 +238,8 @@ public class MiningUtil {
                                         if (inv > 100 || diff > 30000) {
                                         //    ChatUI.sendAll("inv: " + inv + " after " + diff);
                                             thisMiner.registerCrate(segmentController);
-                                            MiningUtil.fillCrate(segmentController, thisMiner.getResources(), config_manager.max_volume_per_crate);
+                                            MiningUtil.fillCrate(segmentController, thisMiner.getResources(), MiningConfig.max_volume_per_crate.getValue());
+                                            thisMiner.deleteOldest();
                                             cancel();
                                         }
                                     }

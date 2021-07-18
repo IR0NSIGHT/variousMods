@@ -21,7 +21,7 @@ public class MiningCylce extends StarRunnable {
     @Override
     public void run() {
         long diff = System.currentTimeMillis() - last;
-        if (diff < config_manager.update_check_time) return;
+        if (diff < MiningConfig.update_check_time.getValue()) return;
         last = System.currentTimeMillis();
         try {
             updateAllMiners(System.currentTimeMillis());
@@ -47,34 +47,9 @@ public class MiningCylce extends StarRunnable {
                 StationManager.removeMiner(entry.getKey());
                 continue;
             }
-
-            //is loaded?
-            if (sc == null) continue;
-            updateMiner(time, m);
+            m.update();
         }
     }
 
-    /**
-     * updates this miner
-     * @param time time now
-     * @param miner miner to update
-     */
-    static void updateMiner(long time, Miner miner) {
-        SegmentController sc = GameServerState.instance.getSegmentControllersByName().get(miner.getUID());
-        if (sc == null) {
-            try {
-                throw new EntityNotFountException("tried updating miner, cant find SegmentCOntroller");
-            } catch (EntityNotFountException e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-        //check if still valid
-        if (0 != StationManager.validMiner(sc)) {
-            StationManager.removeMiner(sc.getUniqueIdentifier());
-            ChatUI.sendAll("not a valid miner anymore: " + sc.getUniqueIdentifier());
-        }
-        miner.update();
-    }
 
 }

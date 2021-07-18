@@ -26,6 +26,7 @@ public class ModMain extends StarMod {
     public void onDisable() {
         super.onDisable();
         StationManager.saveToPersistent();
+        MiningConfig.saveConfig();
     }
 
     @Override
@@ -36,6 +37,7 @@ public class ModMain extends StarMod {
     @Override
     public void onServerCreated(ServerInitializeEvent serverInitializeEvent) {
         super.onServerCreated(serverInitializeEvent);
+        MiningConfig.loadConfig();
         StationManager.init();
         StationManager.loadFromPersistent();
         ChatUI.init();

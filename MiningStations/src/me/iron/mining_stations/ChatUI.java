@@ -3,7 +3,6 @@ package me.iron.mining_stations;
 import api.listener.Listener;
 import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
-import org.luaj.vm2.ast.Stat;
 import org.schema.game.common.controller.ElementCountMap;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.data.player.PlayerState;
@@ -12,8 +11,6 @@ import org.schema.game.server.data.GameServerState;
 import org.schema.schine.common.language.Lng;
 import org.schema.schine.network.objects.Sendable;
 import org.schema.schine.network.server.ServerMessage;
-
-import javax.validation.constraints.Min;
 
 /**
  * STARMADE MOD
@@ -48,6 +45,18 @@ public class ChatUI {
     private static boolean adminCmds(PlayerState  sender, String key, SegmentController controlled, SegmentController selected) {
         Miner m;
         int code = -1;
+        int[] args = getArgs(key);
+        try {
+            if (key.contains(" ")) {
+                String[] split = key.split(" ");
+                key = split.length>0?split[0]:key;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    //    key = key.split(" ")[0];
         switch (key) {
             case "save":
                 StationManager.loadFromPersistent();
@@ -60,7 +69,7 @@ public class ChatUI {
 
                 return true;
 
-            case "set station":
+            case "set_station":
                 if (selected == null) {
                     sendMssg(sender,"must select something");
                     return false;
@@ -74,7 +83,7 @@ public class ChatUI {
                 }
                 return true;
 
-            case "set asteroid":
+            case "set_asteroid":
                 if (selected == null || controlled == null) {
                     sendMssg(sender,"must control miner and select asteroid");
                     return false;
@@ -90,7 +99,7 @@ public class ChatUI {
                 if (0 != code) {
                     sendMssg(sender,"asteroid can not be registered to station." + code); //TODO give asteroid conditions
                 }
-            case "clear station": //unregister miner
+            case "clear_station": //unregister miner
                 if (selected == null) {
                     sendMssg(sender,"nothing selected");
                     return false;
@@ -114,15 +123,20 @@ public class ChatUI {
                     sendMssg(sender,"Miner: " + m.toString());
                     return true;
                 }
-                if (StationManager.asteroids.get(selected.getUniqueIdentifier()) != null) {
-                    ElementCountMap ecm = MiningUtil.getResources(selected,config_manager.passive_mining_bonus);
+                if (StationManager.isRegistered(selected.getUniqueIdentifier())) {
+                    ElementCountMap ecm = MiningUtil.getResources(selected, MiningConfig.passive_mining_bonus.getValue());
                     sendMssg(sender,"Registered Asteroid: " + ecm.getAmountListString() + "total Volume: " + ecm.getVolume());
                     return true;
                 }
                 sendMssg(sender,"Not registered with PassiveMining.");
                 return false;
+            case "clear_all":
+                StationManager.miners.clear();
+                StationManager.roidsByMiner.clear();
+                sendMssg(sender,"deleting miners and roids in heap");
+                return true;
 
-            case "print all":
+            case "print_all":
                 StringBuilder s = new StringBuilder("MINERS ("+StationManager.miners.size()+"): \n");
                 for (String UID : StationManager.miners.keySet()) {
                     s.append(StationManager.miners.get(UID).toString());
@@ -131,11 +145,62 @@ public class ChatUI {
                 sendMssg(sender, s.toString());
                 return true;
 
+            case "print_config":
+                StringBuilder string = new StringBuilder("MINING CONFIG : \n");
+                boolean desc = false;
+                if (args.length==1)
+                    desc = args[0]==1;
+                for (MiningConfig entry: MiningConfig.values()) {
+                    string.append(entry.name()).append("(key: ").append(entry.getKey()).append("): ").append(entry.getValue()).append("\n ");
+                    if (desc)
+                        string.append(entry.getDescription()).append("\n");
+                }
+                sendMssg(sender, string.toString());
+                return true;
+
+            case "set_config":
+                if (args==null||args.length!=2) {
+                    sendMssg(sender,"wrong input format. must be 'set_config key value'");
+                    return false;
+                }
+
+                int out = MiningConfig.setValue(args[0],args[1]);
+                if (out != 0) {
+                    sendMssg(sender,"could not set config value. unknown key.");
+                } else {
+                    sendMssg(sender,"set value to " + args[1] + "for " + MiningConfig.getName(args[0]));
+                }
+                return true;
+
+            case "delete_save":
+                sendMssg(sender,"deleting persistent savefile.");
+                StationManager.destroySaveFile();
+                return true;
+
             default:
                 sendMssg(sender,"unrecognized command.");
                 return false;
         }
     }
+
+    private static int[] getArgs(String input) {
+        //input = input.replace(" ","");
+        if (!input.contains(" "))
+            return  new int[0];
+        String[] vars = input.split(" ");
+        if(vars.length == 0) {
+            return new int[0];
+        }
+        int[] args = new int[vars.length-1];
+        for (int i = 0; i < vars.length-1; i++) {
+            try {
+                args[i] = Integer.parseInt(vars[i+1]);
+            } catch (NumberFormatException ex) {
+            }
+        }
+        return args;
+    }
+
     public static void sendMssg(PlayerState receiver, String mssg) {
         receiver.sendServerMessage(new ServerMessage(Lng.astr(mssg), ServerMessage.MESSAGE_TYPE_SIMPLE, receiver.getId()));
     }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 class PersistentContainer implements Serializable {
     private HashMap<String, Miner> miners = new HashMap<String, Miner>();
-    private HashMap<String, Long> asteroids = new HashMap<String, Long>();
 
     public HashMap<String, Miner> getMiners() {
         return miners;
@@ -15,10 +14,11 @@ class PersistentContainer implements Serializable {
         this.miners = miners;
     }
 
-    public HashMap<String, Long> getAsteroids() {
+    public HashMap<String, String> getAsteroids() {
+        HashMap<String, String> asteroids = new HashMap<>();
         for (Miner m: miners.values()) {
             if (m.hasAsteroid()) {
-                asteroids.put(m.roidUID, m.roid_db_ID);
+                asteroids.put(m.roidUID, m.getUID());
             }
         }
         return asteroids;

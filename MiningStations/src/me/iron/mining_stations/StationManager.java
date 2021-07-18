@@ -15,9 +15,7 @@ import org.schema.game.common.data.world.StellarSystem;
 import org.schema.game.server.data.GameServerState;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -28,21 +26,31 @@ import java.util.List;
  */
 public class StationManager {
     static HashMap<String, Miner> miners = new HashMap<String, Miner>();
-    transient static HashMap<String,Long> asteroids = new HashMap<String,Long>();
+    transient static HashMap<String,String> roidsByMiner = new HashMap<String,String>();
     /**
      * initializes stationmanager. adds listener and update cycle
      */
     public static void init() {
+        DebugFile.log("INIT FOR STATION MANAGER",ModMain.instance);
         new MiningCylce().runTimer(ModMain.instance,10);
         StarLoader.registerListener(SegmentControllerFullyLoadedEvent.class, new Listener<SegmentControllerFullyLoadedEvent>() {
             @Override
             public void onEvent(SegmentControllerFullyLoadedEvent event) {
                 Miner m = miners.get(event.getController().getUniqueIdentifier());
-                if (m == null) return;
-                SegmentController station = event.getController();
-                SegmentController roid = m.getAsteroid();
-                //auto checks that roid and station are loaded
-                m.loadedUpdate(station,roid);
+                if (m != null) {
+                    ChatUI.sendAll("miner was loaded in, updating.");
+                    SegmentController station = event.getController();
+                    SegmentController roid = m.getAsteroid();
+                    //auto checks that roid and station are loaded
+                    m.loadedUpdate(station,roid);
+                }
+
+                if (StationManager.isRegistered(event.getController().getUniqueIdentifier())){
+                    ChatUI.sendAll("asteroid was loaded in, locking.");
+                    //registered roid
+                    MiningUtil.lockAsteroid(event.getController());
+                }
+
             }
         },ModMain.instance);
         //no salvage for registered roids
@@ -50,7 +58,10 @@ public class StationManager {
             @Override
             public void onEvent(SegmentPieceSalvageEvent event) {
                 String hitUID = event.getBlockInternal().getSegmentController().getUniqueIdentifier();
-                if (asteroids.get(hitUID)!=null) event.setCanceled(true);
+                if (StationManager.isRegistered(hitUID)) {
+                    ChatUI.sendAll("is a registered roid");
+                    event.setCanceled(true);
+                }
                 SegmentController hitter = event.getSegmentController();
                 if (hitter.railController.isDocked()) {
                     RailRelation parent = hitter.railController.previous;
@@ -87,6 +98,22 @@ public class StationManager {
 
     }
 
+    /**
+     * tests if asteroid is registered, fixes bugged roids by unregistering them as a sideeffect
+     * @param UID
+     * @return
+     */
+    static boolean isRegistered(String UID) {
+        String miner = roidsByMiner.get(UID);
+        Miner m = miners.get(miner);
+        if (m == null)
+            return false;
+        if (!m.hasAsteroid() || !m.getRoidUID().equals(UID)) {
+            roidsByMiner.remove(UID);
+            return false;
+        }
+        return true;
+    }
     static void removeMiner(String UID) {
         DebugFile.log("removing miner: "+UID);
         ChatUI.sendAll("removed " + UID);
@@ -96,7 +123,6 @@ public class StationManager {
         miners.remove(UID);
     }
 
-    //TOdo pretty way to register miner (apart from chat command)0
     /**
      * attempt to make this segmentcontroller a passive miner.
      * returns already existing or new miner
@@ -147,8 +173,8 @@ public class StationManager {
             return -1; //internal error contant mod author
         }
         SectorInformation.SectorType t = sys.getCenterSectorType();
-        if (!config_manager.allowed_system_types.contains(t))
-            return 2; //no star in system
+    //    if (!MiningConfig.allowed_system_type.getValue().contains(t))
+    //        return 2; //no star in system
 
         return 0;
     }
@@ -159,7 +185,7 @@ public class StationManager {
     static void loadFromPersistent() {
         PersistentContainer container = getOrNewContainer();
         miners.putAll(container.getMiners());
-        asteroids.putAll(container.getAsteroids());
+        roidsByMiner.putAll(container.getAsteroids());
     }
 
     /**
@@ -194,6 +220,13 @@ public class StationManager {
     static void saveToPersistent() {
         PersistentContainer container = getOrNewContainer();
         container.setMiners(miners);
+
         PersistentObjectUtil.save(ModMain.instance.getSkeleton());
+    }
+
+    static void destroySaveFile() {
+        PersistentContainer container = getOrNewContainer();
+        PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),container);
+        PersistentObjectUtil.save(ModMain.instance.getSkeleton() );
     }
 }

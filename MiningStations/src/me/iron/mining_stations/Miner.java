@@ -1,19 +1,16 @@
 package me.iron.mining_stations;
 
-import api.common.GameServer;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.ElementCountMap;
 import org.schema.game.common.controller.FloatingRock;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.server.data.GameServerState;
 
-import javax.validation.constraints.Min;
 import javax.vecmath.Vector3f;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * STARMADE MOD
@@ -26,7 +23,7 @@ public class Miner implements Serializable {
 
     //internal technic stuff
     private String UID;
-    private long dbID = -1;
+    private long dbID;
 
     String roidUID; //registered asteroid
     long roid_db_ID;
@@ -37,8 +34,7 @@ public class Miner implements Serializable {
     private String crateBlueprint = "cargo-crate-01";
 
     private transient ElementCountMap resources;
-    private transient long nextUpdate = 0;
-    private transient SegmentController sc;
+    private transient long lastUpdate = 0;
 
     //upgradeable values that define how "good" a station is
     private int maxCrates = 5; //how many crates can exist, without being deleted when a new one is spawned
@@ -57,14 +53,15 @@ public class Miner implements Serializable {
      */
     public void update() {
         ChatUI.sendAll("updating: " + UID);
-        int timeToNext = config_manager.miner_update_time*(100-this.time_level*config_manager.miner_improvement_per_level)/100;
-        nextUpdate = System.currentTimeMillis() + timeToNext;
-
+        lastUpdate = System.currentTimeMillis();
+        removeDeadFromCrates();
         deleteOldest();
 
         //no asteroid, no need to update.
-        if (!hasAsteroid())
+        if (!hasAsteroid()) {
+            resources = null;
             return;
+        }
 
         //increment (potential) crates
         if (maxCrates > queuedCrates) queuedCrates++;
@@ -100,7 +97,7 @@ public class Miner implements Serializable {
             return;
         //fill element map
         if (resources == null) { //assigning new resources resets crate queue
-            resources = MiningUtil.getResources(roid, config_manager.passive_mining_bonus);
+            resources = MiningUtil.getResources(roid, MiningConfig.passive_mining_bonus.getValue());
             queuedCrates = 0;
         }
 
@@ -127,25 +124,31 @@ public class Miner implements Serializable {
         ChatUI.sendAll("resources remaining: " + (int) resources.getVolume());
     }
 
-    private void deleteOldest() { //TODO make me 100% reliable, bc sometimes >maxCrates coexist for a short time
+    public void deleteOldest() { //TODO make me 100% reliable, bc sometimes >maxCrates coexist for a short time
+
         if (crates.size() <= maxCrates)
             return;
         for (int i = 0; i < crates.size() - maxCrates; i++) {
             long db_id = crates.get(i);
             String crate_uid = crateUIDs.get(db_id);
+            if (!MiningUtil.existsInDB(db_id,crate_uid))
+                continue;
             SegmentController crate = GameServerState.instance.getSegmentControllersByName().get(crate_uid);
             if (crate != null) {
                 crate.markForPermanentDelete(true);
                 crate.setMarkedForDeleteVolatile(true);
             } else {
+
                 try {
                     GameServerState.instance.destroyEntity(db_id);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    ChatUI.sendAll(e.getMessage());
                 }
             }
         }
+    }
+
+    private void removeDeadFromCrates() {
         for (int i = 0; i < crates.size(); i++) {
             long db_id = crates.get(i);
             String crate_uid = crateUIDs.get(db_id);
@@ -155,9 +158,12 @@ public class Miner implements Serializable {
             }
         }
     }
-
     public ElementCountMap getResources() {
         return resources;
+    }
+
+    public String getRoidUID() {
+        return roidUID;
     }
 
     public List<Long> getCrates() {
@@ -185,11 +191,8 @@ public class Miner implements Serializable {
     }
 
     public long getNextUpdate() {
-        return nextUpdate;
-    }
-
-    public void setNextUpdate(long nextUpdate) {
-        this.nextUpdate = nextUpdate;
+        int timeToNext = MiningConfig.miner_update_time.getValue()*(100-this.time_level* MiningConfig.miner_improvement_per_level.getValue())/100;
+        return lastUpdate + timeToNext;
     }
 
     /**
@@ -204,7 +207,7 @@ public class Miner implements Serializable {
         if (roidUID != null && roid_db_ID != -1) {
             if (!MiningUtil.existsInDB(roid_db_ID,roidUID)) {
                 //roid doesnt exist anymore
-                StationManager.asteroids.remove(roidUID);
+                StationManager.roidsByMiner.remove(roidUID);
                 roid_db_ID = -1;
                 roidUID = null;
                 return false;
@@ -219,16 +222,24 @@ public class Miner implements Serializable {
 
     public boolean registerAsteroid(SegmentController roid) {
         //test if allowed
-        if (0 != allowedAsteroid(roid)) return false;
+        int code = allowedAsteroid(roid);
+        if (0 != code) {
+            ChatUI.sendAll("roidcode:"+code);
+            return false;
+        }
+        roid.setAllTouched(true);
+        if (roid.dbId == -1) {
+            ChatUI.sendAll("db id == -1");
+            return false;
+        }
+
         //register globally
-        StationManager.asteroids.put(roid.getUniqueIdentifier(),roid.dbId);
+        StationManager.roidsByMiner.put(roid.getUniqueIdentifier(),this.UID);
         //register locally
         this.roidUID = roid.getUniqueIdentifier();
         this.roid_db_ID = roid.dbId;
-        resources = MiningUtil.getResources(roid, config_manager.passive_mining_bonus);
+        resources = MiningUtil.getResources(roid, MiningConfig.passive_mining_bonus.getValue());
         MiningUtil.lockAsteroid(roid);
-        int timeToNext = config_manager.miner_update_time*(100-this.time_level*config_manager.miner_improvement_per_level)/100;
-        nextUpdate = System.currentTimeMillis() + timeToNext;
         return true;
     }
 
@@ -238,7 +249,7 @@ public class Miner implements Serializable {
     public void unregisterAsteroid() {
         if (roidUID == null || roid_db_ID == -1)  return;
         ChatUI.sendAll("removing roid for miner: " + UID);
-        StationManager.asteroids.remove(roidUID);
+        StationManager.roidsByMiner.remove(roidUID);
         SegmentController roid = GameServerState.instance.getSegmentControllersByName().get(roidUID);
         if (roid != null) {
             roid.markForPermanentDelete(true);
@@ -264,7 +275,7 @@ public class Miner implements Serializable {
             return 2;
 
         //already registered
-        if (StationManager.asteroids.get(roid.getUniqueIdentifier())!=null && !this.roidUID.equals(roid.getUniqueIdentifier()))
+        if (StationManager.isRegistered(roid.getUniqueIdentifier()) && this.hasAsteroid() && !this.roidUID.equals(roid.getUniqueIdentifier()))
             return 3;
 
 
@@ -290,9 +301,7 @@ public class Miner implements Serializable {
      * @return sc if exists, else null
      */
     private SegmentController getSc() {
-        if (sc == null)
-            sc = GameServerState.instance.getSegmentControllersByName().get(UID);
-        return sc;
+        return GameServerState.instance.getSegmentControllersByName().get(UID);
     }
 
     public void registerCrate(SegmentController crate) {
@@ -303,15 +312,13 @@ public class Miner implements Serializable {
     public String toString() {
         return "Miner{" +
                 "UID='" + UID + '\'' + "\n" +
-                ", roidUID='" + roidUID + '\'' + "\n" +
-                ", roid_db_ID=" + roid_db_ID + "\n" +
-                ", crates=" + crates + "\n" +
-                ", maxCrates=" + maxCrates + "\n" +
-                ", queuedCrates=" + queuedCrates + "\n" +
-                ", crateBlueprint='" + crateBlueprint + '\'' + "\n" +
-                ", dbID=" + dbID + "\n" +
-                ", resources=" + ((resources != null)? resources.getAmountListString():"null resources") + "\n" +
-                ", nextUpdate=" + nextUpdate + "\n" +
+                "roidUID='" + roidUID + '\'' + "\n" +
+                "maxCrates=" + maxCrates + "\n" +
+                "existing Crates=" + crates.toString() + "\n" +
+                "queuedCrates=" + queuedCrates + "\n" +
+                "resources=" + ((resources != null)? resources.getAmountListString():"null resources") + "\n" +
+                "update in: =" + (getNextUpdate() - System.currentTimeMillis())/1000 + "\n" +
+                "loaded: " + (getSc()!=null)+
                 '}';
     }
 }
