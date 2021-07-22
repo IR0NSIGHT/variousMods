@@ -24,23 +24,9 @@ public class ModMain extends StarMod {
     }
 
     @Override
-    public void onEnable() {
-        super.onEnable();
-        DebugFile.log("on enable",this);
-        //debug
-        StarLoader.registerCommand(new TestCommand());
-        //CommandCommander.init();
-    }
-
-    @Override
     public void onDisable() {
         super.onDisable();
         StationReplacer.savePersistentAll();
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
     }
 
     @Override
@@ -50,7 +36,7 @@ public class ModMain extends StarMod {
         StationReplacer.loadPersistentAll(); //load persistent data for pirates
         StationReplacer.deployListener();
         //Debug
-        CommandListener.addListener();
+        CommandCommander.init(); //chat command listener
     }
 
     @Override

@@ -1,24 +1,19 @@
 package me.iron.npccontrol.stationReplacement.commands;
 
-import api.DebugFile;
-import api.ModPlayground;
-import api.common.GameServer;
 import api.mod.StarMod;
 import api.utils.game.PlayerUtils;
 import api.utils.game.chat.CommandInterface;
 import me.iron.npccontrol.ModMain;
 import me.iron.npccontrol.stationReplacement.StationHelper;
 import me.iron.npccontrol.stationReplacement.StationReplacer;
-import org.apache.commons.collections4.iterators.EntrySetMapIterator;
 import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.server.data.GameServerState;
+import org.schema.schine.common.language.Lng;
 import org.schema.schine.network.objects.Sendable;
+import org.schema.schine.network.server.ServerMessage;
 
-import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * STARMADE MOD
@@ -60,61 +55,99 @@ public class StationCommand implements CommandInterface {
     public boolean onCommand(PlayerState playerState, String[] strings) {
         PlayerUtils.sendMessage(playerState,  "station command was fired, server exists:" + (GameServerState.instance == null));
    //    ModPlayground.broadcastMessage("station command was used!");
-   //    DebugFile.log("station command was used: " + this.toString());
+   //    echo("station command was used: " + this.toString());
         return true;
     }
-
+    PlayerState sender;
     @Override
     public void serverAction(PlayerState sender, String[] arguments) {
         assert sender != null;
-        System.err.println("station command was used by " + sender.getName() + " with args: " + Arrays.toString(arguments));
-        //station add blueprintname -1
-        if (arguments.length == 3) {
-            if (arguments[0].equalsIgnoreCase("add") || arguments[0].equalsIgnoreCase("remove")) {
-                //get blueprint and faction ID
-                String action = arguments[0];
+        this.sender = sender;
+    //    System.err.println("station command was used by " + sender.getName() + " with args: " + Arrays.toString(arguments));
+        if (arguments.length < 1)
+            return;
+        String cmd = arguments[0];
+        ChatCmds c = ChatCmds.getByCmd(cmd);
+        switch (c) {
+            case LIST:
+            case ADD_BP: {
+                if (arguments.length < 2) {
+                    echo("syntax error, expects: \n" + c.getExp());
+                    return;
+                }
                 String blueprintName = arguments[1];
                 int factionID = tryParseInt(arguments[2]);
                 if (factionID == 0) {
-                    DebugFile.log(  factionID + " is not a valid faction ID.");
+                    echo(factionID + " is not a valid faction ID.");
                     return;
                 }
-
-                //test blueprint validity
-                if (!StationHelper.isValidBlueprint(blueprintName)) {
-                    DebugFile.log(  blueprintName + " is not a valid blueprint in the catalogmanager.");
-
-                    return;
-                }
-
                 StationReplacer replacer = StationReplacer.getFromList(factionID);
                 if (replacer == null) {
-                    DebugFile.log(  "no replacer exists for faction " + factionID);
+                    echo("no replacer exists for faction " + factionID);
                     return;
                 }
 
-                switch (action) {
-                    case "add":
-                    {
-                        if (replacer.addBlueprint(blueprintName)) {
-                            DebugFile.log(  "successfully added " + blueprintName + " to faction " + factionID);
-                            replacer.savePersistent();
-                            return;
-                        } else {
-                            DebugFile.log(  blueprintName + " is already listed for " + factionID);
-                            return;
-                        }
-                    }
-                    case "remove":
-                        if (replacer.removeBlueprint(blueprintName)) {
-                            DebugFile.log(  "successfully removed " + blueprintName + " from faction " + factionID);
-                            replacer.savePersistent();
-                            return;
-                        } else {
-                            DebugFile.log(  blueprintName + " is not listed for " + factionID);
-                            return;
-                        }
+                if (replacer.addBlueprint(blueprintName)) {
+                    echo("successfully added " + blueprintName + " to faction " + factionID);
+                    replacer.savePersistent();
+                    return;
+                } else {
+                    echo(blueprintName + " is already listed for " + factionID);
+                    return;
                 }
+
+                /*        if (replacer.removeBlueprint(blueprintName)) {
+                            echo(  "successfully removed " + blueprintName + " from faction " + factionID);
+                            replacer.savePersistent();
+                            return;
+                        } else {
+                            echo(  blueprintName + " is not listed for " + factionID);
+                            return;
+                        }
+                */ //FIXME remove-bp code
+            }
+            case REMOVE_BP: {
+                if (arguments.length < 2) {
+                    echo("syntax error, expects: \n" + c.getExp());
+                    return;
+                }
+                String blueprintName = arguments[1];
+                int factionID = tryParseInt(arguments[2]);
+                if (factionID == 0) {
+                    echo(factionID + " is not a valid faction ID.");
+                    return;
+                }
+                StationReplacer replacer = StationReplacer.getFromList(factionID);
+                if (replacer == null) {
+                    echo("no replacer exists for faction " + factionID);
+                    return;
+                }
+
+                if (replacer.removeBlueprint(blueprintName)) {
+                    echo(  "successfully removed " + blueprintName + " from faction " + factionID);
+                    replacer.savePersistent();
+                    return;
+                } else {
+                    echo(  blueprintName + " is not listed for " + factionID);
+                    return;
+                }
+            }
+            case CLEAR_BP: {}
+
+            case SAVE: {}
+            case LOAD: {}
+            case REPLACE: {}
+            case HELP: {}
+            default: {
+                echo("unknown message. type \n" + ChatCmds.PREFIX.getCmd() + ChatCmds.HELP.getCmd() + "\n for help.");
+            }
+        }
+        //station add blueprintname -1
+        if (arguments.length == 3) {
+                //get blueprint and faction ID
+
+
+
                 //todo get faction related stationmanager
                 return;
             }
@@ -124,7 +157,7 @@ public class StationCommand implements CommandInterface {
                 int factionID = tryParseInt(arguments[1]);
                 StationReplacer replacer = StationReplacer.getFromList(factionID);
                 if (replacer == null) {
-                    DebugFile.log(  factionID + " does not have a replacer.");
+                    echo(  factionID + " does not have a replacer.");
                     return;
                 }
                 String s = "Faction " + factionID;
@@ -135,26 +168,26 @@ public class StationCommand implements CommandInterface {
                 for (Map.Entry<String, String> iterator: replacer.getManagedStations().entrySet()) {
                     s += iterator.getKey() + " || " + iterator.getValue() + "\n";
                 }
-                DebugFile.log(  s);
+                echo(  s);
                 return;
             }
         }
 
-        //station list -1
+        //station list -1 (factionID)
         if (arguments.length == 2) {
             String action = arguments[0];
             int factionID = tryParseInt(arguments[1]);
 
             if (action.equalsIgnoreCase("list")) {
                 if (factionID == 0) {
-                    DebugFile.log(  arguments[3] + " is not a valid faction ID.");
+                    echo(  arguments[3] + " is not a valid faction ID.");
                     return;
                 }
 
                 //get replacer
                 StationReplacer replacer = StationReplacer.getFromList(factionID);
                 if (replacer == null) {
-                    DebugFile.log(  "no replacer exists for faction " + factionID);
+                    echo(  "no replacer exists for faction " + factionID);
                     return;
                 }
 
@@ -162,19 +195,19 @@ public class StationCommand implements CommandInterface {
                 for (String bp : replacer.getBlueprints()) {
                     list += bp + "\n";
                 }
-                DebugFile.log(  "faction " + factionID + " has available blueprints: \n" + list);
+                echo(  "faction " + factionID + " has available blueprints: \n" + list);
                 return;
             }
 
             if (action.equalsIgnoreCase("clear")) {
                 if (factionID == 0) {
-                    DebugFile.log(  factionID + " is not a valid faction ID.");
+                    echo(  factionID + " is not a valid faction ID.");
                     return;
                 }
 
                 StationReplacer replacer = StationReplacer.getFromList(factionID);
                 if (replacer == null) {
-                    DebugFile.log(  "no replacer exists for faction " + factionID);
+                    echo(  "no replacer exists for faction " + factionID);
                     return;
                 }
 
@@ -183,7 +216,7 @@ public class StationCommand implements CommandInterface {
                     list += bp + "\n";
                     replacer.removeBlueprint(bp);
                 }
-                DebugFile.log(  "faction " + factionID + " had removed blueprints: \n" + list);
+                echo(  "faction " + factionID + " had removed blueprints: \n" + list);
                 replacer.savePersistent();
                 return;
             }
@@ -200,10 +233,11 @@ public class StationCommand implements CommandInterface {
                 }
                 list += factionID + " " + name + "\n";
             }
-            DebugFile.log(  "replacers exist for factions: \n " + list);
+            echo(  "replacers exist for factions: \n " + list);
 
             return;
         }
+
 
         //station add_replacer -1 || remove_replacer
         if (arguments.length == 2) {
@@ -211,14 +245,14 @@ public class StationCommand implements CommandInterface {
             int factionID = tryParseInt(arguments[1]);
 
             if (factionID == 0) {
-                DebugFile.log(  "invalid faction id given:" + factionID);
+                echo(  "invalid faction id given:" + factionID);
                 return;
             }
 
             if (action.equalsIgnoreCase("add_replacer")) {
                 //test if replacer already exists
                 if (StationReplacer.getFromList(factionID) != null) {
-                    DebugFile.log(  "Faction " + factionID + " already has a replacer.");
+                    echo(  "Faction " + factionID + " already has a replacer.");
                     return;
                 }
 
@@ -232,7 +266,7 @@ public class StationCommand implements CommandInterface {
                     name = "unknown faction";
                 }
 
-                DebugFile.log(  "Created replacer for faction " + name + "("+factionID+")" );
+                echo(  "Created replacer for faction " + name + "("+factionID+")" );
                 return;
             }
 
@@ -240,7 +274,7 @@ public class StationCommand implements CommandInterface {
                 //test if replacer exists
                 StationReplacer replacer = StationReplacer.getFromList(factionID);
                 if (replacer == null) {
-                    DebugFile.log(  "Faction " + factionID + " doesn't have a replacer.");
+                    echo(  "Faction " + factionID + " doesn't have a replacer.");
                     return;
                 }
 
@@ -248,7 +282,7 @@ public class StationCommand implements CommandInterface {
                 StationReplacer.removeFromList(factionID);
 
                 //return
-                DebugFile.log(  "replacer removed for " + factionID);
+                echo(  "replacer removed for " + factionID);
                 return;
             }
 
@@ -256,14 +290,14 @@ public class StationCommand implements CommandInterface {
 
         //station save
         if (arguments[0].equalsIgnoreCase("save")) {
-            DebugFile.log(  "saving all replacers to moddata");
+            echo(  "saving all replacers to moddata");
             StationReplacer.savePersistentAll();
             return;
         }
 
         //pirate station load
         if (arguments[0].equalsIgnoreCase("load")) {
-            DebugFile.log(  "loading replacers from moddata");
+            echo(  "loading replacers from moddata");
             StationReplacer.loadPersistentAll();
             return;
         }
@@ -274,7 +308,7 @@ public class StationCommand implements CommandInterface {
             String blueprint = arguments[1];
 
             if (!StationHelper.isValidBlueprint(blueprint)) {
-                DebugFile.log(  "Not a valid blueprint");
+                echo(  "Not a valid blueprint");
                 return;
             }
 
@@ -286,7 +320,7 @@ public class StationCommand implements CommandInterface {
             if (selected instanceof  SpaceStation) {
                 station = (SpaceStation) selected;
             } else {
-                DebugFile.log(  "Selected object not a station.");
+                echo(  "Selected object not a station.");
                 return;
             }
 
@@ -298,7 +332,7 @@ public class StationCommand implements CommandInterface {
             return;
         }
         //no command matched:
-        DebugFile.log(  "Command not recognized.");
+        echo(  "Command not recognized.");
         return;
     }
 
@@ -315,7 +349,17 @@ public class StationCommand implements CommandInterface {
         return factionID;
     }
 
+    private boolean blueprintChange(String bp, int factionID, boolean add) {
 
+    }
+
+    /**
+     * answers command caller with string.
+     * @param mssg mssg to send only to this.sender
+     */
+    private void echo(String mssg) {
+        sender.sendServerMessage(new ServerMessage(Lng.astr(mssg), ServerMessage.MESSAGE_TYPE_SIMPLE, sender.getId()));
+    }
 
     @Override
     public StarMod getMod() {
