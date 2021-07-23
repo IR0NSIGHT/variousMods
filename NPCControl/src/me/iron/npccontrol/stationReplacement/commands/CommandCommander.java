@@ -28,8 +28,10 @@ public class CommandCommander {
                 if (sender == null || !sender.isAdmin())
                     return;
                 String mssg = event.getText();
-                if (!mssg.contains("!station")) return;
-                mssg = mssg.replace("!station ","");
+                String prefix = ChatCmds.PREFIX.getCmd();
+                if (!mssg.contains(prefix)) return;
+                mssg = mssg.replace(prefix,"");
+
                 String[] args = mssg.split(" ");
                 stationCommand.serverAction(sender,args);
                 event.setCanceled(true);

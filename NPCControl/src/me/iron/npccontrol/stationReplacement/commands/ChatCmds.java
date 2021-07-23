@@ -11,23 +11,25 @@ import java.util.HashMap;
 public enum ChatCmds {
     PREFIX("!rpc ","this prefix has to be in front of all NPC replacer chat commands.","!rpc"),
     LIST("list","list all or a factions replacers. optional: faction ID","list, list -1"),
-    ADD_BP("add_bp","adds a blueprint to the factions replacer","add MyCoolStation -1"),
+    ADD_BP("add_bp","adds a blueprint to the factions replacer","add_bp MyCoolStation -1"),
     REMOVE_BP("rmv_bp","removes a blueprint from the factions replacer","rmv_bp MyCoolStation -1"),
     CLEAR_BP("clear_bp","clears all blueprints from the factions replacer","clear_bp -1"),
-    ADD_REPLACER("add_rpc","adds a replacer to this faction","add_rpc -1"),
+    ADD_RPC("add_rpc","adds a replacer to this faction","add_rpc -1"),
+    RM_RPC("rmv_rpc","removes replacer from this faction","rmv_rpc -1"),
+
 
     SAVE("save","saves the current replacers persistently to a savefile.","save"),
     LOAD("load","loads replacers from the persistent savefile","load"),
     HELP("help","get help about this mod","help"),
-    REPLACE("replacer","replace the selected station with this blueprint.","replace MyNewStation");
+    REPLACE("replace","replace the selected station with this blueprint.","replace MyNewStation");
 
     private final String cmd;
     private final String desc;
-    private final String exp;
+    private final String exampleSyntax;
     ChatCmds(String cmd, String desc, String exp) {
         this.cmd = cmd;
         this.desc = desc;
-        this.exp = exp;
+        this.exampleSyntax = exp;
     }
 
     public String getCmd() {
@@ -38,8 +40,8 @@ public enum ChatCmds {
         return desc;
     }
 
-    public String getExp() {
-        return exp;
+    public String getSyntax() {
+        return PREFIX.getCmd() + exampleSyntax;
     }
 
     private static HashMap<String,ChatCmds> by_cmd = new HashMap<>();
@@ -54,7 +56,7 @@ public enum ChatCmds {
     public static String getAllHelp() {
         StringBuilder s = new StringBuilder();
         for (ChatCmds c: ChatCmds.values()) {
-            s.append(PREFIX.cmd).append(c.exp).append(": ").append(c.desc);
+            s.append(PREFIX.cmd).append(c.exampleSyntax).append(": ").append(c.desc);
         }
         return s.toString();
     }

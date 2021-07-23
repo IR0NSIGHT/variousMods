@@ -22,6 +22,12 @@ import java.util.HashMap;
 public class StationReplacer {
     private static boolean hasListener = false;
     private static HashMap<Integer,StationReplacer> replacerList = new HashMap<>();
+
+    /**
+     * get replacer by its faction ID
+     * @param factionID
+     * @return replacer or null
+     */
     public static StationReplacer getFromList(int factionID) {
         return replacerList.get(factionID);
     }
