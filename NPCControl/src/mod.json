@@ -1,8 +1,8 @@
 {
   "name": "NPCControl",
   "author": "IR0NSIGHT",
-  "description": "testplatform updated",
-  "version": "0.1",
+  "description": "Station replacement manager",
+  "version": "1.0",
   "starmade_version": "0.202.110",
   "client_mod": false,
   "server_mod": false,
