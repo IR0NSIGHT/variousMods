@@ -1,19 +1,14 @@
 package me.iron.pve_rand.GUI;
 
-import api.DebugFile;
-import api.ModPlayground;
 import api.listener.Listener;
-import api.listener.events.input.KeyPressEvent;
 import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
 import api.utils.gui.GUIControlManager;
 import api.utils.gui.GUIMenuPanel;
 import api.utils.gui.ModGUIHandler;
 import me.iron.pve_rand.ModMain;
-import org.lwjgl.input.Keyboard;
 import org.schema.game.client.data.GameClientState;
 import org.schema.game.common.data.player.PlayerState;
-import org.schema.schine.input.KeyboardEvent;
 
 /**
  * STARMADE MOD
@@ -23,6 +18,7 @@ import org.schema.schine.input.KeyboardEvent;
  * 100% clientside
  */
 public class ScriptControlManager extends GUIControlManager {
+    public static GUIMenuPanel p;
     public static ScriptControlManager instance;
     public ScriptControlManager (GameClientState state) {
         super(state);
@@ -32,8 +28,9 @@ public class ScriptControlManager extends GUIControlManager {
 
     @Override
     public GUIMenuPanel createMenuPanel() {
-        MyMenuPanel p = new MyMenuPanel(getState());
+        p = new ScriptMenuPanel(getState());
         p.onInit();
+        p.recreateTabs();
         return p;
     }
 
@@ -50,17 +47,11 @@ public class ScriptControlManager extends GUIControlManager {
                     }
                     //TODO disable all others
                     setActive(true);
+                    if (ScriptControlManager.p != null)
+                        ScriptControlManager.p.recreateTabs();
                     event.setCanceled(true);
                 }
             }
         }, ModMain.instance);
-
-        StarLoader.registerListener(KeyPressEvent.class, new Listener<KeyPressEvent>() {
-            @Override
-            public void onEvent(KeyPressEvent keyPressEvent) {
-                KeyboardEvent e = keyPressEvent.getRawEvent();
-                DebugFile.log("keydown: "  + e.toString());
-            }
-        },ModMain.instance);
     }
 }
