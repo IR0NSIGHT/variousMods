@@ -24,7 +24,7 @@ public class ModMain extends StarMod {
     @Override
     public void onDisable() {
         super.onDisable();
-        NewsManager.saveToPersistenUtil();
+        NewsManager.saveToPersistentUtil();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ModMain extends StarMod {
         super.onServerCreated(event);
         new ListenerManager();
         CommandUI.addListener();
-        NewsManager.loadFromPersistenUtil();
+        NewsManager.loadFromPersistentUtil();
         Broadcaster.init();
     }
 

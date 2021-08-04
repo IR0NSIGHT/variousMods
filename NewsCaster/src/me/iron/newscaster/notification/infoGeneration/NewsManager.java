@@ -1,6 +1,7 @@
 package me.iron.newscaster.notification.infoGeneration;
 
 import api.DebugFile;
+import api.ModPlayground;
 import api.mod.config.PersistentObjectUtil;
 import api.utils.StarRunnable;
 import me.iron.newscaster.ModMain;
@@ -24,7 +25,7 @@ public class NewsManager {
     //config set values
     private static boolean info_save_persistent = false;
     private static int info_threshold = 10;
-    private static int info_save_timer = 30;
+    private static int info_save_timer = 1; //in minutes
     private static Class[] newsTypes = new Class[]{EntityInfo.class,ShipDestroyedInfo.class};
     private static boolean saveTimerOn = false;
     /**
@@ -44,26 +45,6 @@ public class NewsManager {
         return newsStorage.size(); //add to end of list => size = index
     }
 
-    /**
-     * returns info at index. use -1 for last entry.
-     * @param index
-     * @return
-     */
-    public static GenericInfo getInfo(int index) {
-        if (index == -1) {
-            if (newsStorage.isEmpty()) {
-                return null;
-            }
-            index = newsStorage.size()-1;
-        }
-        try {
-            return newsStorage.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
     public static List<GenericInfo> getNewsStorage() {
         return newsStorage;
     }
@@ -73,36 +54,21 @@ public class NewsManager {
         info_save_timer             = configManager.getValue("info_save_timer");
         info_save_persistent        = configManager.getValue("info_save_persistent")==1;
     }
-    public static void saveToPersistenUtil() {
+
+    public static void saveToPersistentUtil() {
         if (!info_save_persistent) return;
-        DebugFile.log("saving newsStorage to persistenObjectUtil");
-        for (GenericInfo info: newsStorage) {
-            PersistentObjectUtil.addObject(ModMain.instance.getSkeleton(),info);
-        }
+    //    ModPlayground.broadcastMessage("saving persistent for newscaster");
+        DebugFile.log("saving newsStorage to persistentObjectUtil");
+        NewsContainer.getSaveObject().setNews(newsStorage);
         PersistentObjectUtil.save(ModMain.instance.getSkeleton());
     }
 
-    public static void loadFromPersistenUtil() {
+    public static void loadFromPersistentUtil() {
         //fired at onServerCreated
         createSaveTimer();
-        for (Class type: newsTypes) {
-            ArrayList<EntityInfo> list = PersistentObjectUtil.getCopyOfObjects(ModMain.instance.getSkeleton(),type);
-            DebugFile.log("loading newsStorage from persistent obj Util: class: "+ type.toString() + ".size: " + list.size());
-            //TODO dont loop a bruteforce test on all existing infos.
-            for (EntityInfo info: list) {
-                boolean isClone = false;
-                for (GenericInfo clone: newsStorage) {
-                    if (clone.getTime() == info.getTime()) {
-                        isClone = true;
-                        break;
-                    }
-                }
-                if (isClone) {
-                    continue;
-                }
-                newsStorage.add(info);
-            }
-        }
+        newsStorage.clear();
+        newsStorage.addAll(NewsContainer.getSaveObject().getNews());
+        DebugFile.log("loading newsStorage from persistent obj Util: "+newsStorage.size()+" events.");
     }
 
     private static void createSaveTimer() {
@@ -110,12 +76,18 @@ public class NewsManager {
             return;
         }
         saveTimerOn = true;
+
         new StarRunnable() {
+            long last = 0;
             @Override
             public void run() {
-                saveToPersistenUtil();
+                if (last + info_save_timer*1000*60 > System.currentTimeMillis()) {
+                    return;
+                }
+                last = System.currentTimeMillis();
+                saveToPersistentUtil();
             }
-        }.runTimer(ModMain.instance,12 * 60 * 5);
+        }.runTimer(ModMain.instance,10);
     }
 
     /** deletes all loaded infos
@@ -130,15 +102,16 @@ public class NewsManager {
      * deletes the savefiles. use with caution. doesnt touch runtime loaded infos.
      */
     public static void cleanPersistentInfo() {
-        //TODO switch to container object instead of single objects
+        //this is legacy code for pre 1.1 versions that brute forced their objects.
         for (Class cl: newsTypes) {
             ArrayList<Object> list = PersistentObjectUtil.getCopyOfObjects(ModMain.instance.getSkeleton(),cl);
             for (Object obj: list) {
                 newsStorage.remove(obj);
                 PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(),obj);
-            //    DebugFile.log("removing object");
             }
         }
+        //new way
+        PersistentObjectUtil.removeObject(ModMain.instance.getSkeleton(), NewsContainer.getSaveObject());
+        PersistentObjectUtil.save(ModMain.instance.getSkeleton());
     }
-
 }

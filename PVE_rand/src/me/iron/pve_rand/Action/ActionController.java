@@ -10,6 +10,7 @@ import org.schema.game.common.controller.FloatingRock;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.controller.SpaceStation;
+import org.schema.game.common.controller.observer.DrawerObservable;
 
 import java.util.*;
 
@@ -19,7 +20,12 @@ import java.util.*;
  * DATE: 27.06.2021
  * TIME: 11:59
  */
-public class ActionController {
+public class ActionController extends DrawerObservable {
+    public static ActionController instance;
+    public ActionController() {
+        instance = this;
+    }
+
     //list that holds all triggers.
     private static HashMap<Integer, HashSet<CustomTrigger>> triggers = new HashMap<Integer, HashSet<CustomTrigger>>();
 
@@ -40,6 +46,7 @@ public class ActionController {
         initEmpty(c&0xFFFFFF00);
         triggers.get(c&0xFFFFFF00).add(t);
         allTriggers.add(t);
+        instance.notifyObservers(t);
     }
 
     public static void removeTrigger(CustomTrigger t, int c) {
@@ -54,6 +61,7 @@ public class ActionController {
             if (set.contains(t)) {unlisted = false; break;}
         }
         if (unlisted) allTriggers.remove(t);
+        instance.notifyObservers(t);
     }
 
     public static void clearAll() {

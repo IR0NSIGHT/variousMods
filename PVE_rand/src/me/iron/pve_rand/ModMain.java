@@ -6,9 +6,13 @@ import api.listener.events.controller.ServerInitializeEvent;
 import api.mod.ModSkeleton;
 import api.mod.StarMod;
 import api.mod.config.FileConfiguration;
+import api.utils.StarRunnable;
+import api.utils.gui.ModGUIHandler;
 import api.utils.particle.ModParticleUtil;
 import me.iron.pve_rand.Action.ActionController;
 import me.iron.pve_rand.Event.ListenerManager;
+import me.iron.pve_rand.GUI.ScriptControlManager;
+import org.schema.game.client.data.GameClientState;
 import org.schema.schine.resource.ResourceLoader;
 
 import java.awt.image.BufferedImage;
@@ -34,14 +38,11 @@ public class ModMain extends StarMod {
     }
 
     @Override
-    public byte[] onClassTransform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] byteCode) {
-        return super.onClassTransform(loader, className, classBeingRedefined, protectionDomain, byteCode);
-    }
-
-    @Override
     public void onEnable() {
         super.onEnable();
         instance = this;
+        new ActionController(); //create an instance for observers
+
     }
 
     @Override
@@ -70,60 +71,14 @@ public class ModMain extends StarMod {
     @Override
     public void onClientCreated(ClientInitializeEvent event) {
         super.onClientCreated(event);
+        new StarRunnable() {
+            @Override
+            public void run() {
+                ScriptControlManager controlManager = new ScriptControlManager(GameClientState.instance);
+                ModGUIHandler.registerNewControlManager(getSkeleton(), controlManager);
+            }
+        }.runLater(instance,100);
+
     }
 
-    @Override
-    public FileConfiguration getConfig(String name) {
-        return super.getConfig(name);
-    }
-
-    @Override
-    public void addClassFileTransformer(ClassFileTransformer transformer) {
-        super.addClassFileTransformer(transformer);
-    }
-
-    @Override
-    public void onUniversalRegistryLoad() {
-        super.onUniversalRegistryLoad();
-    }
-
-    @Override
-    public void onBlockConfigLoad(BlockConfig config) {
-        super.onBlockConfigLoad(config);
-    }
-
-    @Override
-    public void onResourceLoad(ResourceLoader loader) {
-        super.onResourceLoad(loader);
-    }
-
-    @Override
-    public void onLoadModParticles(ModParticleUtil.LoadEvent event) {
-        super.onLoadModParticles(event);
-    }
-
-    @Override
-    public void setSkeleton(ModSkeleton skeleton) {
-        super.setSkeleton(skeleton);
-    }
-
-    @Override
-    public String getName() {
-        return super.getName();
-    }
-
-    @Override
-    public InputStream getJarResource(String url) throws IllegalArgumentException {
-        return super.getJarResource(url);
-    }
-
-    @Override
-    public BufferedImage getJarBufferedImage(String url) throws IllegalArgumentException {
-        return super.getJarBufferedImage(url);
-    }
-
-    @Override
-    protected void forceDefine(String name) {
-        super.forceDefine(name);
-    }
 }

@@ -6,10 +6,7 @@ import me.iron.pve_rand.Action.CustomScript;
 import org.schema.common.util.linAlg.Vector3i;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * STARMADE MOD
@@ -90,10 +87,31 @@ public class CustomTrigger implements Serializable {
     @Override
     public String toString() {
         return "CustomTrigger{" +
-                "conditions=" + conditions +
+                "conditions=" +  conditions +
                 ", conditionsPure=" + conditionsPure +
                 ", description='" + description + '\'' +
-                ", actions=" + scripts +
+                ", scripts=" + scripts +
                 '}';
+    }
+
+    /**
+     * gets string of condition + descirption
+     * @return
+     */
+    public String getOverview() {
+        StringBuilder out = new StringBuilder("Trigger{\n\tdescription: " + description + "\n\tconditions: ");
+        Iterator<Integer> it = conditionsPure.iterator();
+        while (it.hasNext()) {
+            int c = it.next();
+            for (int i = 3; i >= 0; i--) {
+                out.append(String.format("%2S",Integer.toHexString((c>>8*i&255))).replace(" ","0"));
+                if (i > 0)
+                  out.append(".");
+            }
+            if (it.hasNext())
+                out.append("|| ");
+        }
+        out.append("\n}\n");
+        return out.toString();
     }
 }

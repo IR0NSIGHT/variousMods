@@ -1,12 +1,9 @@
 package me.iron.newscaster;
 
 import api.DebugFile;
-import api.ModPlayground;
 import api.listener.Listener;
 import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
-import me.iron.newscaster.ModMain;
-import me.iron.newscaster.configManager;
 import me.iron.newscaster.notification.broadcasting.Broadcaster;
 import me.iron.newscaster.notification.infoGeneration.NewsManager;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.GenericInfo;
@@ -51,12 +48,12 @@ public class CommandUI {
                 }
                 if (playerChatEvent.getText().contains("!news save")) {
                     sendMssg(sender,"saving news.");
-                    NewsManager.saveToPersistenUtil();
+                    NewsManager.saveToPersistentUtil();
                     playerChatEvent.setCanceled(true);return;
                 }
                 if (playerChatEvent.getText().contains("!news load")) {
                     sendMssg(sender,"loading news from persistent data, overwriting runtime list");
-                    NewsManager.loadFromPersistenUtil();
+                    NewsManager.loadFromPersistentUtil();
                     playerChatEvent.setCanceled(true);return;
                 }
                 if (playerChatEvent.getText().contains("!news clean")) {
@@ -106,8 +103,8 @@ public class CommandUI {
                         sendMssg(sender,"invalid input, value has to be an integer.");
                         playerChatEvent.setCanceled(true);return;
                     }
-                    sendMssg(sender,"setting config value: " + vars[0]  +": " + configManager.getValue(vars[0]));
                     configManager.setValue(vars[0],value);
+                    sendMssg(sender,"setting config value to: " + vars[0]  +": " + configManager.getValue(vars[0]));
 
                     configManager.updateGameValues();
                     playerChatEvent.setCanceled(true);return;
