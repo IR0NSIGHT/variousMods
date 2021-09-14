@@ -1,8 +1,10 @@
 package me.iron.newscaster.notification.broadcasting;
 
 import api.DebugFile;
+import api.listener.events.player.PlayerChatEvent;
+import api.mod.StarLoader;
 import api.utils.StarRunnable;
-import me.iron.newscaster.CommandUI;
+import me.iron.newscaster.commandUI.CommandUI;
 import me.iron.newscaster.ModMain;
 import me.iron.newscaster.configManager;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.FactionSystemClaimInfo;
@@ -12,11 +14,10 @@ import me.iron.newscaster.notification.infoGeneration.infoTypes.ShipDestroyedInf
 import me.iron.newscaster.notification.infoGeneration.objectTypes.ShipObject;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.player.PlayerState;
+import org.schema.game.network.objects.ChatMessage;
 import org.schema.game.server.data.Galaxy;
 import org.schema.game.server.data.GameServerState;
-import org.schema.schine.common.language.Lng;
 import org.schema.schine.network.RegisteredClientOnServer;
-import org.schema.schine.network.server.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -133,6 +134,9 @@ public class Broadcaster {
     public static void flushQueue() {
         //bundle events
         int length = queue.size();
+        if (length == 0)
+            return;
+
         String s = "";
         for (int i = 0; i<length; i++) {
             s += getReportString(queueShift()) + "\n";
@@ -252,9 +256,16 @@ public class Broadcaster {
      * @param mssg
      */
     private static void sendToAll(String mssg){
+        if (mssg.equals(""))
+            return;
+
         for(RegisteredClientOnServer client : GameServerState.instance.getClients().values()) {
             PlayerState player = GameServerState.instance.getPlayerStatesByName().get(client.getPlayerName());
             CommandUI.sendMssg(player,mssg);
+            ChatMessage m = new ChatMessage();
+            m.text = mssg;
+            m.sender = "Newscaster";
+            StarLoader.fireEvent(new PlayerChatEvent(m,null),true);
         }
     }
 }

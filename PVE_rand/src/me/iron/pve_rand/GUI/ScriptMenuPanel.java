@@ -62,6 +62,7 @@ public class ScriptMenuPanel extends GUIMenuPanel {
     public void recreateTabs() {
         guiWindow.clearTabs();
         allTriggerTab();
+        tableTab();
     }
 
     private void allTriggerTab() {
@@ -94,5 +95,14 @@ public class ScriptMenuPanel extends GUIMenuPanel {
         //static accessor
         triggerElement = background;
 
+    }
+
+    private void tableTab() {
+        GUIContentPane tab = guiWindow.addTab("TABLE");
+
+        //create scrollable table of elements
+        GUIElementTable table = new GUIElementTable(getState(),width,height,tab.getContent(0));
+        table.onInit();
+        tab.getContent(0).attach(table);
     }
 }

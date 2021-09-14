@@ -1,9 +1,11 @@
-package me.iron.newscaster;
+package me.iron.newscaster.commandUI;
 
 import api.DebugFile;
 import api.listener.Listener;
 import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
+import me.iron.newscaster.ModMain;
+import me.iron.newscaster.configManager;
 import me.iron.newscaster.notification.broadcasting.Broadcaster;
 import me.iron.newscaster.notification.infoGeneration.NewsManager;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.GenericInfo;
@@ -26,6 +28,8 @@ import java.util.Map;
  * debug stuff like printing the newsStorage into the chat, runs 100% serverside
  */
 public class CommandUI {
+    public static String prefix = "news";
+
     public static void addListener() {
         StarLoader.registerListener(PlayerChatEvent.class, new Listener<PlayerChatEvent>() {
             @Override

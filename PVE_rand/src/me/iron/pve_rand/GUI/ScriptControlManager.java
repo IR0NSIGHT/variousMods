@@ -1,12 +1,15 @@
 package me.iron.pve_rand.GUI;
 
+import api.ModPlayground;
 import api.listener.Listener;
+import api.listener.events.input.KeyPressEvent;
 import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
 import api.utils.gui.GUIControlManager;
 import api.utils.gui.GUIMenuPanel;
 import api.utils.gui.ModGUIHandler;
 import me.iron.pve_rand.ModMain;
+import org.lwjgl.input.Keyboard;
 import org.schema.game.client.data.GameClientState;
 import org.schema.game.common.data.player.PlayerState;
 
@@ -53,5 +56,21 @@ public class ScriptControlManager extends GUIControlManager {
                 }
             }
         }, ModMain.instance);
+        StarLoader.registerListener(KeyPressEvent.class, new Listener<KeyPressEvent>() {
+            @Override
+            public void onEvent(KeyPressEvent keyPressEvent) {
+                //ModPlayground.broadcastMessage("key: " + keyPressEvent.getKey() + keyPressEvent.toString());
+                if (Keyboard.isKeyDown(29) && Keyboard.isKeyDown(50)) {
+                    for (GUIControlManager manager: ModGUIHandler.getAllModControlManagers()) {
+                        manager.setActive(false);
+                    }
+                    setActive(true);
+                    if (ScriptControlManager.p != null)
+                        ScriptControlManager.p.recreateTabs();
+                    ModPlayground.broadcastMessage("CTRL + M = MENU");
+                }
+
+            }
+        },ModMain.instance);
     }
 }

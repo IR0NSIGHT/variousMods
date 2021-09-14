@@ -3,6 +3,7 @@ package me.iron.newscaster;
 import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
 import api.mod.StarMod;
+import me.iron.newscaster.commandUI.CommandUI;
 import me.iron.newscaster.eventListening.ListenerManager;
 import me.iron.newscaster.notification.broadcasting.Broadcaster;
 import me.iron.newscaster.notification.infoGeneration.NewsManager;

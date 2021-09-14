@@ -5,6 +5,7 @@ import org.schema.common.util.linAlg.Vector3i;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -16,18 +17,23 @@ import java.util.List;
  */
 public class CustomAction extends CustomCode {
 
-    private int argument;
+
+
+    public int getArgument() {
+        return (int) params.get("argument");
+    }
 
     private List<Integer> actionList = new ArrayList<>(); //TODO get rid of subactions, move all into scripts
     public CustomAction(int argument, String name, String description) {
         super(name, description);
-        this.argument = argument;
+        params.put("argument",argument);
         ActionController.addAction(this);
     }
 
     public void execute( Vector3i sector) {
         if (!isActive())
             return;
+        int argument = (int) params.get("argument");
         int chance = argument&0x000000FF;
         int rand = (int)(100 * Math.random());
         if (chance < rand)
@@ -48,7 +54,7 @@ public class CustomAction extends CustomCode {
     @Override
     public String toString() {
         return "CustomAction{" +
-                "chance" + (argument&0x000000FF) +
+                "params" + params.toString() +
                 ", description='" + getDescription() + '\'' +
                 '}';
     }

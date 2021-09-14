@@ -20,6 +20,7 @@ import org.schema.schine.graphicsengine.core.settings.StateParameterNotFoundExce
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,24 +30,20 @@ import java.util.List;
  * TIME: 15:13
  */
 public class SpawnAction extends CustomAction implements Serializable {
-    private int factionID;
-    private String blueprint;
-    private int amount;
-    private boolean AI;
-    private int lifetime; //in seconds
+    //TODO make all params null safe and type safe
     public SpawnAction(int argument, String name, String description, String blueprint, int factionID, int amount, boolean AI, int lifetime) {
         super(argument, name, description);
-        this.blueprint = blueprint;
-        this.factionID = factionID;
-        this.amount = amount;
-        this.AI = AI;
-        this.lifetime = lifetime;
+        params.put("factionID",factionID);
+        params.put("blueprint",blueprint);
+        params.put("amount",amount);
+        params.put("AI",AI);
+        params.put("lifetime",lifetime);
     }
 
     @Override
     protected void onExecute(int argument, Vector3i sector) {
         super.onExecute(argument, sector);
-        for (int i = 0; i < amount; i++) {
+        for (int i = 0; i < (int)params.get("amount"); i++) {
             spawnObject(sector);
         }
     }
@@ -65,7 +62,14 @@ public class SpawnAction extends CustomAction implements Serializable {
         //TODO delayed deleting also from unloaded + across server restarts, abort on "is docked or piloted"
         //create outline = loaded but not yet spawned entity
         SegmentControllerOutline scOutline = null;
+        String blueprint = (String)params.get("blueprint");
+        if (blueprint == null)
+            return;
+        int factionID = (int)params.get("factionID");
+        boolean AI = (boolean)params.get("AI");
+        final int lifetime = (int)params.get("lifetime");
         try {
+
             scOutline = BluePrintController.active.loadBluePrint(
                     GameServerState.instance,
                     blueprint, //catalog entry name
@@ -139,12 +143,16 @@ public class SpawnAction extends CustomAction implements Serializable {
 
     }
 
+    public HashMap<String,Object> getParams() {
+        HashMap<String,Object> map = new HashMap<>();
+
+        return map;
+    }
+
     @Override
     public String toString() {
         return "SpawnAction{" +
-                amount + "x " + blueprint + "["+factionID+"]"+
-                (AI?" -ai":"")+
-                ((lifetime != -1)?(" -lt: "+ lifetime):"")+
+                "params"+params.toString()+
                 '}';
     }
 

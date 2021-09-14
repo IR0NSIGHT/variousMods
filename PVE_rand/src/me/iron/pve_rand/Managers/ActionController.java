@@ -37,7 +37,7 @@ public class ActionController {
         return id_to_trigger.values();
     }
 
-    private static HashMap<Integer,CustomTrigger> id_to_trigger = new HashMap<>();
+    public static HashMap<Integer,CustomTrigger> id_to_trigger = new HashMap<>();
     public static void addTrigger(CustomTrigger trigger) {
         id_to_trigger.put(trigger.getID(),trigger);
     }
@@ -45,7 +45,7 @@ public class ActionController {
         return id_to_trigger.get(id);
     }
 
-    private static HashMap<Integer,CustomScript> id_to_script = new HashMap<>();
+    public static HashMap<Integer,CustomScript> id_to_script = new HashMap<>();
     public static void addScript(CustomScript script) {
         id_to_script.put(script.getID(),script);
     }
@@ -53,7 +53,7 @@ public class ActionController {
         return id_to_script.get(id);
     }
 
-    private static HashMap<Integer,CustomAction> id_to_action = new HashMap<>();
+    public static HashMap<Integer,CustomAction> id_to_action = new HashMap<>();
     public static void addAction(CustomAction action) {
         id_to_action.put(action.getID(),action);
     }
