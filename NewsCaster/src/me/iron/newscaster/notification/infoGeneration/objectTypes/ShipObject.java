@@ -2,6 +2,7 @@ package me.iron.newscaster.notification.infoGeneration.objectTypes;
 
 import api.common.GameServer;
 import org.schema.game.common.controller.SegmentController;
+import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.data.ManagedSegmentController;
 import org.schema.game.common.data.player.faction.Faction;
 
@@ -22,6 +23,7 @@ public class ShipObject implements Serializable {
     private String pilot = unknownString; //TODO add pilot getter, setter, getStringPretty etc.
     private int mass = unknownNumber;
     private int cargoMass = unknownNumber;
+    public boolean isStation = false;
     //TODO more info? type? "drive signature" for identification = UID + turning into a number?
 
     /**
@@ -60,6 +62,7 @@ public class ShipObject implements Serializable {
         //TODO get cargo mass
         double invMass = (this instanceof ManagedSegmentController<?> ? ((ManagedSegmentController<?>) this).getManagerContainer().getMassFromInventories() : 0);
         this.cargoMass = (int) invMass;
+        this.isStation = (ship instanceof SpaceStation);
     }
     public String getUID() {
         return UID;

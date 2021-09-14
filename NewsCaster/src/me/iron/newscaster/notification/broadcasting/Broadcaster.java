@@ -158,7 +158,7 @@ public class Broadcaster {
             ShipDestroyedInfo dInfo = (ShipDestroyedInfo) info;
             String report = "";
             if (dInfo.getAttacker().getFaction().equals("Pirates")) {
-                return "Pirates claim yet another victim ("+dInfo.getShip().getMass()+"k) from ["+dInfo.getShip().getFaction()+"] in "+getSystemName(dInfo.getSector(),true)+"!";
+                return "Pirates claim yet another victim ("+dInfo.getShip().getMass()+"k"+(dInfo.getShip().isStation?" station":"")+") from ["+dInfo.getShip().getFaction()+"] in "+getSystemName(dInfo.getSector(),true)+"!";
             }
             String shipA = "";
             String type = getShipType(dInfo.getShip().getMass());
@@ -185,10 +185,10 @@ public class Broadcaster {
             ShipCreatedInfo sinfo = (ShipCreatedInfo) info;
             ShipObject s = sinfo.getShip();
             if (sinfo.getShip().getFaction().equals("Pirates") || s.getFaction().equals("")) {
-
+                return "";
             }
-            String string = "["+s.getFaction()+"] has deployed a "+getShipType(s.getMass())+" (" + s.getMass() + "k) in " + getSystemName(sinfo.getSector(),true);
-            return(string            );
+            String string = "["+s.getFaction()+"] has deployed a "+((s.isStation)?"space station":getShipType(s.getMass())+" (" + s.getMass() + "k)")+" in " + getSystemName(sinfo.getSector(),true);
+            return(string);
 
         }
         if (info.getType().equals(GenericInfo.EventType.SYSTEM_CONQUERED)) {
