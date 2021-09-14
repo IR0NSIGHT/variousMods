@@ -184,9 +184,6 @@ public class Broadcaster {
         if (info instanceof ShipCreatedInfo) {
             ShipCreatedInfo sinfo = (ShipCreatedInfo) info;
             ShipObject s = sinfo.getShip();
-            if (sinfo.getShip().getFaction().equals("Pirates") || s.getFaction().equals("")) {
-                return "";
-            }
             String string = "["+s.getFaction()+"] has deployed a "+((s.isStation)?"space station":getShipType(s.getMass())+" (" + s.getMass() + "k)")+" in " + getSystemName(sinfo.getSector(),true);
             return(string);
 
