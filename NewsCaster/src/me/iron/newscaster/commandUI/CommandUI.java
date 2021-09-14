@@ -34,13 +34,15 @@ public class CommandUI {
         StarLoader.registerListener(PlayerChatEvent.class, new Listener<PlayerChatEvent>() {
             @Override
             public void onEvent(PlayerChatEvent playerChatEvent) {
-                if (!playerChatEvent.isServer()) {
-                    playerChatEvent.setCanceled(true);return;
+                if (!playerChatEvent.isServer()) { //shouldnt happen bc EH is serverside
+                    return;
                 }
+
                 PlayerState sender = GameServerState.instance.getPlayerFromNameIgnoreCaseWOException(playerChatEvent.getMessage().sender);
                 if (sender == null || !sender.isAdmin()) {
-                    playerChatEvent.setCanceled(true);return;
+                    return;
                 }
+
                 if (playerChatEvent.getText().contains("!news all")) {
                     sendMssg(sender,"listing all news:");
                     for (GenericInfo info: NewsManager.getNewsStorage()) {
