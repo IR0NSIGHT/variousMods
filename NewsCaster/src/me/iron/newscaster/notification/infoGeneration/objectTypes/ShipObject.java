@@ -114,6 +114,10 @@ public class ShipObject implements Serializable {
        this.faction = new FactionObject(faction);
     }
 
+    public void setFaction(FactionObject f) {
+        this.faction = f;
+    }
+
     /**
      * returns mass in k (1000)
      * @return

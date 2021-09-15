@@ -2,10 +2,10 @@
   "name": "NewsCaster",
   "author": "IR0NSIGHT",
   "description": "Automated newscasting",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "starmade_version": "0.202.110",
   "client_mod": false,
-  "server_mod": true,
+  "server_mod": false,
   "main_class": "me.iron.newscaster.ModMain",
   "smd_resource_id": 8252,
   "dependencies": [

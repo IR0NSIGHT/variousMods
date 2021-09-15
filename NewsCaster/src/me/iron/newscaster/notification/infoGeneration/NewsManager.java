@@ -33,7 +33,7 @@ public class NewsManager {
      * @param info info object
      * @return index in list.
      */
-    public static int addInfo(GenericInfo info) {
+    public static <T extends GenericInfo> int addInfo(T info) {
         //DebugFile.log("addInfo: " + info.getNewscast());
         if (newsStorage.size() >= info_threshold) {
             for(int i = 0; i < newsStorage.size() - info_threshold; i++) {
@@ -41,11 +41,12 @@ public class NewsManager {
             }
         }
         newsStorage.add(info);
+        ModPlayground.broadcastMessage(info.toString());
         Broadcaster.queueAdd(info);
         return newsStorage.size(); //add to end of list => size = index
     }
 
-    public static List<GenericInfo> getNewsStorage() {
+    public static List<? extends GenericInfo> getNewsStorage() {
         return newsStorage;
     }
 

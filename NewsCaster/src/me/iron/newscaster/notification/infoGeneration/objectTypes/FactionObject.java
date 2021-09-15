@@ -37,6 +37,14 @@ public class FactionObject implements Serializable {
         return factionName;
     }
 
+    public void setFactionID(int factionID) {
+        this.factionID = factionID;
+    }
+
+    public void setFactionName(String factionName) {
+        this.factionName = factionName;
+    }
+
     @Override
     public String toString() {
         return "FactionObject{" +

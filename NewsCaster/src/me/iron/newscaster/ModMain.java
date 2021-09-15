@@ -1,8 +1,12 @@
 package me.iron.newscaster;
 
+import api.DebugFile;
 import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
+import api.mod.StarLoader;
 import api.mod.StarMod;
+import me.iron.newscaster.commandUI.CommandBroadcast;
+import me.iron.newscaster.commandUI.CommandGenerate;
 import me.iron.newscaster.commandUI.CommandUI;
 import me.iron.newscaster.eventListening.ListenerManager;
 import me.iron.newscaster.notification.broadcasting.Broadcaster;
@@ -19,6 +23,8 @@ public class ModMain extends StarMod {
     @Override
     public void onEnable() {
         instance = this;
+        DebugFile.log("registering generator commmand");
+        registerCommands();
         super.onEnable();
     }
 
@@ -40,6 +46,7 @@ public class ModMain extends StarMod {
         CommandUI.addListener();
         NewsManager.loadFromPersistentUtil();
         Broadcaster.init();
+
     }
 
     @Override
@@ -47,4 +54,8 @@ public class ModMain extends StarMod {
         super.onClientCreated(event);
     }
 
+    private void registerCommands() {
+        StarLoader.registerCommand(new CommandGenerate());
+        StarLoader.registerCommand(new CommandBroadcast());
+    }
 }

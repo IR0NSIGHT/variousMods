@@ -73,6 +73,9 @@ public class Broadcaster {
 
     }
 
+    public static int getQueueSize() {
+        return queue.size();
+    }
     /**
      * if true, system will automatically broadcast new events
      */
@@ -95,11 +98,8 @@ public class Broadcaster {
                 if (!autobroadcast) {
                     return;
                 }
-                if (System.currentTimeMillis() > lastBroadcast + broadcastLoopTime) {
-                    timeToBroadcast = true;
-                }
-                if (queue.size() >= threshold || timeToBroadcast) {
-                    timeToBroadcast = false;
+
+                if (queue.size() >= threshold || System.currentTimeMillis() >= lastBroadcast + broadcastLoopTime ) {
                     lastBroadcast = System.currentTimeMillis();
                     //was created after last broadcast.
                     flushQueue();
@@ -161,7 +161,7 @@ public class Broadcaster {
                 return "Pirates claim yet another victim ("+dInfo.getShip().getMass()+"k"+(dInfo.getShip().isStation?" station":"")+") from ["+dInfo.getShip().getFaction()+"] in "+getSystemName(dInfo.getSector(),true)+"!";
             }
             String shipA = "";
-            String type = getShipType(dInfo.getShip().getMass());
+            String type = getShipType(dInfo.getShip().getReactor());
             if (!broadcast_show_shipname || dInfo.getShip().getName().equals("")|| dInfo.getShip().getName().length() > 14) {
                 shipA = "a " + type+ " ";
             } else {

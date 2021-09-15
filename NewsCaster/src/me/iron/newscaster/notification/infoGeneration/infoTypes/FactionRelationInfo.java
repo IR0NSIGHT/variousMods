@@ -30,6 +30,25 @@ public class FactionRelationInfo extends FactionInfo {
         faction2 = new FactionObject(f2);
     }
 
+    public FactionRelationInfo(FactionObject f1, FactionObject f2, FactionRelation.RType oldRelation, FactionRelation.RType newRelation) {
+        super(f1,EventType.GENERIC);
+
+        switch (newRelation.getName()) {
+            case "NEUTRAL":
+                this.eventType = EventType.PEACE_DECLARATION;
+                break;
+            case "FRIEND":
+                this.eventType = EventType.ALLIANCE_DECLARATION;
+                break;
+            case "ENEMY":
+                this.eventType = EventType.WAR_DECLARATION;
+                break;
+        };
+        faction1 =f1;
+        faction2 =f2;
+    }
+
+
     @Override
     public String getNewscast() {
         String s = "";

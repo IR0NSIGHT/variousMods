@@ -44,12 +44,13 @@ public class CommandUI {
                 }
 
                 if (playerChatEvent.getText().contains("!news all")) {
-                    sendMssg(sender,"listing all news:");
+                    StringBuilder out = new StringBuilder();
+                    out.append("listing all news:\n");
                     for (GenericInfo info: NewsManager.getNewsStorage()) {
-                        String report = info.getNewscast();
-                        sendMssg(sender,info.toString() + "systemname:" + Broadcaster.getSystemName(info.getSector(),true));
+                       out.append(info.toString()).append("systemname:").append(Broadcaster.getSystemName(info.getSector(), true)).append("\n\n");
                         DebugFile.log(info.getNewscast());
                     }
+                    sendMssg(sender,out.toString());
                     playerChatEvent.setCanceled(true);return;
                 }
                 if (playerChatEvent.getText().contains("!news save")) {
