@@ -1,9 +1,12 @@
 package me.iron.newscaster.notification.infoGeneration.objectTypes;
 
 import api.common.GameServer;
+import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.SegmentController;
+import org.schema.game.common.controller.Ship;
 import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.data.ManagedSegmentController;
+import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.faction.Faction;
 
 import java.io.Serializable;
@@ -22,6 +25,10 @@ public class ShipObject implements Serializable {
     private FactionObject faction;
     private String pilot = unknownString; //TODO add pilot getter, setter, getStringPretty etc.
     private int mass = unknownNumber;
+
+
+
+    private int reactor = unknownNumber;
     private int cargoMass = unknownNumber;
     public boolean isStation = false;
     //TODO more info? type? "drive signature" for identification = UID + turning into a number?
@@ -35,16 +42,16 @@ public class ShipObject implements Serializable {
      * @param mass mass, gets rounded.
      * @param cargoMass total cargo mass (gets rounded)
      */
-    public ShipObject(String UID, String name, int factionID, int mass, int cargoMass) {
+    public ShipObject(String UID, String name, int factionID, int mass, int cargoMass, int reactor) {
         this.setUID(UID);
         this.setName(name);
         this.setFaction(factionID);
         this.setMass(mass);
         this.setCargoMass(mass);
+        this.setReactor(reactor);
         //DebugFile.log("created ship object" + toString());
     }
     public ShipObject(SegmentController ship) {
-
         setUID(ship.getUniqueIdentifier());
         setName(ship.getName());
 
@@ -63,6 +70,15 @@ public class ShipObject implements Serializable {
         double invMass = (this instanceof ManagedSegmentController<?> ? ((ManagedSegmentController<?>) this).getManagerContainer().getMassFromInventories() : 0);
         this.cargoMass = (int) invMass;
         this.isStation = (ship instanceof SpaceStation);
+        this.reactor = ((ManagedSegmentController<?>)ship).getManagerContainer().getPowerInterface().getActiveReactor().getActualSize();
+
+        ManagedUsableSegmentController<?> msc = (ManagedUsableSegmentController<?>)ship;
+        for (PlayerState p: msc.getAttachedPlayers()) {
+            if (p.getFirstControlledTransformableWOExc().equals(ship)) {
+                pilot = p.getName();
+                break;
+            }
+        }
     }
     public String getUID() {
         return UID;
@@ -125,15 +141,25 @@ public class ShipObject implements Serializable {
         this.cargoMass = cargoMass;
     }
 
+    public int getReactor() {
+        return reactor;
+    }
+
+    public void setReactor(int reactor) {
+        this.reactor = reactor;
+    }
+
     @Override
     public String toString() {
         return "ShipObject{" +
                 "UID='" + UID + '\'' +
                 ", name='" + name + '\'' +
-                ", faction='" + faction.factionName + '\'' +
+                ", faction=" + faction +
                 ", pilot='" + pilot + '\'' +
                 ", mass=" + mass +
+                ", reactor=" + reactor +
                 ", cargoMass=" + cargoMass +
+                ", isStation=" + isStation +
                 '}';
     }
 

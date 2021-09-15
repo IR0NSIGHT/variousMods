@@ -102,6 +102,8 @@ public class ListenerManager {
                 }
 
                 ShipObject victim = new ShipObject(ship);
+                //account for overheating, ship is at 40% reactor
+                victim.setReactor((int) (victim.getReactor()/0.4f)); //TODO use reactor overheat percent
                 ShipObject attacker;
                 if (event.getLastDamager().getShootingEntity() instanceof SegmentController) {
                     attacker = new ShipObject((SegmentController) event.getLastDamager().getShootingEntity());

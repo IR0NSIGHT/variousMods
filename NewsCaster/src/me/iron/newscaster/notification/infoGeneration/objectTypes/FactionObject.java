@@ -37,4 +37,11 @@ public class FactionObject implements Serializable {
         return factionName;
     }
 
+    @Override
+    public String toString() {
+        return "FactionObject{" +
+                "factionID=" + factionID +
+                ", factionName='" + factionName + '\'' +
+                '}';
+    }
 }

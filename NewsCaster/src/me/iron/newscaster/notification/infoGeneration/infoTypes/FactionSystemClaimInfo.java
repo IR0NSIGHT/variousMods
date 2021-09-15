@@ -25,4 +25,16 @@ public class FactionSystemClaimInfo extends FactionInfo {
         this.oldOwner = oldOwner;
         this.system = system;
     }
+
+    @Override
+    public String toString() {
+        return "FactionSystemClaimInfo{" +
+                "oldOwner=" + oldOwner +
+                ", system=" + system +
+                ", faction=" + faction +
+                ", sector=" + sector +
+                ", eventType=" + eventType +
+                ", time=" + time +
+                '}';
+    }
 }

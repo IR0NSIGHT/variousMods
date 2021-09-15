@@ -26,4 +26,13 @@ public class EntityInfo extends GenericInfo {
         this.ship = ship; //who
     }
 
+    @Override
+    public String toString() {
+        return "EntityInfo{" +
+                "ship=" + ship +
+                ", sector=" + sector +
+                ", eventType=" + eventType +
+                ", time=" + time +
+                '}';
+    }
 }

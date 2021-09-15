@@ -18,4 +18,14 @@ public class ShipCreatedInfo extends EntityInfo {
     public String getNewscast() {
         return "" + ship.getInfoStringPretty() + " was created at " + sector.toString() + " at " + getTimestampGMT();
     }
+
+    @Override
+    public String toString() {
+        return "ShipCreatedInfo{" +
+                "ship=" + ship +
+                ", sector=" + sector +
+                ", eventType=" + eventType +
+                ", time=" + time +
+                '}';
+    }
 }

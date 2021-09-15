@@ -233,18 +233,18 @@ public class Broadcaster {
     }
 
     /**
-     * gets a hardcoded shiptype(string) based on the mass of the ship.
-     * @param mass mass of ship in k
+     * gets a hardcoded shiptype(string) based on the reactorsize of the ship.
+     * @param reactorsize reactorsize of ship in k
      * @return
      */
-    public static String getShipType(int mass) {
-        if(mass <=  15) return "Fast Attack Craft";
-        if(mass <=  30) return "Escort";
-        if(mass <=  50) return "Corvette";
-        if(mass <= 100) return "Frigate";
-        if(mass <= 200) return "Destroyer";
-        if(mass <= 300) return "Cruiser";
-        if(mass <= 500) return "Battleship";
+    public static String getShipType(int reactorsize) {
+        if(reactorsize <=  15000) return "Fast Attack Craft";
+        if(reactorsize <=  30000) return "Escort";
+        if(reactorsize <=  50000) return "Corvette";
+        if(reactorsize <= 100000) return "Frigate";
+        if(reactorsize <= 200000) return "Destroyer";
+        if(reactorsize <= 300000) return "Cruiser";
+        if(reactorsize <= 500000) return "Battleship";
         return "Titan";
     }
 

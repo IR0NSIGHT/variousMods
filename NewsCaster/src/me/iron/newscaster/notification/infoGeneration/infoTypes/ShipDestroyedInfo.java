@@ -23,4 +23,15 @@ public class ShipDestroyedInfo extends EntityInfo {
     public String getNewscast() {
         return "" + ship.getInfoStringPretty() + " was lost to " + attacker.getInfoStringPretty() + " at sector " + sector.toString() + " at " + getTimestampGMT();
     }
+
+    @Override
+    public String toString() {
+        return "ShipDestroyedInfo{" +
+                "attacker=" + attacker +
+                ", ship=" + ship +
+                ", sector=" + sector +
+                ", eventType=" + eventType +
+                ", time=" + time +
+                '}';
+    }
 }

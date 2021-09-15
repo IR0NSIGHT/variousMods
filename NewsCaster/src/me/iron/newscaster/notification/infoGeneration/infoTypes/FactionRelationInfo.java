@@ -47,4 +47,16 @@ public class FactionRelationInfo extends FactionInfo {
         s += " at " + getTimestampGMT();
         return s;
     }
+
+    @Override
+    public String toString() {
+        return "FactionRelationInfo{" +
+                "faction1=" + faction1 +
+                ", faction2=" + faction2 +
+                ", faction=" + faction +
+                ", sector=" + sector +
+                ", eventType=" + eventType +
+                ", time=" + time +
+                '}';
+    }
 }

@@ -84,4 +84,13 @@ public class GenericInfo {
         s += sdf.format(currentTime);
         return s;
     }
+
+    @Override
+    public String toString() {
+        return "GenericInfo{" +
+                "sector=" + sector +
+                ", eventType=" + eventType +
+                ", time=" + time +
+                '}';
+    }
 }

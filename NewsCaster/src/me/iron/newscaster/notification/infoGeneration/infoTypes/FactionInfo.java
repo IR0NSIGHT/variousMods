@@ -19,4 +19,14 @@ public class FactionInfo extends GenericInfo {
         super(new Vector3i(), type);
         this.faction = faction;
     }
+
+    @Override
+    public String toString() {
+        return "FactionInfo{" +
+                "faction=" + faction +
+                ", sector=" + sector +
+                ", eventType=" + eventType +
+                ", time=" + time +
+                '}';
+    }
 }

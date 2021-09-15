@@ -47,7 +47,7 @@ public class CommandUI {
                     sendMssg(sender,"listing all news:");
                     for (GenericInfo info: NewsManager.getNewsStorage()) {
                         String report = info.getNewscast();
-                        sendMssg(sender,info.getNewscast() + "systemname:" + Broadcaster.getSystemName(info.getSector(),true));
+                        sendMssg(sender,info.toString() + "systemname:" + Broadcaster.getSystemName(info.getSector(),true));
                         DebugFile.log(info.getNewscast());
                     }
                     playerChatEvent.setCanceled(true);return;
