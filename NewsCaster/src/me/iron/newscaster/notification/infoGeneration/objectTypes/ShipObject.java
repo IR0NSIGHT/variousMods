@@ -64,7 +64,7 @@ public class ShipObject implements Serializable {
         };
 
 
-        setMass((int) ship.getMass());
+        setMass((int) ship.getMassWithDocks());
         //DebugFile.log("created ship object" + toString());
         //TODO get cargo mass
         double invMass = (this instanceof ManagedSegmentController<?> ? ((ManagedSegmentController<?>) this).getManagerContainer().getMassFromInventories() : 0);

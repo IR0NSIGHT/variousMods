@@ -8,6 +8,7 @@ package me.iron.newscaster.eventListening;
  */
 
 import api.DebugFile;
+import api.ModPlayground;
 import api.listener.Listener;
 import api.listener.events.entity.SegmentControllerOverheatEvent;
 import api.listener.events.entity.SegmentControllerSpawnEvent;
@@ -16,6 +17,7 @@ import api.listener.events.faction.SystemClaimEvent;
 import api.mod.StarLoader;
 import api.utils.StarRunnable;
 import me.iron.newscaster.*;
+import me.iron.newscaster.DBMS.Manager;
 import me.iron.newscaster.notification.infoGeneration.NewsManager;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.*;
 import me.iron.newscaster.notification.infoGeneration.objectTypes.FactionObject;
@@ -33,6 +35,7 @@ import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.server.data.GameServerState;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -67,10 +70,18 @@ public class ListenerManager {
     }
 
     private void InitEHs() {
+        try {
+            Manager.initTable();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
         DebugFile.log("initializing eventhandlers.");
         StarLoader.registerListener(SegmentControllerOverheatEvent.class, new Listener<SegmentControllerOverheatEvent>() {
             @Override
             public void onEvent(SegmentControllerOverheatEvent event) {
+                info_log_ship_destruct = true;
+                info_ship_minMass = 0;
                 if (!event.isServer() || !info_log_ship_destruct)
                 {
                     return;
@@ -105,12 +116,21 @@ public class ListenerManager {
                 //account for overheating, ship is at 40% reactor
                 victim.setReactor((int) (victim.getReactor()/0.4f)); //TODO use reactor overheat percent
                 ShipObject attacker;
+                long attackerID;
                 if (event.getLastDamager().getShootingEntity() instanceof SegmentController) {
                     attacker = new ShipObject((SegmentController) event.getLastDamager().getShootingEntity());
+                    attackerID = ((SegmentController) event.getLastDamager()).dbId;
                 } else {
                     attacker = new ShipObject((SegmentController) shooter);
+                    attackerID = ((SegmentController) shooter).dbId;
                 }
                 ShipDestroyedInfo info = new ShipDestroyedInfo(victim,attacker,ship.getSector(new Vector3i()));
+                Manager.addAttack(ship.dbId,ship.getFactionId(), (int) ship.getMassWithDocks(),true, attackerID, lastDamager.getFactionId());
+                try {
+                    ModPlayground.broadcastMessage(Manager.printTable());
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
                 NewsManager.addInfo(info);
 
             }

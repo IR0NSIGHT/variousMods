@@ -88,7 +88,7 @@ public class Broadcaster {
      */
     public static void init() {
         //initialize config reading
-        configManager.init();
+    //    configManager.init();
         updateFromConfig();
         //start cycle
         new StarRunnable() {
@@ -259,10 +259,19 @@ public class Broadcaster {
         for(RegisteredClientOnServer client : GameServerState.instance.getClients().values()) {
             PlayerState player = GameServerState.instance.getPlayerStatesByName().get(client.getPlayerName());
             CommandUI.sendMssg(player,mssg);
-            ChatMessage m = new ChatMessage();
-            m.text = mssg;
-            m.sender = "Newscaster";
-            StarLoader.fireEvent(new PlayerChatEvent(m,null),true);
         }
+        //TODO starbridge implementation
+        //ChatMessage m = new ChatMessage();
+        //m.text = mssg;
+        //m.sender = "Newscaster";
+        //StarLoader.fireEvent(new PlayerChatEvent(m,null),true);
+        try {
+            sendToStarBridge();
+        } catch (ClassNotFoundException ex) {
+
+        }
+    }
+    private static void sendToStarBridge() throws ClassNotFoundException {
+        
     }
 }
