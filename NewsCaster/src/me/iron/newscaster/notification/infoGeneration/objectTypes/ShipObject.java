@@ -53,7 +53,7 @@ public class ShipObject implements Serializable {
     }
     public ShipObject(SegmentController ship) {
         setUID(ship.getUniqueIdentifier());
-        setName(ship.getName());
+        setName(ship.getRealName());
 
         //faction
         Faction shipFaction = ship.getFaction();
@@ -70,7 +70,7 @@ public class ShipObject implements Serializable {
         double invMass = (this instanceof ManagedSegmentController<?> ? ((ManagedSegmentController<?>) this).getManagerContainer().getMassFromInventories() : 0);
         this.cargoMass = (int) invMass;
         this.isStation = (ship instanceof SpaceStation);
-        this.reactor = ((ManagedSegmentController<?>)ship).getManagerContainer().getPowerInterface().getActiveReactor().getActualSize();
+        this.reactor = -1;//TODO caused error on stations with not reactors((ManagedSegmentController<?>)ship).getManagerContainer().getPowerInterface().getActiveReactor().getActualSize();
 
         ManagedUsableSegmentController<?> msc = (ManagedUsableSegmentController<?>)ship;
         for (PlayerState p: msc.getAttachedPlayers()) {

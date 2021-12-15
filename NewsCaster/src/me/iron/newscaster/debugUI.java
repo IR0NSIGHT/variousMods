@@ -31,7 +31,7 @@ public class debugUI {
                 }
                 if (event.getText().contains("print")) {
                     try {
-                        System.out.println(Manager.printTable());
+                        System.out.println(Manager.tableToString(Manager.getConnection().createStatement().executeQuery(Manager.printQuery)));
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                     }
