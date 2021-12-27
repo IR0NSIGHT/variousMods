@@ -36,7 +36,6 @@ import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.server.data.GameServerState;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -125,9 +124,9 @@ public class ListenerManager {
                     attackerID = ((SegmentController) shooter).dbId;
                 }
                 ShipDestroyedInfo info = new ShipDestroyedInfo(victim,attacker,ship.getSector(new Vector3i()));
-                Manager.addAttack(ship.dbId,ship.getFactionId(), (int) ship.getMassWithDocks(),true, attackerID, lastDamager.getFactionId());
+        //TODO        Manager.addAttack(ship.dbId,ship.getFactionId(), (int) ship.getMassWithDocks(),true, attackerID, lastDamager.getFactionId());
                 try {
-                    ModPlayground.broadcastMessage(Manager.printTable());
+                    ModPlayground.broadcastMessage(Manager.resultToString(Manager.getAttacksPretty()));
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
