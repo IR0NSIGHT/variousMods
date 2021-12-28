@@ -80,7 +80,6 @@ public class ListenerManager {
             @Override
             public void onEvent(SegmentControllerOverheatEvent event) {
                 info_log_ship_destruct = true;
-                info_ship_minMass = 0;
                 if (!event.isServer() || !info_log_ship_destruct)
                 {
                     return;
@@ -124,12 +123,17 @@ public class ListenerManager {
                     attackerID = ((SegmentController) shooter).dbId;
                 }
                 ShipDestroyedInfo info = new ShipDestroyedInfo(victim,attacker,ship.getSector(new Vector3i()));
-        //TODO        Manager.addAttack(ship.dbId,ship.getFactionId(), (int) ship.getMassWithDocks(),true, attackerID, lastDamager.getFactionId());
-                try {
-                    ModPlayground.broadcastMessage(Manager.resultToString(Manager.getAttacksPretty()));
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
+                Manager.addAttack(ship.dbId,
+                        ship.getFactionId(),
+                        ship.getRealName(),
+
+                        true,
+                        attackerID,
+                        lastDamager.getFactionId(),
+                        attacker.getName(),
+                        ship.getSector(new Vector3i()),
+                        System.currentTimeMillis());
+
                 NewsManager.addInfo(info);
 
             }

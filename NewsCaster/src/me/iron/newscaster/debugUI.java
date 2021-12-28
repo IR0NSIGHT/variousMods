@@ -36,6 +36,20 @@ public class debugUI {
                         throwables.printStackTrace();
                     }
                 }
+                if (event.getText().contains("!killer")) {
+                    try {
+                        ModPlayground.broadcastMessage(Manager.resultToString(Manager.getKillers()));
+                    } catch (Exception ignored) {
+
+                    }
+                }
+                if (event.getText().contains("!attacks")) {
+                    try {
+                        ModPlayground.broadcastMessage(Manager.resultToString(Manager.getAttacksPretty()));
+                    } catch (Exception ignored) {
+
+                    }
+                }
             }
         }, ModMain.instance);
     }
