@@ -13,12 +13,12 @@ import java.util.Random;
  * TIME: 22:17
  */
 public class Manager {
-    public static String printQuery ="SELECT v.name, v.size, a.name, a.size, att.sector_x, att.sector_y, attack.sector_z, att.millis \n" +
+    public static String printQuery ="SELECT v.name, v.faction, a.name, a.faction \n" +
             "from\n" +
             "\tdestroyed as att,\n" +
             "\tobjects as v,\n" +
             "\tobjects as a\n" +
-            "WHERE att.victim_id = v.DBID and att.attacker_id = a.DBID;";
+            "WHERE (att.victim_id, att.victim_faction) = (v.DBID,v.faction) and (att.attacker_id,att.attacker_faction) = (a.DBID,a.faction);";
 
     public static Connection connection;
     private static String maxNIOSize = "";
@@ -49,28 +49,32 @@ public class Manager {
 
 
 
-    public static void addDestroyed(long victimID, long victimFactionID, String victimName, int victim_size, long attackerID, long attackerFactionId, String attackerName, int attacker_size, long millis, Vector3i sector) {
+    public static void addDestroyed(long victimID, long victimFactionID, String victimName, int victim_size, boolean killed, long attackerID, long attackerFactionId, String attackerName, int attacker_size, long millis, Vector3i sector) {
         try {
             Statement s = connection.createStatement();
             victimName = "'"+victimName.substring(0, Math.min(victimName.length(),50))+"'";
             attackerName ="'"+attackerName.substring(0, Math.min(attackerName.length(),50))+"'";
 
-            addOrUpdateObject(victimID,victimFactionID,victimName,victim_size);
-            addOrUpdateObject(attackerID,attackerFactionId,attackerName,attacker_size);
-
             //was ship destroyed earlier already
-        //   ResultSet r = s.executeQuery("SELECT 1 from destroyed as a where a.victim_ID = "+victimID +";");
-        //   if (r.next()) {
-        //       s.close();
-        //       System.out.println("NOT LOGGING KILLED SHIP TWICE: " + victimName);
-        //       return;
-        //   }
+            ResultSet r = s.executeQuery("SELECT 1 from objects as o where o.DBID = "+victimID +" and o.killed = 1;");
+            if (r.next()) {
+                s.close();
+                System.out.println("NOT LOGGING KILLED SHIP TWICE: " + victimName);
+                return;
+            }
+
+            addOrUpdateObject(victimID,victimFactionID,victimName,victim_size, killed );
+            addOrUpdateObject(attackerID,attackerFactionId,attackerName,attacker_size, false);
+
+
 
             StringBuilder q = new StringBuilder();
 
-            q.append("INSERT INTO destroyed(victim_id,attacker_id,millis,sector_x,sector_y,sector_z) VALUES (");
+            q.append("INSERT INTO destroyed(victim_id,victim_faction,attacker_id,attacker_faction,millis,sector_x,sector_y,sector_z) VALUES (");
             q.append(victimID).append(",");
+            q.append(victimFactionID).append(",");
             q.append(attackerID).append(",");
+            q.append(attackerFactionId).append(",");
             q.append(millis).append(",");
             q.append(sector.x).append(",").append(sector.y).append(",").append(sector.z).append(");");
             System.out.println(q.toString());
@@ -97,7 +101,7 @@ public class Manager {
                     r.nextInt(2),
                     "ship"+shipID1,
                     500,
-
+                    r.nextBoolean(),
                     shipID2,
                     r.nextInt(2),
                     "ship_"+shipID2,
@@ -110,16 +114,16 @@ public class Manager {
         s.close();
     }
 
-    private static void addOrUpdateObject(long DBID, long factionID, String name, int size) throws SQLException {
+    private static void addOrUpdateObject(long DBID, long factionID, String name, int size, boolean killed) throws SQLException {
         Statement s = connection.createStatement();
         ResultSet existsQuery = s.executeQuery("SELECT 1 from objects as o WHERE o.DBID ="+DBID+" and o.faction = "+factionID+";");
         String updateVictim;
         if (existsQuery.next()) { //update existing
-            updateVictim= "UPDATE objects as o \n" + "SET (faction,name,size)=(" + factionID + ","+ name + ","+size+ ") WHERE o.DBID = "+ DBID +"and o.faction = "+factionID+";";
+            updateVictim= "UPDATE objects as o \n" + "SET (faction,name,size,killed)=(" + factionID + ","+ name + ","+size+","+(killed?1:0)+ ") WHERE o.DBID = "+ DBID +"and o.faction = "+factionID+";";
         } else { //create new
-            updateVictim = "INSERT INTO objects(DBID,faction,name,size)\n" +
+            updateVictim = "INSERT INTO objects(DBID,faction,name,size,killed)\n" +
                     "VALUES" +
-                    "(" + DBID + "," + factionID + "," + name +","+size+ ");";
+                    "(" + DBID + "," + factionID + "," + name +","+size+","+(killed?1:0)+ ");";
 
         }
         s.executeUpdate(updateVictim);
@@ -162,12 +166,15 @@ public class Manager {
                 "\tfaction bigint not null,\n" +
                 "\tname varchar(50) not null,\n" +
                 "\tsize int not null,\n" +
+                "\tkilled int, \n" +
                 "\tCONSTRAINT ship_key PRIMARY KEY (DBID, faction)\n" +
                 ");\n" +
                 "\t\n" +
                 "CREATE TABLE IF NOT EXISTS destroyed (\n" +
                 "\tvictim_id bigint,\n" +
+                "\tvictim_faction bigint, \n" +
                 "\tattacker_id bigint,\n" +
+                "\tattacker_faction bigint, \n"+
                 "\tmillis bigint,\n" +
                 "\tsector_x int,\n" +
                 "\tsector_y int,\n" +

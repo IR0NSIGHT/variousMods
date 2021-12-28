@@ -238,6 +238,7 @@ public class Broadcaster {
      * @return
      */
     public static String getShipType(int reactorsize) {
+        if (reactorsize == -1)    return "Unpowered Object";
         if(reactorsize <=  15000) return "Fast Attack Craft";
         if(reactorsize <=  30000) return "Escort";
         if(reactorsize <=  50000) return "Corvette";
