@@ -6,7 +6,6 @@ import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
 import api.utils.game.PlayerUtils;
 import me.iron.newscaster.DBMS.Manager;
-import org.lwjgl.Sys;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.server.data.GameServerState;
 
@@ -32,14 +31,23 @@ public class debugUI {
                 }
                 if (event.getText().contains("print")) {
                     try {
-                        System.out.println("print attacks:");
-                        System.out.println(Manager.tableToString(Manager.getConnection().createStatement().executeQuery("SELECT a.* from destroyed as a;")));
-
-                        System.out.println("print all objects");
-                        System.out.println(Manager.tableToString(Manager.getConnection().createStatement().executeQuery("SELECT s.* FROM objects as s;")));
-
+                        System.out.println(Manager.resultToString(Manager.getAttacksPretty()));
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
+                    }
+                }
+                if (event.getText().contains("!killer")) {
+                    try {
+                        ModPlayground.broadcastMessage(Manager.resultToString(Manager.getKillers()));
+                    } catch (Exception ignored) {
+
+                    }
+                }
+                if (event.getText().contains("!attacks")) {
+                    try {
+                        ModPlayground.broadcastMessage(Manager.resultToString(Manager.getAttacksPretty()));
+                    } catch (Exception ignored) {
+
                     }
                 }
             }

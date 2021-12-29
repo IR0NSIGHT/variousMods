@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="MiningStationsDed">
-    <output-path>$PROJECT_DIR$/../server testarea/server/StarMade/mods</output-path>
-    <root id="archive" name="MiningStations.jar">
-      <element id="module-output" name="MiningStations" />
-    </root>
-  </artifact>
-</component>

@@ -23,7 +23,6 @@ import me.iron.newscaster.notification.infoGeneration.infoTypes.*;
 import me.iron.newscaster.notification.infoGeneration.objectTypes.FactionObject;
 import me.iron.newscaster.notification.infoGeneration.objectTypes.ShipObject;
 import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.SegmentControllerHpController;
 import org.schema.game.common.controller.SendableSegmentController;
@@ -81,62 +80,61 @@ public class ListenerManager {
             @Override
             public void onEvent(SegmentControllerOverheatEvent event) {
                 info_log_ship_destruct = true;
-                info_ship_minMass = 0;
                 if (!event.isServer() || !info_log_ship_destruct)
                 {
                     return;
                 }
                 DebugFile.log("segmentcontroller is overheating.");
                 //make ship object
-                SegmentController victim = event.getEntity();
-                float mass = victim.getMassWithDocks();
+                SegmentController ship = event.getEntity();
+                float mass = ship.getMassWithDocks();
                 float min = info_ship_minMass;
-                if (victim.getMassWithDocks() < info_ship_minMass) {
+                if (ship.getMassWithDocks() < info_ship_minMass) {
                     return;
                 }
 
                 //make attacker object
                 Damager lastDamager = event.getLastDamager();
-                ManagedUsableSegmentController attacker;
+
+                if (lastDamager.getFactionId() == ship.getFactionId() && ship.getFactionId() != 0) {
+                    return; //same faction == boring.
+                }
+
                 boolean isPlayer = (lastDamager.getOwnerState() instanceof PlayerState);
-                try {
-                    if (isPlayer && (((PlayerState) lastDamager.getOwnerState()).getFirstControlledTransformable()instanceof ManagedUsableSegmentController)) {
-                        attacker = (ManagedUsableSegmentController) ((PlayerState) lastDamager.getOwnerState()).getFirstControlledTransformable();
-                    } else if (lastDamager instanceof ManagedUsableSegmentController) {
-                        attacker = (ManagedUsableSegmentController) lastDamager;
-                    } else {
-                        return;
+                SimpleTransformableSendableObject shooter = lastDamager.getShootingEntity();
+                if (isPlayer) {
+                    try {
+                        shooter = ((PlayerState) lastDamager.getOwnerState()).getFirstControlledTransformable();
+                    } catch (PlayerControlledTransformableNotFound playerControlledTransformableNotFound) {
+                        playerControlledTransformableNotFound.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return;
                 }
 
-                ManagedUsableSegmentController victimMSC = (ManagedUsableSegmentController) victim;
-                long sizeV = victimMSC.getReactorHpMax();
-                long sizeA = attacker.getReactorHpMax();
-
-                long overheatLeft = victim.isCoreOverheating()?victim.getCoreOverheatingTimeLeftMS(0L):1000;
-                Manager.addDestroyed(
-                        victim.dbId,
-                        victim.getFactionId(),
-                        victim.getRealName(),
-                        (int)sizeV, //TODO downcasting is a problem at some point?
-                        victim.isCoreOverheating(), //if its already overheating, its the "killing" event.
-                        //--DBID, faction, name, size
-                        attacker.dbId,
-                        lastDamager.getFactionId(), //might be a player in a 0 factioned ship
-                        attacker.getRealName(),
-                        (int)sizeA,
-
-                        //--time and position
-                        System.currentTimeMillis(),
-                        victim.getSector(new Vector3i()));
-                try {
-                    ModPlayground.broadcastMessage(Manager.tableToString(Manager.getConnection().createStatement().executeQuery(Manager.printQuery)));
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                ShipObject victim = new ShipObject(ship);
+                //account for overheating, ship is at 40% reactor
+                victim.setReactor((int) (victim.getReactor()/0.4f)); //TODO use reactor overheat percent
+                ShipObject attacker;
+                long attackerID;
+                if (event.getLastDamager().getShootingEntity() instanceof SegmentController) {
+                    attacker = new ShipObject((SegmentController) event.getLastDamager().getShootingEntity());
+                    attackerID = ((SegmentController) event.getLastDamager()).dbId;
+                } else {
+                    attacker = new ShipObject((SegmentController) shooter);
+                    attackerID = ((SegmentController) shooter).dbId;
                 }
+                ShipDestroyedInfo info = new ShipDestroyedInfo(victim,attacker,ship.getSector(new Vector3i()));
+                Manager.addAttack(ship.dbId,
+                        ship.getFactionId(),
+                        ship.getRealName(),
+
+                        true,
+                        attackerID,
+                        lastDamager.getFactionId(),
+                        attacker.getName(),
+                        ship.getSector(new Vector3i()),
+                        System.currentTimeMillis());
+
+                NewsManager.addInfo(info);
 
             }
         }, ModMain.instance);
@@ -281,6 +279,4 @@ public class ListenerManager {
         }
         forceOverheatSC(sc);
     }
-
-
 }

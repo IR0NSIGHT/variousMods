@@ -1,6 +1,7 @@
 package me.iron.npccontrol;
 
 import api.DebugFile;
+import api.ModPlayground;
 import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
 import api.mod.StarLoader;
@@ -8,6 +9,7 @@ import api.mod.StarMod;
 import me.iron.npccontrol.stationReplacement.*;
 import me.iron.npccontrol.stationReplacement.commands.CommandCommander;
 import org.junit.Test;
+import org.schema.game.server.data.GameServerState;
 
 
 /**
@@ -33,10 +35,7 @@ public class ModMain extends StarMod {
     public void onServerCreated(ServerInitializeEvent event) {
         super.onServerCreated(event);
         DebugFile.log("server created",this);
-        StationReplacer.loadPersistentAll(); //load persistent data for pirates
-        StationReplacer.deployListener();
-        //Debug
-        CommandCommander.init(); //chat command listener
+
     }
 
     @Override
@@ -44,5 +43,13 @@ public class ModMain extends StarMod {
         super.onClientCreated(event);
         DebugFile.log("on client",this);
 
+    }
+
+    public static void log(String mssg) {
+        System.out.println(mssg);
+        if (GameServerState.instance != null) {
+            DebugFile.log(mssg);
+            ModPlayground.broadcastMessage(mssg);
+        }
     }
 }

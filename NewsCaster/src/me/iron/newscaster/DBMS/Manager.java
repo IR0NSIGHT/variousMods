@@ -1,7 +1,9 @@
 package me.iron.newscaster.DBMS;
 
 import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.data.player.faction.Faction;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.sql.*;
 import java.util.Random;
@@ -13,148 +15,32 @@ import java.util.Random;
  * TIME: 22:17
  */
 public class Manager {
-    public static String printQuery ="SELECT v.name, v.faction, a.name, a.faction \n" +
-            "from\n" +
-            "\tdestroyed as att,\n" +
-            "\tobjects as v,\n" +
-            "\tobjects as a\n" +
-            "WHERE (att.victim_id, att.victim_faction) = (v.DBID,v.faction) and (att.attacker_id,att.attacker_faction) = (a.DBID,a.faction);";
-
-    public static Connection connection;
     private static String maxNIOSize = "";
+    public static Connection connection;
 
     public static void main(String[] args) {
         try {
-            connection = getConnection();
+            initTable();
             deleteTables();
             createTable();
-
             addEntries();
-            Statement s = connection.createStatement();
-            System.out.print(tableToString(s.executeQuery("SELECT o.* FROM objects as o;")));
-            System.out.print(tableToString(s.executeQuery("SELECT o.* FROM destroyed as o;")));
-            System.out.println(tableToString(s.executeQuery(printQuery)));
-            connection.close();
 
+            System.out.println(resultToString(getObjectsSimple()));
+            System.out.println("attacks pretty");
+            System.out.println(resultToString(getAttacksPretty()));
+            System.out.println("killers(dbid,name,kills)");
+            System.out.println(resultToString(getKillers()));
+            System.out.println("get kills of ship-8 (DBID = 8)");
+            System.out.println(resultToString(getKills(8,null)));
+            System.out.println("done");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
 
-
-
-    private static String getDbPath() {
-        return "."+File.separator+"server-database"+File.separator;
-    }
-
-
-
-    public static void addDestroyed(long victimID, long victimFactionID, String victimName, int victim_size, boolean killed, long attackerID, long attackerFactionId, String attackerName, int attacker_size, long millis, Vector3i sector) {
-        try {
-            Statement s = connection.createStatement();
-            victimName = "'"+victimName.substring(0, Math.min(victimName.length(),50))+"'";
-            attackerName ="'"+attackerName.substring(0, Math.min(attackerName.length(),50))+"'";
-
-            //was ship destroyed earlier already
-            ResultSet r = s.executeQuery("SELECT 1 from objects as o where o.DBID = "+victimID +" and o.killed = 1;");
-            if (r.next()) {
-                s.close();
-                System.out.println("NOT LOGGING KILLED SHIP TWICE: " + victimName);
-                return;
-            }
-
-            addOrUpdateObject(victimID,victimFactionID,victimName,victim_size, killed );
-            addOrUpdateObject(attackerID,attackerFactionId,attackerName,attacker_size, false);
-
-
-
-            StringBuilder q = new StringBuilder();
-
-            q.append("INSERT INTO destroyed(victim_id,victim_faction,attacker_id,attacker_faction,millis,sector_x,sector_y,sector_z) VALUES (");
-            q.append(victimID).append(",");
-            q.append(victimFactionID).append(",");
-            q.append(attackerID).append(",");
-            q.append(attackerFactionId).append(",");
-            q.append(millis).append(",");
-            q.append(sector.x).append(",").append(sector.y).append(",").append(sector.z).append(");");
-            System.out.println(q.toString());
-            System.out.println("");
-            s.executeUpdate( q.toString());
-
-
-            s.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-
-
-    }
-
-    private static void addEntries() throws SQLException {
-        Statement s = connection.createStatement();
-        Random r = new Random(420);
-        for (int i = 5; i < 10; i++) {
-            long shipID1 = r.nextInt(10);
-            long shipID2 = r.nextInt(10);
-            addDestroyed(
-                    shipID1,
-                    r.nextInt(2),
-                    "ship"+shipID1,
-                    500,
-                    r.nextBoolean(),
-                    shipID2,
-                    r.nextInt(2),
-                    "ship_"+shipID2,
-                    1000,
-
-                    i,
-                    new Vector3i(r.nextInt()%1000,r.nextInt()%1000,r.nextInt()%1000)
-                    );
-        }
-        s.close();
-    }
-
-    private static void addOrUpdateObject(long DBID, long factionID, String name, int size, boolean killed) throws SQLException {
-        Statement s = connection.createStatement();
-        ResultSet existsQuery = s.executeQuery("SELECT 1 from objects as o WHERE o.DBID ="+DBID+" and o.faction = "+factionID+";");
-        String updateVictim;
-        if (existsQuery.next()) { //update existing
-            updateVictim= "UPDATE objects as o \n" + "SET (faction,name,size,killed)=(" + factionID + ","+ name + ","+size+","+(killed?1:0)+ ") WHERE o.DBID = "+ DBID +"and o.faction = "+factionID+";";
-        } else { //create new
-            updateVictim = "INSERT INTO objects(DBID,faction,name,size,killed)\n" +
-                    "VALUES" +
-                    "(" + DBID + "," + factionID + "," + name +","+size+","+(killed?1:0)+ ");";
-
-        }
-        s.executeUpdate(updateVictim);
-        s.close();
-    }
-
-    public static String tableToString(ResultSet r) throws SQLException {
-        StringBuilder b = new StringBuilder();
-        for (int i = 1; i < r.getMetaData().getColumnCount()+1; i++) {
-            b.append(String.format("%1$" + 20 + "s", r.getMetaData().getColumnName(i)));
-
-
-        }
-        b.append("\n");
-        for (int i = 0; i < r.getMetaData().getColumnCount(); i++) {
-            b.append("--------------------");
-        }
-        b.append("\n");
-        while (r.next()) {
-            for (int i = 1; i <= r.getMetaData().getColumnCount(); i++) {
-                b.append( String.format("%1$" + 20 + "s", r.getString(i)));//+ " " + r.getMetaData().getColumnName(i));
-            }
-            b.append("\n");
-        }
-        r.close();
-        return b.toString();
-
-    }
-
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:hsqldb:file:" + getDbPath() + ";shutdown=true" + maxNIOSize, "SA", "");
+    public static void initTable() throws SQLException {
+        connection = getConnection();
+        createTable();
     }
 
     private static void createTable() throws SQLException {
@@ -162,40 +48,219 @@ public class Manager {
 
         //create table
         s.executeUpdate("CREATE TABLE IF NOT EXISTS objects (\n" +
+                "\tship_snapshot bigint primary key identity,"+
                 "\tDBID bigint,\n" +
-                "\tfaction bigint not null,\n" +
-                "\tname varchar(50) not null,\n" +
-                "\tsize int not null,\n" +
-                "\tkilled int, \n" +
-                "\tCONSTRAINT ship_key PRIMARY KEY (DBID, faction)\n" +
-                ");\n" +
-                "\t\n" +
-                "CREATE TABLE IF NOT EXISTS destroyed (\n" +
-                "\tvictim_id bigint,\n" +
-                "\tvictim_faction bigint, \n" +
-                "\tattacker_id bigint,\n" +
-                "\tattacker_faction bigint, \n"+
+                "\tfaction bigint,\n" +
+                "\tname varchar(50)\n" +
+                "\t);\n" +
+                "\n" +
+                "CREATE TABLE IF NOT EXISTS attacks (\n" +
+                "\tvictim_snapshot bigint,"+
+                "\tvictim_killed boolean,\n" +
+                "\tattacker_snapshot bigint,\n" +
                 "\tmillis bigint,\n" +
-                "\tsector_x int,\n" +
-                "\tsector_y int,\n" +
-                "\tsector_z int,\n" +
-                "\tCONSTRAINT pk_attack PRIMARY KEY(victim_id,attacker_id,millis)\n" +
-                ");");
+                "\tx int,"+
+                "\ty int,"+
+                "\tz int,"+
+                "\tCONSTRAINT pk_attack PRIMARY KEY(victim_snapshot,attacker_snapshot,millis,x,y,z)\n" +
+                ")");
 
         s.close();
     }
 
     private static void deleteTables() throws SQLException {
-        Statement s = connection.createStatement();
-        s.executeUpdate("DROP TABLE IF EXISTS objects;\n" +
-                "DROP TABLE IF EXISTS attacks;"+
-                "DROP TABLE IF EXISTS destroyed;");
-        s.close();
+        connection.createStatement().executeUpdate("DROP TABLE IF EXISTS objects;\n" +
+                "DROP TABLE IF EXISTS attacks;");
     }
 
-    public static void initTable() throws SQLException {
-        connection = getConnection();
-        deleteTables();
-        createTable();
+    private static String getDbPath() {
+        return "."+File.separator+"server-database"+File.separator;
     }
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:hsqldb:file:" + getDbPath() + ";shutdown=true" + maxNIOSize, "SA", "");
+    }
+
+    /**
+     * turns table into a string, formatted like a table
+     * @param r
+     * @return
+     * @throws SQLException
+     */
+    public static String resultToString(ResultSet r) throws SQLException {
+
+        StringBuilder b = new StringBuilder();
+        for (int i = 1; i < r.getMetaData().getColumnCount()+1; i++) {
+            if (i > 1)
+                b.append(" ");
+            b.append(r.getMetaData().getColumnLabel(i));
+
+        }
+        b.append("\n-----------------------------------\n");
+        while (r.next()) {
+            for (int i = 1; i <= r.getMetaData().getColumnCount(); i++) {
+
+                if (i > 1) b.append("  ");
+                String columnValue = r.getString(i);
+                b.append(columnValue);//+ " " + r.getMetaData().getColumnName(i));
+            }
+            b.append("\n");
+        }
+        return b.toString();
+    }
+
+    /**
+     * add an attack event to dbms
+     * @param victimID
+     * @param victimFactionID
+     * @param victimName
+     * @param killed
+     * @param attackerID
+     * @param attackerFactionId
+     * @param attackerName
+     * @param sector
+     * @param millis
+     */
+    public static void addAttack(long victimID, int victimFactionID, String victimName,
+                                 boolean killed,
+                                 long attackerID, int attackerFactionId, String attackerName,
+                                 Vector3i sector, long millis) {
+        try {
+            Statement s = connection.createStatement();
+
+            //add victim
+            long v_snap = addOrUpdateObject(victimID,victimFactionID,victimName);
+            //add attacker
+            long a_snap = addOrUpdateObject(attackerID,attackerFactionId,attackerName);
+
+            //get snapshot IDs of victim and attacker
+            PreparedStatement p = connection.prepareStatement("Insert into attacks(victim_snapshot, victim_killed, attacker_snapshot, millis, x,y,z) values (?,?,?,?,?,?,?);");
+            p.setLong(1,v_snap);
+            p.setBoolean(2,killed);
+            p.setLong(3,a_snap);
+            p.setLong(4,millis); //millis
+            p.setInt(5,sector.x);//x
+            p.setInt(6,sector.y);//y
+            p.setInt(7,sector.z);//z
+            p.executeUpdate();
+            s.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    /**
+     * will create a ship snapshot in the DB, or update if one matches DBID and factionID
+     * @param DBID vanilla DB id of the segmentcontroller
+     * @param factionID .
+     * @param name ships name
+     * @return intern snapshot id used for identifiying snapshot in the attack entry, -1 if not existing
+     * @throws SQLException
+     */
+    private static long addOrUpdateObject(long DBID, int factionID, String name) throws SQLException {
+        PreparedStatement p = connection.prepareStatement("select o.* from objects as o where o.dbid = ? and o.faction = ?;");
+        p.setLong(1,DBID);
+        p.setInt(2,factionID);
+
+        ResultSet r = p.executeQuery();
+
+        if (r.next()) { //object exists
+            p = connection.prepareStatement("Update objects as o SET name = ? where o.dbid = ? and o.faction = ?;");
+        }else { //make new object
+            p = connection.prepareStatement("Insert into objects(name, dbid, faction) values (?,?,?);");
+        }
+        p.setString(1,name);
+        p.setLong(2,DBID);
+        p.setInt(3,factionID);
+        p.executeUpdate();
+
+        p = connection.prepareStatement("Select o.ship_snapshot from objects as o where o.DBID = ? and o.faction = ?;");
+        p.setLong(1,DBID);
+        p.setInt(2,factionID);
+        r = p.executeQuery();
+        if (r.next())
+            return r.getLong(1);
+        else {
+            new NullPointerException("ship snapshot wasnt found in objects DB").printStackTrace();
+            return -1;
+
+        }
+    }
+
+    /**
+     * debug method, generates attacks
+     * @throws SQLException
+     */
+    private static void addEntries() throws SQLException {
+        Random r = new Random(420);
+        for (int i = 0; i < 1000; i++) {
+            int a_id = r.nextInt(10);
+            int v_id = r.nextInt(10);
+            addAttack(v_id,
+                    10000+r.nextInt(5),
+                    "ship-"+v_id,
+
+                    r.nextBoolean(),
+                    a_id,
+                    10000+r.nextInt(5),
+                    "ship_"+ a_id,
+                    new Vector3i(r.nextInt()%100,r.nextInt()%100,r.nextInt()%100),
+                    i
+            );
+        }
+    }
+
+    public static ResultSet getAttacksPretty() throws SQLException {
+        String query = "Select event.millis, agg.name as Attacker, vic.name as Victim,concat(event.x,',',event.y,',',event.z) as sector \n" +
+                "From attacks as event, objects as agg, objects as vic\n" +
+                "WHERE event.victim_snapshot = vic.ship_snapshot and event.attacker_snapshot = agg.ship_snapshot order by vic.name;";
+        return getConnection().createStatement().executeQuery(query);
+    }
+
+    public static ResultSet getObjectsSimple() throws SQLException {
+        String query = "Select o.*\n" +
+                "From objects as o\n";
+        return getConnection().createStatement().executeQuery(query);
+    }
+
+    /**
+     * gets all ships that have killed an entity and the amount they killed.
+     * @return
+     */
+    public static ResultSet getKillers() throws SQLException {
+        String q="Select distinct o.name, o.faction, a.kills\n" +
+                "from " +
+                "(Select agg.dbid, agg.faction, count(*) as kills " +
+                "from attacks as att, " +
+                "objects as agg " +
+                "where att.attacker_snapshot = agg.ship_snapshot " +
+                "group by agg.dbid, agg.faction) as a,\n" +
+                "\tobjects as o\n" +
+                "where a.dbid = o.dbid and a.faction = o.faction " +
+                "order by a.kills desc;";
+        return connection.createStatement().executeQuery(q);
+    }
+
+    /**
+     * return the kills made by ship with this DBID and optional under which faction the kills were made.
+     * @param DBID
+     * @param factionID
+     * @return
+     * @throws SQLException
+     */
+    public static ResultSet getKills(long DBID, @Nullable Integer factionID) throws SQLException {
+        String q = "Select v.name, v.faction" +
+                " from attacks as a, objects as v, objects as k" +
+                " where a.attacker_snapshot = k.ship_snapshot and a.victim_snapshot = v.ship_snapshot" +
+                " and k.dbid = ?";
+        if (factionID != null)
+            q += "and k.faction = ?";
+        q+= ";";
+        PreparedStatement p = connection.prepareStatement(q);
+        p.setLong(1,DBID);
+        if (factionID != null)
+            p.setInt(2,factionID);
+        return p.executeQuery();
+    }
+
 }
