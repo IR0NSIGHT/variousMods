@@ -8,6 +8,9 @@ import api.mod.StarLoader;
 import api.mod.StarMod;
 import me.iron.npccontrol.stationReplacement.*;
 import me.iron.npccontrol.stationReplacement.commands.CommandCommander;
+import me.iron.npccontrol.triggers.AIManager;
+import me.iron.npccontrol.triggers.DebugUI;
+import me.iron.npccontrol.triggers.Trigger;
 import org.junit.Test;
 import org.schema.game.server.data.GameServerState;
 
@@ -20,9 +23,16 @@ import org.schema.game.server.data.GameServerState;
  */
 public class ModMain extends StarMod {
     public static StarMod instance;
+    public static Trigger trigger;
     public ModMain() {
         super();
         instance = this;
+    }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        StarLoader.registerCommand(new DebugUI());
     }
 
     @Override
@@ -35,7 +45,8 @@ public class ModMain extends StarMod {
     public void onServerCreated(ServerInitializeEvent event) {
         super.onServerCreated(event);
         DebugFile.log("server created",this);
-
+        new AIManager();
+        trigger = new Trigger();
     }
 
     @Override

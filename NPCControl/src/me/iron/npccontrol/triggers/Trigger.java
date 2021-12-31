@@ -5,13 +5,14 @@ import api.listener.events.entity.SegmentControllerFullyLoadedEvent;
 import api.mod.StarLoader;
 import me.iron.npccontrol.ModMain;
 import me.iron.npccontrol.triggers.events.PirateScoutRaid;
-import org.newdawn.slick.tests.xml.Entity;
+import org.apache.poi.ss.formula.functions.T;
 import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.common.data.player.faction.Faction;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.server.data.GameServerState;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * STARMADE MOD
@@ -21,36 +22,53 @@ import java.util.ArrayList;
  */
 public class Trigger {
     public ArrayList<Event> scLoadedEvents = new ArrayList<>();
-
+    private final ArrayList<Listener> listeners = new ArrayList<>();
     public Trigger() {
         if (GameServerState.instance != null)
             segConLoaded();
+
         addEvents();
-        ModMain.log("trigger init");
+        //ModMain.log("trigger init");
+    }
 
-
+    /**
+     * unregisters this trigger and all its event listeners (in case of reload or similar)
+     */
+    public void unregister() {
+        for (Listener l: listeners) {
+            try {
+            //    StarLoader.unregisterListener(l.getClass(),l); //TODO unregister listeners
+            } catch (Exception ex) {
+                //ModMain.log(ex.toString());
+            }
+        }
+        listeners.clear();
+        scLoadedEvents.clear();
     }
 
     public void addEvents() {
-        scLoadedEvents.add(new PirateScoutRaid(0x8401,100,0));
+        scLoadedEvents.add(new PirateScoutRaid(0x8401,100,120));
+        //ModMain.log("added pirate scout event to list");
     }
 
     private void segConLoaded() {
-        StarLoader.registerListener(SegmentControllerFullyLoadedEvent.class, new Listener<SegmentControllerFullyLoadedEvent>() {
+        //ModMain.log("added SC-loaded EH");
+        Listener l = new Listener<SegmentControllerFullyLoadedEvent>() {
             @Override
             public void onEvent(SegmentControllerFullyLoadedEvent event) {
-                ModMain.log("segcon loaded");
+                //ModMain.log("segcon loaded");
                 long code = 0;
                 code = addFaction(code,event.getController().getFactionId());
                 code = addEntityType(code,event.getController().getType());
 
                 triggerList(scLoadedEvents,code,event.getController().getSector(new Vector3i()));
             }
-        }, ModMain.instance);
+        };
+        StarLoader.registerListener(SegmentControllerFullyLoadedEvent.class, l, ModMain.instance);
     }
 
     private void triggerList(ArrayList<Event> events, long code, Vector3i position) {
-        ModMain.log(String.format("trigger list with input %s\npos %s",toBin(code),position.toStringPure()));
+        //ModMain.log(String.format("trigger list with input %s\npos %s",toBin(code),position.toStringPure()));
         for (Event e: events) {
             e.trigger(code,position);
         }
