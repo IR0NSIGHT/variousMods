@@ -7,8 +7,24 @@ Technicality:
     - starloader eventhandlers generate info code
     - fire all custom events that match code
     - binary code that contains event info
-        - 0-7: faction type
-        - 8-15: entity type
+        - 0-7: faction type (part 0)
+            0 neutral
+            1 pirates
+            2 npcs
+            3 player faction
+            4
+            5
+            6
+            7
+        - 8-15: entity type (part 1)
+            0   ship
+            1   station
+            2   roid, roid managed
+            3   astronaut
+            4   sun
+            5   blackhole
+            6   shop
+            7   planet core, ico, segment
         ... tbd
         - 49-56: cooldown in minutes 1..256 (4.2h)
         - 57-64: probability x/256

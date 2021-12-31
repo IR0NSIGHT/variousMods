@@ -23,17 +23,15 @@ import java.util.Random;
 public class PirateScoutRaid extends Event {
     Random r = new Random();
     FleetComposition f;
-    public PirateScoutRaid(long code, int chance, int cooldown) {
-        //super(code,chance,cooldown);
+    public PirateScoutRaid(long code, int chance, int cooldown, String name) {
+        super(code,chance,cooldown, name);
         f = new FleetComposition(2);
         f.addEntry(0,Utility.getBlueprintByName("SnakeEye"),1);
-        f.addEntry(1,Utility.getBlueprintByName("shippy"),2);
+        f.addEntry(1,Utility.getBlueprintByName("Venom"),2);
     }
 
-    @Override
-    protected String getName() {
-        return "Pirate Scout Raid";
-    }
+
+
 
     @Override
     protected void run(long code, Vector3i sector) {
@@ -44,12 +42,16 @@ public class PirateScoutRaid extends Event {
             return;
         PlayerState p = players.get(0); //closest
 
+        f = new FleetComposition(2);
+        f.addEntry(0,Utility.getBlueprintByName("SnakeEye"),r.nextInt(3)-1);
+        f.addEntry(1,Utility.getBlueprintByName("Venom"),r.nextInt(4));
+
         //TODO select a better target than just players ship: slowest, biggest and weakest ship.
         SimpleTransformableSendableObject s = p.getFirstControlledTransformableWOExc();
         if (s != null) {
             Utility.spawnAdvancedHunt(sector,s,f.toFlatArray(), -2);
         }
-
+        ModMain.log(String.format("pirate scout raid ran with code: "+Utility.toBin(code));
     }
 
     @Override

@@ -3,6 +3,7 @@ package me.iron.npccontrol.triggers;
 import me.iron.npccontrol.ModMain;
 import org.luaj.vm2.ast.Str;
 import org.lwjgl.Sys;
+import org.lwjgl.openal.Util;
 import org.schema.common.util.linAlg.Vector3i;
 
 /**
@@ -16,11 +17,11 @@ public class Event {
     private long last;
     private int cooldown;
     private int chance;
-
-    public Event(long code, int chance, int cooldown) {
+    private String name; //used to tell the difference between two similar ones
+    public Event(long code, int chance, int cooldown, String name) {
         this.code = code;
         this.chance = chance;
-        this.cooldown = cooldown;
+        this.cooldown = cooldown*1000;
     };
 
     /**
@@ -39,21 +40,20 @@ public class Event {
      */
     protected boolean triggerCheck(long inputCode, Vector3i pos) {
         if (Math.random()*100>=chance) {
-            ModMain.log("abort random chance");
+        //    ModMain.log("abort random chance");
             return false;
         }
         if (cooldown > 0 && System.currentTimeMillis()<last+cooldown) {
-            ModMain.log("abort cooldown, wait: " + (last+cooldown- System.currentTimeMillis()));
+            ModMain.log("abort cooldown, wait: " + (last+cooldown- System.currentTimeMillis())/1000);
             return false;
         }
-        ModMain.log(String.format("%s input\n%s code\n%s differece\n\n",Trigger.toBin(inputCode),Trigger.toBin(code),Trigger.toBin(inputCode&code)));
-        for (long i = 0; i < 8; i++) {
-            long mask =255L<<(8L*i);
-            //ModMain.log(String.format("%s mask, %s value",Trigger.toBin(mask),mask));
-            ModMain.log(String.format("%s mask \n%s input\n%s code\n%s differece\n\n",Trigger.toBin(mask),Trigger.toBin(mask&inputCode),Trigger.toBin(mask&code),Trigger.toBin((mask&(inputCode&code)))));
-
-            if (((mask&code) != 0) && (mask&(inputCode&code)) == 0) {
-                ModMain.log("ABORT");
+    //    ModMain.log(String.format("%s input\n%s code\n%s differece\n\n",Utility.toBin(inputCode),Utility.toBin(code),Utility.toBin(inputCode&code)));
+        for (int i = 0; i < 8; i++) {
+            long in = Utility.get8bit(inputCode,i);
+            long own = Utility.get8bit(code,i);
+            System.out.println(Long.toBinaryString(in));
+            System.out.println(Long.toBinaryString(own));
+            if (own > 0 && (in&own)==0) {
                 return false;
             }
         }
@@ -69,6 +69,6 @@ public class Event {
     }
 
     protected String getName() {
-        return "?";
+        return name;
     }
 }

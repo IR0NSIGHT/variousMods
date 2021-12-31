@@ -47,8 +47,16 @@ public class Trigger {
     }
 
     public void addEvents() {
-        scLoadedEvents.add(new PirateScoutRaid(0x8401,100,120));
-        //ModMain.log("added pirate scout event to list");
+        long code = 0;
+        //spawn pirates in asteroid belt
+        code = Utility.add8bit(code,0b1,0); //neutral faction
+        code = Utility.add8bit(code,0b10000100,1); //roid or planet
+        scLoadedEvents.add(new PirateScoutRaid(code,100,120, "belter pirates"));
+
+        //spawn pirates at pirate stations and neutral stations (derelicts)
+        code = Utility.add8bit(code,0b1,0); //neutral faction
+        code = Utility.add8bit(code,0b00000010,1); //roid or planet
+        scLoadedEvents.add(new PirateScoutRaid(code,100,120,"station lurkers"));
     }
 
     private void segConLoaded() {
@@ -58,8 +66,8 @@ public class Trigger {
             public void onEvent(SegmentControllerFullyLoadedEvent event) {
                 //ModMain.log("segcon loaded");
                 long code = 0;
-                code = addFaction(code,event.getController().getFactionId());
-                code = addEntityType(code,event.getController().getType());
+                code = Utility.addFaction(code,event.getController().getFactionId());
+                code = Utility.addEntityType(code,event.getController().getType());
 
                 triggerList(scLoadedEvents,code,event.getController().getSector(new Vector3i()));
             }
@@ -80,59 +88,19 @@ public class Trigger {
         long l = 0;
         System.out.println("spawn neutral roid");
 
-        l = addFaction(l,0);
-        l = addEntityType(l, SimpleTransformableSendableObject.EntityType.ASTEROID);
+        l = Utility.addFaction(l,0);
+        l = Utility.addEntityType(l, SimpleTransformableSendableObject.EntityType.ASTEROID);
         t.triggerList(t.scLoadedEvents, l, new Vector3i(2,2,2));
 
         System.out.println("spawn pirate ship");
         l = 0;
-        l = addFaction(l,-1);
-        l = addEntityType(l, SimpleTransformableSendableObject.EntityType.SHIP);
+        l = Utility.addFaction(l,-1);
+        l = Utility.addEntityType(l, SimpleTransformableSendableObject.EntityType.SHIP);
 
         t.triggerList(t.scLoadedEvents, l, new Vector3i(3,3,3));
 
 
     }
 
-    private static long addFaction(long in, int factionID) {
-        switch (factionID) {
-            case 0: //neutral
-                return in|1;
-            case -1: //pirates
-                return in|(1<<1);
-        }
-        if (factionID < 0) { //is NPC
-            return in|(1<<2);
-        } else if (factionID > 10000){ //is player
-            return in|(1<<3);
-        }
-        return in;
-    }
 
-    private static long addEntityType(long in, SimpleTransformableSendableObject.EntityType type) {
-        int s = 8;
-        switch (type) {
-            case SHIP:                    break;
-            case SPACE_STATION:           s += 1;break;
-            case ASTEROID_MANAGED:
-            case ASTEROID:
-                s += 2; break;
-            case ASTRONAUT:               s += 3; break;
-            case SUN:                     s += 4; break;
-            case BLACK_HOLE:              s += 5;break;
-            case SHOP:                    s += 6; break;
-            case PLANET_CORE:
-            case PLANET_ICO:
-            case PLANET_SEGMENT:
-                s += 7;break;
-            default:return in;
-        }
-        return in|1<<s;
-
-    }
-
-    public static String toBin(long code) {
-        String o = Long.toBinaryString(code);
-        return String.format("%1$" + 64 + "s", o).replace(' ', '0');
-    }
 }

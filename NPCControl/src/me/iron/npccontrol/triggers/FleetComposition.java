@@ -19,9 +19,9 @@ public class FleetComposition {
 
     private int total = 0;
 
-    public FleetComposition(int size) {
-        this.blueprints = new CatalogPermission[size];
-        this.count      = new int[size];
+    public FleetComposition(int types) {
+        this.blueprints = new CatalogPermission[types];
+        this.count      = new int[types];
     }
 
     public void addFlagship(int i) {
@@ -56,6 +56,25 @@ public class FleetComposition {
             b.append(String.format("#%s - BP:%s(mass:%s,type:%s-%s)\n",count[i],blueprints[i].getUid(),blueprints[i].mass,blueprints[i].getEntry(),blueprints[i].getClassification()));
         }
         return b.toString();
+    }
+
+    //TODO allow to use count instead as probability
+    public CatalogPermission[] toFlatArray(boolean random) {
+        CatalogPermission[] out = new CatalogPermission[total];
+        int idx = 0;
+        for (int i = 0; i < blueprints.length; i++) {
+            for (int j = 0; j < count[i]; j++) {
+                out[idx++] = blueprints[i];
+            }
+        }
+
+        StringBuilder b = new StringBuilder("fleet comp:");
+        for (CatalogPermission p: out) {
+            b.append(p.getUid()).append(",");
+        }
+        ModMain.log(b.toString());
+
+        return out;
     }
 
     public CatalogPermission[] toFlatArray() {

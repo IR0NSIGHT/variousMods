@@ -87,7 +87,7 @@ public class Utility {
                 }
                 group.createFromBlueprints(unloadedPos,simMan.getUniqueGroupUId(),factionID,bps); //seems to try and work but doesnt spawn stuff?
                 //add program to group
-                TargetProgram<SimulationGroup> p = new CustomPirateProgram(group,false);
+                TargetProgram<SimulationGroup> p = new PirateSimulationProgram(group,false);//new CustomPirateProgram(group,false);
                 group.setCurrentProgram(p);
                 AIManager.groups.add(group);
                 ModMain.log("spawned advanced hunt:"+group.getDebugString());
@@ -141,7 +141,9 @@ public class Utility {
         code = code|bits; //add new info to code
         return code;
     }
+
     private static Random r = new Random();
+
     public static Random getRand() {
         return r;
     }
@@ -204,5 +206,46 @@ public class Utility {
         }
     }
 
+    public static long addFaction(long in, int factionID) {
+        switch (factionID) {
+            case 0: //neutral
+                return in|1;
+            case -1: //pirates
+                return in|(1<<1);
+        }
+        if (factionID < 0) { //is NPC
+            return in|(1<<2);
+        } else if (factionID > 10000){ //is player
+            return in|(1<<3);
+        }
+        return in;
+    }
+
+    public static long addEntityType(long in, SimpleTransformableSendableObject.EntityType type) {
+        int s = 8;
+        switch (type) {
+            case SHIP:                    break;
+            case SPACE_STATION:           s += 1;break;
+            case ASTEROID_MANAGED:
+            case ASTEROID:
+                s += 2; break;
+            case ASTRONAUT:               s += 3; break;
+            case SUN:                     s += 4; break;
+            case BLACK_HOLE:              s += 5;break;
+            case SHOP:                    s += 6; break;
+            case PLANET_CORE:
+            case PLANET_ICO:
+            case PLANET_SEGMENT:
+                s += 7;break;
+            default:return in;
+        }
+        return in|1<<s;
+
+    }
+
+    public static String toBin(long code) {
+        String o = Long.toBinaryString(code);
+        return String.format("%1$" + 64 + "s", o).replace(' ', '0');
+    }
 
 }
