@@ -14,13 +14,18 @@ import me.iron.newscaster.notification.infoGeneration.infoTypes.ShipDestroyedInf
 import me.iron.newscaster.notification.infoGeneration.objectTypes.ShipObject;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.player.PlayerState;
+import org.schema.game.common.data.player.faction.Faction;
 import org.schema.game.network.objects.ChatMessage;
 import org.schema.game.server.data.Galaxy;
 import org.schema.game.server.data.GameServerState;
 import org.schema.schine.network.RegisteredClientOnServer;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * STARMADE MOD
@@ -274,5 +279,43 @@ public class Broadcaster {
     }
     private static void sendToStarBridge() throws ClassNotFoundException {
         
+    }
+
+    public static String prettyKillers(ResultSet r) throws SQLException {
+        StringBuilder s = new StringBuilder("Top 10 killer ships:");
+        //Select distinct o.name, o.faction, a.kills
+        for (int i = 0; i < Math.min(10,r.getMetaData().getColumnCount()); i++) {
+            r.next();
+            String name = r.getString(1);
+            Faction f = null;
+            if (GameServerState.instance != null) {
+                f = GameServerState.instance.getFactionManager().getFaction(r.getInt(2));
+            }
+            s.append(String.format("%s -- Name: %s, faction: %s, ships overheated: %s\n",i, r.getString(1), (f != null ? f.getName() : "-"), r.getInt(3)));
+        }
+        return  s.toString();
+    }
+
+    public static String prettyVictims(ResultSet r) throws SQLException {
+        StringBuilder s = new StringBuilder("Kills made:");
+        //Select v.name, v.faction, v.reactor, a.x, a.y, a.z, a.millis
+        String name, type; Faction f; Vector3i sector; long systemTime;
+        for (int i = 0; i < Math.min(10,r.getMetaData().getColumnCount()) && r.next(); i++) {
+            name = r.getString(1);
+            if (GameServerState.instance != null) {
+                f = GameServerState.instance.getFactionManager().getFaction(r.getInt(2));
+            } else {
+                f = null;
+            }
+            type = Broadcaster.getShipType(r.getInt(3));
+            sector = new Vector3i(r.getInt(4),r.getInt(5),r.getInt(6));
+
+            systemTime = r.getLong(7);
+            SimpleDateFormat sdf = new SimpleDateFormat("E, dd MMM yyyy HH:mm z");
+            Date resultdate = new Date(systemTime);
+
+            s.append(String.format("%s -- Name: %s, faction: %s, class: %s, sector: %s, time: %s\n",i, name, (f!=null?f.getName():"-"), type, sector.toStringPure(),sdf.format(resultdate)));
+        }
+        return  s.toString();
     }
 }

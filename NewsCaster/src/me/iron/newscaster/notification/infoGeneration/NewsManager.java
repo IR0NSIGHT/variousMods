@@ -41,7 +41,7 @@ public class NewsManager {
             }
         }
         newsStorage.add(info);
-        ModPlayground.broadcastMessage(info.toString());
+    //    ModPlayground.broadcastMessage(info.toString());
         Broadcaster.queueAdd(info);
         return newsStorage.size(); //add to end of list => size = index
     }

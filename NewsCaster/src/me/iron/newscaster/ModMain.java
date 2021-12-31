@@ -46,7 +46,7 @@ public class ModMain extends StarMod {
         CommandUI.addListener();
         NewsManager.loadFromPersistentUtil();
         Broadcaster.init();
-        debugUI.chatListener();
+    //    debugUI.chatListener();
     }
 
     @Override

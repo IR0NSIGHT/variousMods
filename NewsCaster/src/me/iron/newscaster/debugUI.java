@@ -6,8 +6,10 @@ import api.listener.events.player.PlayerChatEvent;
 import api.mod.StarLoader;
 import api.utils.game.PlayerUtils;
 import me.iron.newscaster.DBMS.Manager;
+import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.server.data.GameServerState;
+import org.schema.schine.network.objects.Sendable;
 
 import java.sql.SQLException;
 
@@ -36,18 +38,69 @@ public class debugUI {
                         throwables.printStackTrace();
                     }
                 }
+
+                if (event.getText().contains("!objects")) {
+                    try {
+                        ModPlayground.broadcastMessage(Manager.resultToString(Manager.getObjectsSimple()));
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
+                }
                 if (event.getText().contains("!killer")) {
                     try {
-                        ModPlayground.broadcastMessage(Manager.resultToString(Manager.getKillers()));
-                    } catch (Exception ignored) {
-
+                        ModPlayground.broadcastMessage("killers:\n"+Manager.resultToString(Manager.getKillers()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                }
+
+                if (event.getText().contains("!victims")) {
+                    //try get player
+                    PlayerState p = GameServerState.instance.getPlayerFromNameIgnoreCaseWOException(event.getMessage().sender);
+                    if (p == null)
+                        return;
+                    Sendable s =GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalObjects().get(p.getSelectedEntityId());
+                    if (s instanceof SegmentController) {
+                        try {
+                            ModPlayground.broadcastMessage("get kills for " + ((SegmentController) s).getRealName() + " type " + ((SegmentController) s).getType().getName());
+                            ModPlayground.broadcastMessage(Manager.resultToString(Manager.getKills(((SegmentController) s).getUniqueIdentifier(),null)));
+                            return;
+                        } catch (Exception e) {
+                            ModPlayground.broadcastMessage("error: " + e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+                    ModPlayground.broadcastMessage("error: selected object not a ship/station");
+                }
+                if (event.getText().contains("!delete")) {
+                    try {
+                        Manager.deleteTables();
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
+                }
+
+                if(event.getText().contains("!reset")) {
+                    try {
+                        Manager.deleteTables();
+                        Manager.initTable();
+                        ModPlayground.broadcastMessage("reset table:");
+                        ModPlayground.broadcastMessage(Manager.resultToString(Manager.getAttacksPretty()));
+                        ModPlayground.broadcastMessage(Manager.resultToString(Manager.getObjectsSimple()));
+
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                        ModPlayground.broadcastMessage(throwables.toString());
+                    }
+
                 }
                 if (event.getText().contains("!attacks")) {
                     try {
-                        ModPlayground.broadcastMessage(Manager.resultToString(Manager.getAttacksPretty()));
-                    } catch (Exception ignored) {
-
+                        String out = "attacks:\n"+Manager.resultToString(Manager.getAttacksPretty());
+                        System.out.println(out);
+                        ModPlayground.broadcastMessage(out);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }

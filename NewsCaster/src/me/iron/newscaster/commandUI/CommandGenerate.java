@@ -3,6 +3,7 @@ package me.iron.newscaster.commandUI;
 import api.ModPlayground;
 import api.mod.StarMod;
 import api.utils.game.chat.CommandInterface;
+import com.sun.istack.internal.Nullable;
 import me.iron.newscaster.notification.broadcasting.Broadcaster;
 import me.iron.newscaster.notification.infoGeneration.NewsManager;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.*;
@@ -13,7 +14,6 @@ import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.faction.FactionRelation;
 import org.schema.game.server.data.GameServerState;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
@@ -47,7 +47,7 @@ public class CommandGenerate implements CommandInterface {
     @Override
     public boolean onCommand(PlayerState playerState, String[] strings) {
         if (GameServerState.instance == null) {
-            ModPlayground.broadcastMessage("IS NOT SERVERSIDE COMMAND");
+            //ModPlayground.broadcastMessage("IS NOT SERVERSIDE COMMAND");
             return false;
         }
 

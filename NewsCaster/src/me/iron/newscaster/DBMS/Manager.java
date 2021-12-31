@@ -1,9 +1,12 @@
 package me.iron.newscaster.DBMS;
 
+import api.ModPlayground;
+import com.sun.istack.internal.Nullable;
+import me.iron.newscaster.commandUI.CommandLeaderboard;
+import me.iron.newscaster.notification.broadcasting.Broadcaster;
+import org.lwjgl.Sys;
 import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.common.data.player.faction.Faction;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.sql.*;
 import java.util.Random;
@@ -21,18 +24,24 @@ public class Manager {
     public static void main(String[] args) {
         try {
             initTable();
-            deleteTables();
-            createTable();
-            addEntries();
+        //   deleteTables();
+        //   createTable();
+        //   addEntries();
 
-            System.out.println(resultToString(getObjectsSimple()));
-            System.out.println("attacks pretty");
-            System.out.println(resultToString(getAttacksPretty()));
-            System.out.println("killers(dbid,name,kills)");
-            System.out.println(resultToString(getKillers()));
-            System.out.println("get kills of ship-8 (DBID = 8)");
-            System.out.println(resultToString(getKills(8,null)));
-            System.out.println("done");
+        //   System.out.println(resultToString(getObjectsSimple()));
+        //   System.out.println("attacks pretty");
+        //   System.out.println(resultToString(getAttacksPretty()));
+        //   System.out.println("killers(UID,name,kills)");
+        //   System.out.println(resultToString(getKillers()));
+
+           String uid = "ENTITY_SHIP_Summer 2";
+           System.out.println(Broadcaster.prettyKillers(getKillers()));
+
+            System.out.println("get kills of UID = "+uid);
+            System.out.println(resultToString(           getKills(uid,null)));
+
+            System.out.println(Broadcaster.prettyVictims(getKills(uid,null)));
+           System.out.println("done");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -40,7 +49,13 @@ public class Manager {
 
     public static void initTable() throws SQLException {
         connection = getConnection();
+
+        //TODO remove
+    //    deleteTables();
         createTable();
+        System.out.println(resultToString(connection.createStatement().executeQuery("select * from attacks;")));
+        System.out.println(resultToString(connection.createStatement().executeQuery("select * from objects;")));
+
     }
 
     private static void createTable() throws SQLException {
@@ -49,26 +64,28 @@ public class Manager {
         //create table
         s.executeUpdate("CREATE TABLE IF NOT EXISTS objects (\n" +
                 "\tship_snapshot bigint primary key identity,"+
-                "\tDBID bigint,\n" +
+                "\tUID varchar(128),\n" +
                 "\tfaction bigint,\n" +
-                "\tname varchar(50)\n" +
+                "\tname varchar(64)\n" +
                 "\t);\n" +
                 "\n" +
                 "CREATE TABLE IF NOT EXISTS attacks (\n" +
-                "\tvictim_snapshot bigint,"+
+                "\tvictim_snapshot bigint,\n"+
+                "\tvictim_reactor int,\n"+
                 "\tvictim_killed boolean,\n" +
                 "\tattacker_snapshot bigint,\n" +
+                "\tattacker_reactor int,\n"+
                 "\tmillis bigint,\n" +
-                "\tx int,"+
-                "\ty int,"+
-                "\tz int,"+
-                "\tCONSTRAINT pk_attack PRIMARY KEY(victim_snapshot,attacker_snapshot,millis,x,y,z)\n" +
+                "\tx int,\n"+
+                "\ty int,\n"+
+                "\tz int,\n"+
+                "\tCONSTRAINT pk_attacks PRIMARY KEY(victim_snapshot,attacker_snapshot,millis,x,y,z)\n" +
                 ")");
 
         s.close();
     }
 
-    private static void deleteTables() throws SQLException {
+    public static void deleteTables() throws SQLException {
         connection.createStatement().executeUpdate("DROP TABLE IF EXISTS objects;\n" +
                 "DROP TABLE IF EXISTS attacks;");
     }
@@ -111,37 +128,40 @@ public class Manager {
 
     /**
      * add an attack event to dbms
-     * @param victimID
+     * @param victimUID
      * @param victimFactionID
      * @param victimName
      * @param killed
-     * @param attackerID
+     * @param attackerUID
      * @param attackerFactionId
      * @param attackerName
      * @param sector
      * @param millis
      */
-    public static void addAttack(long victimID, int victimFactionID, String victimName,
+    public static void addAttack(String victimUID, int victimFactionID, String victimName, int victimReactor,
                                  boolean killed,
-                                 long attackerID, int attackerFactionId, String attackerName,
+                                 String attackerUID, int attackerFactionId, String attackerName, int attackerReactor,
                                  Vector3i sector, long millis) {
+        //ModPlayground.broadcastMessage("ADD ATTACK ON "+victimName + " BY " + attackerName);
         try {
             Statement s = connection.createStatement();
 
             //add victim
-            long v_snap = addOrUpdateObject(victimID,victimFactionID,victimName);
+            long v_snap = addOrUpdateObject(victimUID,victimFactionID,victimName);
             //add attacker
-            long a_snap = addOrUpdateObject(attackerID,attackerFactionId,attackerName);
+            long a_snap = addOrUpdateObject(attackerUID,attackerFactionId,attackerName);
 
             //get snapshot IDs of victim and attacker
-            PreparedStatement p = connection.prepareStatement("Insert into attacks(victim_snapshot, victim_killed, attacker_snapshot, millis, x,y,z) values (?,?,?,?,?,?,?);");
+            PreparedStatement p = connection.prepareStatement("Insert into attacks(victim_snapshot, victim_killed, victim_reactor, attacker_snapshot, attacker_reactor, millis, x,y,z) values (?,?,?,?,?,?,?,?,?);");
             p.setLong(1,v_snap);
             p.setBoolean(2,killed);
-            p.setLong(3,a_snap);
-            p.setLong(4,millis); //millis
-            p.setInt(5,sector.x);//x
-            p.setInt(6,sector.y);//y
-            p.setInt(7,sector.z);//z
+            p.setInt(3,victimReactor);
+            p.setLong(4,a_snap);
+            p.setInt(5,attackerReactor);
+            p.setLong(6,millis); //millis
+            p.setInt(7,sector.x);//x
+            p.setInt(8,sector.y);//y
+            p.setInt(9,sector.z);//z
             p.executeUpdate();
             s.close();
         } catch (SQLException throwables) {
@@ -151,31 +171,32 @@ public class Manager {
 
     /**
      * will create a ship snapshot in the DB, or update if one matches DBID and factionID
-     * @param DBID vanilla DB id of the segmentcontroller
+     * @param UID vanilla UID of the segmentcontroller
      * @param factionID .
      * @param name ships name
      * @return intern snapshot id used for identifiying snapshot in the attack entry, -1 if not existing
      * @throws SQLException
      */
-    private static long addOrUpdateObject(long DBID, int factionID, String name) throws SQLException {
-        PreparedStatement p = connection.prepareStatement("select o.* from objects as o where o.dbid = ? and o.faction = ?;");
-        p.setLong(1,DBID);
+    private static long addOrUpdateObject(String UID, int factionID, String name) throws SQLException {
+        //ModPlayground.broadcastMessage("add object for '" + UID + "' (" + UID.length()+")");
+        PreparedStatement p = connection.prepareStatement("select o.* from objects as o where o.UID = ? and o.faction = ?;");
+        p.setString(1,UID);
         p.setInt(2,factionID);
 
         ResultSet r = p.executeQuery();
 
         if (r.next()) { //object exists
-            p = connection.prepareStatement("Update objects as o SET name = ? where o.dbid = ? and o.faction = ?;");
+            p = connection.prepareStatement("Update objects as o SET name = ? where o.UID = ? and o.faction = ?;");
         }else { //make new object
-            p = connection.prepareStatement("Insert into objects(name, dbid, faction) values (?,?,?);");
+            p = connection.prepareStatement("Insert into objects(name, UID, faction) values (?,?,?);");
         }
         p.setString(1,name);
-        p.setLong(2,DBID);
+        p.setString(2,UID);
         p.setInt(3,factionID);
         p.executeUpdate();
 
-        p = connection.prepareStatement("Select o.ship_snapshot from objects as o where o.DBID = ? and o.faction = ?;");
-        p.setLong(1,DBID);
+        p = connection.prepareStatement("Select o.ship_snapshot from objects as o where o.UID = ? and o.faction = ?;");
+        p.setString(1,UID);
         p.setInt(2,factionID);
         r = p.executeQuery();
         if (r.next())
@@ -194,16 +215,18 @@ public class Manager {
     private static void addEntries() throws SQLException {
         Random r = new Random(420);
         for (int i = 0; i < 1000; i++) {
-            int a_id = r.nextInt(10);
-            int v_id = r.nextInt(10);
+            String a_id = "ship_"+r.nextInt(10);
+            String v_id = "ship_"+r.nextInt(10);
             addAttack(v_id,
                     10000+r.nextInt(5),
                     "ship-"+v_id,
+                    r.nextInt()%1000,
 
                     r.nextBoolean(),
                     a_id,
                     10000+r.nextInt(5),
                     "ship_"+ a_id,
+                    r.nextInt()%1000,
                     new Vector3i(r.nextInt()%100,r.nextInt()%100,r.nextInt()%100),
                     i
             );
@@ -211,15 +234,17 @@ public class Manager {
     }
 
     public static ResultSet getAttacksPretty() throws SQLException {
-        String query = "Select event.millis, agg.name as Attacker, vic.name as Victim,concat(event.x,',',event.y,',',event.z) as sector \n" +
+        String query = "Select event.millis, concat(agg.name,'(',agg.UID,')',' [',agg.faction,'] ','r',event.attacker_reactor) as Attacker, vic.name as Victim,concat(event.x,',',event.y,',',event.z) as sector, event.victim_killed \n" +
                 "From attacks as event, objects as agg, objects as vic\n" +
-                "WHERE event.victim_snapshot = vic.ship_snapshot and event.attacker_snapshot = agg.ship_snapshot order by vic.name;";
+                "WHERE event.victim_snapshot = vic.ship_snapshot and event.attacker_snapshot = agg.ship_snapshot and event.victim_killed = FALSE" +
+                " order by vic.name;";
         return getConnection().createStatement().executeQuery(query);
     }
 
     public static ResultSet getObjectsSimple() throws SQLException {
         String query = "Select o.*\n" +
-                "From objects as o\n";
+                "From objects as o\n" +
+                "order by o.faction;";
         return getConnection().createStatement().executeQuery(query);
     }
 
@@ -230,37 +255,39 @@ public class Manager {
     public static ResultSet getKillers() throws SQLException {
         String q="Select distinct o.name, o.faction, a.kills\n" +
                 "from " +
-                "(Select agg.dbid, agg.faction, count(*) as kills " +
+                "(Select agg.UID, agg.faction, count(*) as kills " +
                 "from attacks as att, " +
                 "objects as agg " +
-                "where att.attacker_snapshot = agg.ship_snapshot " +
-                "group by agg.dbid, agg.faction) as a,\n" +
+                "where att.attacker_snapshot = agg.ship_snapshot and att.victim_killed = FALSE " +
+                "group by agg.UID, agg.faction) as a,\n" +
                 "\tobjects as o\n" +
-                "where a.dbid = o.dbid and a.faction = o.faction " +
+                "where a.UID = o.UID and a.faction = o.faction " +
                 "order by a.kills desc;";
         return connection.createStatement().executeQuery(q);
     }
 
     /**
-     * return the kills made by ship with this DBID and optional under which faction the kills were made.
-     * @param DBID
+     * return the kills made by ship with this UID and optional under which faction the kills were made.
+     * @param UID
      * @param factionID
      * @return
      * @throws SQLException
      */
-    public static ResultSet getKills(long DBID, @Nullable Integer factionID) throws SQLException {
-        String q = "Select v.name, v.faction" +
+    public static ResultSet getKills(String UID, @Nullable Integer factionID) throws SQLException {
+        System.out.println("getting kills for UID "+UID +"["+factionID+"]");
+        String q = "Select v.name, v.faction, a.victim_reactor, a.x, a.y, a.z, a.millis" +
                 " from attacks as a, objects as v, objects as k" +
                 " where a.attacker_snapshot = k.ship_snapshot and a.victim_snapshot = v.ship_snapshot" +
-                " and k.dbid = ?";
+                " and k.UID = ?";
         if (factionID != null)
-            q += "and k.faction = ?";
-        q+= ";";
+            q += " and k.faction = ?";
+        q+= " order by a.victim_reactor, v.faction;";
         PreparedStatement p = connection.prepareStatement(q);
-        p.setLong(1,DBID);
+        p.setString(1,UID);
         if (factionID != null)
             p.setInt(2,factionID);
         return p.executeQuery();
     }
+
 
 }

@@ -22,17 +22,21 @@ import me.iron.newscaster.notification.infoGeneration.NewsManager;
 import me.iron.newscaster.notification.infoGeneration.infoTypes.*;
 import me.iron.newscaster.notification.infoGeneration.objectTypes.FactionObject;
 import me.iron.newscaster.notification.infoGeneration.objectTypes.ShipObject;
+import org.lwjgl.Sys;
 import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.SegmentControllerHpController;
 import org.schema.game.common.controller.SendableSegmentController;
 import org.schema.game.common.controller.damage.Damager;
 import org.schema.game.common.controller.elements.ManagerContainer;
+import org.schema.game.common.controller.elements.power.reactor.PowerImplementation;
 import org.schema.game.common.controller.rails.RailRelation;
 import org.schema.game.common.data.ManagedSegmentController;
 import org.schema.game.common.data.player.PlayerControlledTransformableNotFound;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
+import org.schema.game.common.data.world.space.FixedSpaceEntity;
 import org.schema.game.server.data.GameServerState;
 
 import java.sql.SQLException;
@@ -80,61 +84,75 @@ public class ListenerManager {
             @Override
             public void onEvent(SegmentControllerOverheatEvent event) {
                 info_log_ship_destruct = true;
-                if (!event.isServer() || !info_log_ship_destruct)
+                if (!event.isServer() || !info_log_ship_destruct || event.isCanceled())
                 {
                     return;
                 }
-                DebugFile.log("segmentcontroller is overheating.");
-                //make ship object
+
                 SegmentController ship = event.getEntity();
-                float mass = ship.getMassWithDocks();
-                float min = info_ship_minMass;
                 if (ship.getMassWithDocks() < info_ship_minMass) {
                     return;
                 }
 
-                //make attacker object
-                Damager lastDamager = event.getLastDamager();
+                String attackerUID;
+                int attackerFaction;
+                String attackerName;
+                int attackerReactor = -1;
+                try {
+                    //get attacker ship
+                    if (event.getLastDamager() instanceof SegmentController) {
+                        //is a ship
+                        attackerUID = ((SegmentController) event.getLastDamager()).getUniqueIdentifier();
+                        attackerName = ((SegmentController) event.getLastDamager()).getRealName();
+                        attackerFaction = event.getLastDamager().getFactionId();
 
-                if (lastDamager.getFactionId() == ship.getFactionId() && ship.getFactionId() != 0) {
-                    return; //same faction == boring.
+                        attackerReactor = (int) ((PowerImplementation)(((ManagedSegmentController<?>)event.getLastDamager()).getManagerContainer().getPowerInterface())).getActiveReactorInitialSize();
+
+                    } else if (event.getLastDamager() instanceof PlayerState) {
+                        //get players ship
+                        SimpleTransformableSendableObject attacker = ((PlayerState) event.getLastDamager()).getFirstControlledTransformableWOExc();
+                        attackerUID = attacker.getUniqueIdentifier();
+                        attackerName = attacker.getRealName();
+                        attackerFaction = attacker.getFactionId();
+                        attackerReactor = (int) ((PowerImplementation)(((ManagedSegmentController<?>)attacker).getManagerContainer().getPowerInterface())).getActiveReactorInitialSize();
+
+                    } else if (event.getLastDamager() instanceof FixedSpaceEntity) {
+                        attackerName = ((FixedSpaceEntity) event.getLastDamager()).getType().getName();
+                        attackerFaction = 0;
+                        attackerUID = ((FixedSpaceEntity) event.getLastDamager()).getUniqueIdentifier();
+
+                    } else {
+                        return;
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
                 }
 
-                boolean isPlayer = (lastDamager.getOwnerState() instanceof PlayerState);
-                SimpleTransformableSendableObject shooter = lastDamager.getShootingEntity();
-                if (isPlayer) {
-                    try {
-                        shooter = ((PlayerState) lastDamager.getOwnerState()).getFirstControlledTransformable();
-                    } catch (PlayerControlledTransformableNotFound playerControlledTransformableNotFound) {
-                        playerControlledTransformableNotFound.printStackTrace();
+
+                int victimReactor = -1;
+                if (ship instanceof ManagedUsableSegmentController) {
+                    try { //lots of raw casting here
+                        victimReactor = (int) ((PowerImplementation)(((ManagedSegmentController<?>)ship).getManagerContainer().getPowerInterface())).getActiveReactorInitialSize();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
 
-                ShipObject victim = new ShipObject(ship);
-                //account for overheating, ship is at 40% reactor
-                victim.setReactor((int) (victim.getReactor()/0.4f)); //TODO use reactor overheat percent
-                ShipObject attacker;
-                long attackerID;
-                if (event.getLastDamager().getShootingEntity() instanceof SegmentController) {
-                    attacker = new ShipObject((SegmentController) event.getLastDamager().getShootingEntity());
-                    attackerID = ((SegmentController) event.getLastDamager()).dbId;
-                } else {
-                    attacker = new ShipObject((SegmentController) shooter);
-                    attackerID = ((SegmentController) shooter).dbId;
-                }
-                ShipDestroyedInfo info = new ShipDestroyedInfo(victim,attacker,ship.getSector(new Vector3i()));
-                Manager.addAttack(ship.dbId,
+                Manager.addAttack(ship.getUniqueIdentifier(),
                         ship.getFactionId(),
                         ship.getRealName(),
+                        victimReactor,
 
-                        true,
-                        attackerID,
-                        lastDamager.getFactionId(),
-                        attacker.getName(),
+                        ship.isMarkedForPermanentDelete(),
+                        attackerUID,
+                        attackerFaction,
+                        attackerName,
+                        attackerReactor,
                         ship.getSector(new Vector3i()),
                         System.currentTimeMillis());
 
-                NewsManager.addInfo(info);
 
             }
         }, ModMain.instance);
