@@ -148,64 +148,6 @@ public class Utility {
         return r;
     }
 
-    static class CustomPirateProgram extends TargetProgram<SimulationGroup> {
-        private String PROGRAM = "PROGRAM";
-        public CustomPirateProgram(SimulationGroup simulationGroup, boolean b) {
-            super(simulationGroup, b);
-        }
-
-        @Override
-        public void onAISettingChanged(AIConfiguationElementsInterface aiConfiguationElementsInterface) throws FSMException {
-
-        }
-
-        @Override
-        protected String getStartMachine() {
-            return PROGRAM;
-        }
-
-        @Override
-        protected void initializeMachines(HashMap<String, FiniteStateMachine<?>> hashMap) {
-            machines.put(PROGRAM, new CustomPirateMachine(getEntityState(),this));
-        }
-    }
-
-    static class CustomPirateMachine extends  FiniteStateMachine<String> {
-
-        public CustomPirateMachine(AiEntityStateInterface aiEntityStateInterface, MachineProgram<?> machineProgram) {
-            super(aiEntityStateInterface, machineProgram, "");
-        }
-
-        private long last;
-        @Override
-        public void update() throws FSMException {
-            super.update();
-            //TODO debug stuff
-        }
-
-        @Override
-        public void createFSM(String s) {
-            Starting starting = new Starting(getObj());
-            GoToRandomInSystem nextRandom = new GoToRandomInSystem(getObj());
-        //    GoToRandomSector nextRandom = new GoToRandomSector(getObj()); //will edit the machines target sector to a nearby random location.
-            MovingToSector goToSector = new MovingToSector(getObj()); //will tell ships to move to target
-            WaitingTimed waitingTimed = new WaitingTimed(getObj(),10); //wait 10 seconds in target sector
-
-            //start->randomSector->moveTo->wait->randomSector
-            starting.addTransition(Transition.PLAN,nextRandom);
-            nextRandom.addTransition(Transition.MOVE_TO_SECTOR,goToSector);
-            goToSector.addTransition(Transition.TARGET_SECTOR_REACHED,waitingTimed);
-            waitingTimed.addTransition(Transition.WAIT_COMPLETED,nextRandom);
-
-            setStartingState(starting);
-        }
-
-        @Override
-        public void onMsg(Message message) {
-
-        }
-    }
-
     public static long addFaction(long in, int factionID) {
         switch (factionID) {
             case 0: //neutral
