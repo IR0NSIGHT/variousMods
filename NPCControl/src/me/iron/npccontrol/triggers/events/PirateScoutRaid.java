@@ -51,7 +51,7 @@ public class PirateScoutRaid extends Event {
         if (s != null) {
             Utility.spawnAdvancedHunt(sector,s,f.toFlatArray(), -2);
         }
-        ModMain.log(String.format("pirate scout raid ran with code: "+Utility.toBin(code));
+        ModMain.log(String.format("pirate scout raid ran with code: %s",Utility.toBin(code)));
     }
 
     @Override
