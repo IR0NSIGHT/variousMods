@@ -49,7 +49,7 @@ public class PirateScoutRaid extends Event {
         //TODO select a better target than just players ship: slowest, biggest and weakest ship.
         SimpleTransformableSendableObject s = p.getFirstControlledTransformableWOExc();
         if (s != null) {
-            Utility.spawnAdvancedHunt(sector,s,f.toFlatArray(), -2);
+            Utility.spawnAdvancedHunt(sector,s,f.toFlatArray(), -1);
         }
         ModMain.log(String.format("pirate scout raid ran with code: %s",Utility.toBin(code)));
     }

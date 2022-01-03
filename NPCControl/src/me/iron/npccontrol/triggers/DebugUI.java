@@ -2,10 +2,20 @@ package me.iron.npccontrol.triggers;
 
 import api.mod.StarMod;
 import api.utils.game.chat.CommandInterface;
+import com.bulletphysics.linearmath.Transform;
 import com.sun.istack.internal.Nullable;
 import me.iron.npccontrol.ModMain;
+import org.schema.game.common.controller.Ship;
+import org.schema.game.common.controller.ai.AIGameConfiguration;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.catalog.CatalogPermission;
+import org.schema.game.mod.Mod;
+import org.schema.game.server.ai.ShipAIEntity;
+import org.schema.game.server.data.GameServerState;
+import org.schema.schine.ai.stateMachines.AiEntityState;
+import org.schema.schine.network.objects.Sendable;
+
+import javax.vecmath.Vector3f;
 
 /**
  * STARMADE MOD
@@ -64,6 +74,49 @@ public class DebugUI implements CommandInterface {
         if (strings.length>0 && strings[0].equals("ai")) {
             AIManager.debug = !AIManager.debug;
             ModMain.log("set AIManager debug to "+AIManager.debug);
+        }
+
+        if (strings.length>0 && strings[0].toLowerCase().equals("showai")) {
+            Sendable s =GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalUpdatableObjects().get(playerState.getSelectedEntityId());
+            if (s instanceof Ship) {
+               AIGameConfiguration aig = ( (Ship)s).getAiConfiguration();
+                ModMain.log("AIG = " + aig.toString());
+               AiEntityState aes = aig.getAiEntityState();
+               ModMain.log("aes = "+aes.toString());
+            }  else {
+                ModMain.log("not a ship");
+            }
+        }
+
+        if (strings.length>0 && strings[0].toLowerCase().equals("spawn")) {
+            Utility.spawnHuntingGroup(playerState.getFirstControlledTransformableWOExc(),-2,1);
+            return true;
+        }
+
+        if (strings.length>0 && strings[0].toLowerCase().equals("move")) {
+            Sendable s =GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalUpdatableObjects().get(playerState.getSelectedEntityId());
+            if (s instanceof Ship) {
+                AIGameConfiguration aig = ( (Ship)s).getAiConfiguration();
+
+                ModMain.log("AIG = " + aig.toString());
+                AiEntityState aes = aig.getAiEntityState();
+                if (aes instanceof ShipAIEntity) {
+                    Vector3f dir = new Vector3f(0,-10000,0);
+                    ((ShipAIEntity)aes).moveTo(
+                            GameServerState.instance.getController().getTimer(),
+                            dir,
+                            true
+                    );
+                    ((Ship)s).getNetworkObject().moveDir.set(dir);
+                }
+                ModMain.log("told ship " + ((Ship) s).getRealName() +" to move");
+            }  else {
+                ModMain.log("not a ship");
+            }
+        }
+
+        if (strings.length>0 && strings[0].equals("pos")) {
+            ModMain.log("player at pos: "+playerState.getFirstControlledTransformableWOExc().getWorldTransform().origin);
         }
 
         return false;

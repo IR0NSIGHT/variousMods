@@ -2,6 +2,8 @@ package me.iron.npccontrol.triggers;
 
 import me.iron.npccontrol.ModMain;
 import me.iron.npccontrol.triggers.FSM.GoToRandomInSystem;
+import org.lwjgl.Sys;
+import org.lwjgl.util.vector.Vector;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.catalog.CatalogPermission;
@@ -25,6 +27,7 @@ import org.schema.schine.ai.AiEntityStateInterface;
 import org.schema.schine.ai.MachineProgram;
 import org.schema.schine.ai.stateMachines.*;
 
+import javax.vecmath.Vector3f;
 import java.util.*;
 
 /**
@@ -52,6 +55,16 @@ public class Utility {
      * @return distance
      */
     public static double getDistance(Vector3i a, Vector3i b) {
+        return Math.sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y) + (a.z-b.z)*(a.z-b.z));
+    }
+
+    /**
+     * euklidean standard norm for vectors = distance between a and b
+     * @param a
+     * @param b
+     * @return distance
+     */
+    public static double getDistance(Vector3f a, Vector3f b) {
         return Math.sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y) + (a.z-b.z)*(a.z-b.z));
     }
 
@@ -190,4 +203,50 @@ public class Utility {
         return String.format("%1$" + 64 + "s", o).replace(' ', '0');
     }
 
+    /**
+     * mutates to
+     * @param from
+     * @param to
+     * @return
+     */
+    public static Vector3i getDir(Vector3i from, Vector3i to) {
+        to.x -= from.x;
+        to.y -= from.y;
+        to.z -= from.z;
+        return to;
+    }
+
+    /**
+     * from sec1, pos1 to sec2, pos2
+     * @param sec1
+     * @param pos1
+     * @param sec2
+     * @param pos2
+     * @return
+     */
+    public static Vector3f getDir(Vector3i sec1, Vector3f pos1, Vector3i sec2, Vector3f pos2) {
+        Vector3f out = sec1.toVector3f();
+        out.sub(sec2.toVector3f());
+        out.add(pos2);
+        out.sub(pos1);
+        return out;
+    }
+
+    public static void main(String[] args) {
+        Vector3f a = new Vector3f(3,2,1);
+        Vector3f b = new Vector3f(-3,4,-1);
+        Vector3f p = new Vector3f(-1,2,1);
+
+        System.out.println(String.format("from %s to %s = %s",a,b,distancePointLine(a,b,p)));
+    }
+
+    /**
+     * distance of point P to line AB
+     */
+    public static float distancePointLine(javax.vecmath.Vector3f p, javax.vecmath.Vector3f a, javax.vecmath.Vector3f b) {
+        Vector3f out = new Vector3f(p);
+        out.sub(a); //p-a
+        out.cross(p,b);
+        return out.length()/b.length();
+    }
 }

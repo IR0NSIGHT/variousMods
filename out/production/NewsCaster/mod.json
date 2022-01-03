@@ -5,7 +5,7 @@
   "version": "1.2.2",
   "starmade_version": "0.202.110",
   "client_mod": false,
-  "server_mod": false,
+  "server_mod": true,
   "main_class": "me.iron.newscaster.ModMain",
   "smd_resource_id": 8252,
   "dependencies": [
