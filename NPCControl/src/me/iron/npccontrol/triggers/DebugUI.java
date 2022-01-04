@@ -1,21 +1,34 @@
 package me.iron.npccontrol.triggers;
 
+import api.listener.fastevents.FastListenerCommon;
+import api.listener.fastevents.SegmentDrawListener;
+import api.mod.StarLoader;
 import api.mod.StarMod;
+import api.network.packets.PacketUtil;
 import api.utils.game.chat.CommandInterface;
 import com.bulletphysics.linearmath.Transform;
 import com.sun.istack.internal.Nullable;
 import me.iron.npccontrol.ModMain;
+import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.controller.ai.AIGameConfiguration;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.catalog.CatalogPermission;
+import org.schema.game.common.data.world.DrawableRemoteSegment;
+import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.mod.Mod;
 import org.schema.game.server.ai.ShipAIEntity;
 import org.schema.game.server.data.GameServerState;
 import org.schema.schine.ai.stateMachines.AiEntityState;
+import org.schema.schine.graphicsengine.forms.debug.DebugDrawer;
+import org.schema.schine.graphicsengine.forms.debug.DebugLine;
+import org.schema.schine.graphicsengine.forms.debug.DebugPacket;
 import org.schema.schine.network.objects.Sendable;
 
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * STARMADE MOD
@@ -24,6 +37,10 @@ import javax.vecmath.Vector3f;
  * TIME: 13:04
  */
 public class DebugUI implements CommandInterface {
+    public DebugUI() {
+
+    }
+
     @Override
     public String getCommand() {
         return "debug";
@@ -119,6 +136,31 @@ public class DebugUI implements CommandInterface {
             ModMain.log("player at pos: "+playerState.getFirstControlledTransformableWOExc().getWorldTransform().origin);
         }
 
+        if (strings.length>0 && strings[0].equals("path")) {
+
+            Sendable s = GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalUpdatableObjects().get( playerState.getSelectedEntityId());
+            String uid = "";
+            if (s != null && s instanceof SimpleTransformableSendableObject)
+                uid = ((SimpleTransformableSendableObject<?>) s).getUniqueIdentifier();
+
+            Pathfinder pf = new Pathfinder(uid);
+            LinkedList<Vector3f> wps = pf.findPath(playerState.getCurrentSector(),new Vector3f(2000,1000,1000),playerState.getCurrentSector(),new Vector3f(-2000,1000,1000),200f);
+            Iterator<Vector3f> it = wps.iterator();
+            Vector3f previous = null;
+            LinkedList<DebugLine> lines = new LinkedList<>();
+            while (it.hasNext()) {
+                Vector3f wp = it.next();
+                if (previous != null) {
+                    lines.add(new DebugLine(previous,wp,new Vector4f(1,0,0,1),60*1000));
+                }
+                ModMain.log("wP:" + wp);
+
+                previous = wp;
+            }
+        //    pf.drawRaycasts();
+            PacketUtil.sendPacket(playerState,new DebugPacket(lines));
+            return true;
+        }
         return false;
     }
 

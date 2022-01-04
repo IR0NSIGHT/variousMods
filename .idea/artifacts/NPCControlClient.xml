@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="NPCControlDedicated">
-    <output-path>$USER_HOME$/Desktop/Starmade/server testarea/server/StarMade/mods</output-path>
+  <artifact type="jar" name="NPCControlClient">
+    <output-path>$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/mods</output-path>
     <root id="archive" name="NPCControl.jar">
       <element id="module-output" name="NPCControl" />
       <element id="extracted-dir" path="$PROJECT_DIR$/NPCControl/lib/commons-math3-3.6.1/commons-math3-3.6.1.jar" path-in-jar="/" />

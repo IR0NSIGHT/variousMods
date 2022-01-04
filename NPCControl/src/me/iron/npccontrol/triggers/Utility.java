@@ -241,12 +241,15 @@ public class Utility {
     }
 
     /**
-     * distance of point P to line AB
+     * distance of point P to line a+x*b
+     * @param p point P
+     * @param a point A
+     * @param b point B
      */
     public static float distancePointLine(javax.vecmath.Vector3f p, javax.vecmath.Vector3f a, javax.vecmath.Vector3f b) {
         Vector3f out = new Vector3f(p);
         out.sub(a); //p-a
-        out.cross(p,b);
+        out.cross(out,b);
         return out.length()/b.length();
     }
 }
