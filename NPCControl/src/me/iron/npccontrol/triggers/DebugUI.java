@@ -192,7 +192,7 @@ public class DebugUI implements CommandInterface {
                 for (SimpleTransformableSendableObject obj: s.getEntities()) {
                     Vector3f point = obj.getWorldTransform().origin;
                     float radius = obj.getBoundingSphereTotal().radius * radiusMod;
-                    DebugSphere sp = new DebugSphere(point,radius,new Vector4f(0,1,0,1),120*1000);
+                    DebugSphere sp = new DebugSphere(point,radius,new Vector4f(0,1,0,1),500*1000);
                     lines.addAll(sp.getLines());
                 }
                 new DebugPacket(lines).sendToAll();

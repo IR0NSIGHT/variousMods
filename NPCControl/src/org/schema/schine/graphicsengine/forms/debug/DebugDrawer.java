@@ -124,14 +124,16 @@ public class DebugDrawer {
 				i--;
 			}
 		}
-
-		for (int i = 0; i < myLines.size(); i++) {
-			DebugGeometry g = myLines.get(i);
-			if (!g.isAlive()) {
-				myLines.remove(i);
-				i--;
+		synchronized (myLines) {
+			for (int i = 0; i < myLines.size(); i++) {
+				DebugGeometry g = myLines.get(i);
+				if (!g.isAlive()) {
+					myLines.remove(i);
+					i--;
+				}
 			}
 		}
+
 	}
 
 	public static void drawBoundingBoxes() {

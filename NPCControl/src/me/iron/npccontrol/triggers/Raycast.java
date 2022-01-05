@@ -40,7 +40,7 @@ public class Raycast {
                 if ((obj instanceof Ship && ((Ship) obj).isDocked()) || obj.getUniqueIdentifier().equals(excludeUID))
                     continue;
 
-                if (!(obj instanceof ManagedUsableSegmentController)) { //playerstates have a fucked up worldtransform getter.
+                if (!(obj instanceof SimpleTransformableSendableObject)) { //playerstates have a fucked up worldtransform getter.
                     continue;
                 }
 
@@ -49,7 +49,7 @@ public class Raycast {
                     continue;
                 }
 
-                obstacles.add(new Obstacle(obj.getWorldTransform().origin, obj.getBoundingSphereTotal().radius, obj.getRealName()));
+                obstacles.add(new Obstacle(obj.getWorldTransform().origin, obj.getBoundingSphereTotal().radius*5, obj.getRealName()));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,7 +129,7 @@ public class Raycast {
             point,
             end,
             color,
-                120*1000
+                Pathfinder.debugLineLifeTime
         );
     }
 

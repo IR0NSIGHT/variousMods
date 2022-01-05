@@ -90,7 +90,7 @@ public class ShipMovingToSector extends ShipGameState {
 
 		if (waypoints.isEmpty()) {
 			ModMain.log("wps is empty.");
-			onTargetReached();
+			onTargetReached(); //TODO this can crash the server is run while the (first) player joins
 			return false;
 		}
 		assert wpIterator!=null&&waypoints!=null;
@@ -120,10 +120,12 @@ public class ShipMovingToSector extends ShipGameState {
 		LinkedList<DebugLine> lines = new LinkedList<>();
 		Vector3f end = new Vector3f(ownPos);
 		end.add(thrustDir);
+		long lt = 50;
 		lines.add(new DebugLine(
-				new Vector3f(ownPos),end,new Vector4f(1,1,0,1),10)
+
+				new Vector3f(ownPos),end,new Vector4f(1,1,0,1),lt)
 		);
-		lines.add(new DebugLine(new Vector3f(ownPos),new Vector3f(currentWP),new Vector4f(1,0,1,1),10));
+		lines.add(new DebugLine(new Vector3f(ownPos),new Vector3f(currentWP),new Vector4f(1,0,1,1),lt));
 		new DebugPacket(lines).sendToAll();
 	//	ModMain.log("length thrust dir: " + thrustDir.length() + " : " + thrustDir);
 
@@ -142,19 +144,12 @@ public class ShipMovingToSector extends ShipGameState {
 			onTargetReached();
 		}
 	}
-	private void onTargetReached() {
+	private void onTargetReached() { //crashes server
 		if (!getEntity().isFullyLoadedWithDock()) {
 			return;
 		}
 		Vector3i sector = new Vector3i(35,59,-5);
-		Random r = new Random();
-		Vector3f nextPos = new Vector3f(
-				r.nextFloat()*(r.nextBoolean()?-1:1),
-				r.nextFloat()*(r.nextBoolean()?-1:1),
-				r.nextFloat()*(r.nextBoolean()?-1:1)
-		);
-		nextPos.normalize();
-		nextPos.scale(2000);
+		Vector3f nextPos = getRandomSafePoint(sector,2000);
 		setMoveTarget(sector,nextPos, new Vector3f());
 	}
 
@@ -190,6 +185,26 @@ public class ShipMovingToSector extends ShipGameState {
 
 	}
 
+	private Vector3f getRandomSafePoint(Vector3i sector, float radius) {
+		boolean safe = false;
+		Pathfinder pf = new Pathfinder(getEntity().getUniqueIdentifier());
+		Vector3f nextPos = null;
+		int i = 0;
+		while (!safe) {		Random r = new Random();
+
+			nextPos = new Vector3f(
+					r.nextFloat()*(r.nextBoolean()?-1:1),
+					r.nextFloat()*(r.nextBoolean()?-1:1),
+					r.nextFloat()*(r.nextBoolean()?-1:1)
+			);
+			nextPos.normalize();
+			nextPos.scale(radius*=1.2);
+			safe = !pf.isPointInObstacle(sector,nextPos,getEntity().getBoundingSphereTotal().radius);
+			i++;
+			assert i <100:"infinite loop, cant find safe pos in sector";
+		}
+		return nextPos;
+	}
 
 
 	public static void main(String[] args) throws IOException {
@@ -240,7 +255,7 @@ public class ShipMovingToSector extends ShipGameState {
 					wp,
 					100,
 					new Vector4f(0,r.nextFloat(),r.nextFloat(),1),
-					120*1000
+					45*1000
 			).getLines());
 		}
 		new DebugPacket(points).sendToAll();

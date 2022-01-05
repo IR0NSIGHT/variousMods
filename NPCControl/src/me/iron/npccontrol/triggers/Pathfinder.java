@@ -23,6 +23,7 @@ import org.schema.schine.graphicsengine.forms.debug.DebugPacket;
  * finds a flyable corridor from a to b for a ship
  */
 public class Pathfinder {
+    public static long debugLineLifeTime = 15*1000;
     private String shipUID;
     private LinkedList<Vector3f[]> raycasts = new LinkedList<>();
     private LinkedList<DebugLine> debugLines = new LinkedList<>();
@@ -288,13 +289,13 @@ public class Pathfinder {
                 new Vector3f(point),
                 p1,
                 new Vector4f(0,0,1,1),
-                120*1000
+                debugLineLifeTime
         ));
         debugLines.add(new DebugLine(
                 new Vector3f(point),
                 p2,
                 new Vector4f(0,0,1,1),
-                120*1000
+                debugLineLifeTime
         ));
         return plane;
     }
@@ -310,7 +311,7 @@ public class Pathfinder {
                     from,
                     to,
                     (hit!=null?new Vector4f(1,0,0,1):new Vector4f(0,1,0,1)),
-                    120*1000
+                    debugLineLifeTime
             ));
         }
         new DebugPacket(lines).sendToAll();
