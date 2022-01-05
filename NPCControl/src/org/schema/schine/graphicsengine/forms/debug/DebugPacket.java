@@ -4,6 +4,7 @@ import api.network.Packet;
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
 import api.network.packets.PacketUtil;
+import me.iron.npccontrol.ModMain;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.server.data.GameServerState;
 
@@ -18,6 +19,11 @@ import java.util.LinkedList;
  */
 public class DebugPacket extends Packet {
     private LinkedList<DebugLine> lines = new LinkedList<>();
+    private boolean clear;
+
+    public void setClear(boolean clear) {
+        this.clear = clear;
+    }
 
     public DebugPacket(LinkedList<DebugLine> lines) {
         this.lines.addAll(lines);
@@ -28,6 +34,7 @@ public class DebugPacket extends Packet {
 
     @Override
     public void readPacketData(PacketReadBuffer packetReadBuffer) throws IOException {
+        clear = packetReadBuffer.readBoolean();
        int size = packetReadBuffer.readInt();
        DebugDrawer.clear();
        for (int i = 0; i < size; i++) {
@@ -46,6 +53,8 @@ public class DebugPacket extends Packet {
 
     @Override
     public void writePacketData(PacketWriteBuffer packetWriteBuffer) throws IOException {
+    //    ModMain.log("sending debug packet to client with " + lines.size() + " lines.");
+        packetWriteBuffer.writeBoolean(clear);
         packetWriteBuffer.writeInt(lines.size());
         for (DebugLine l: lines) {
             packetWriteBuffer.writeVector3f(l.pointA);
@@ -57,7 +66,8 @@ public class DebugPacket extends Packet {
 
     @Override
     public void processPacketOnClient() {
-     //   DebugDrawer.myLines.clear();
+        if (clear)
+            DebugDrawer.myLines.clear();
         synchronized (DebugDrawer.myLines) {
             DebugDrawer.myLines.addAll(lines);
         }

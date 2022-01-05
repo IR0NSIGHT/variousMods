@@ -77,7 +77,6 @@ public class Raycast {
         //TODO ignore if startpos is inside obstacle
         //TODO replace ownUID with a filter object
         //TODO allow constant-speed moving objects
-        ModMain.log("raycast from " + pos + " towards " + dir);
         for (Obstacle obj: obstacles) {
             if (isObjectBlockingLine(point,dir,obj, minDist)) {
                 hitObj = obj;
@@ -89,13 +88,14 @@ public class Raycast {
     }
 
     private boolean isObjectBlockingLine(Vector3f point, Vector3f dir, Obstacle obj, float minDist) {
-   //    //build dot product to determine if "possible collison" point is behind ship already.
-   //    ab = new Vector3f(dir); ab.sub(pos); ab.normalize();
-   //    ap = new Vector3f(obj.pos); ap.sub(pos); ap.normalize();
-   //    float dot = ap.dot(ab);
-   //    if (dot<0) { //collision point is behind ship.
-   //        continue;
-   //    }
+        Vector3f ab,ap;
+        //build dot product to determine if "possible collison" point is behind ship already.
+        ab = new Vector3f(dir); ab.sub(point); ab.normalize();
+        ap = new Vector3f(obj.pos); ap.sub(point); ap.normalize();
+        float dot = ap.dot(ab);
+        if (dot<0) { //collision point is behind ship.
+            return false;
+        }
 
         Vector3f objPos = obj.pos;
         float objBBS = obj.bbsRadius;

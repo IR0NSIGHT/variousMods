@@ -36,7 +36,6 @@ public class PirateScoutRaid extends Event {
     @Override
     protected void run(long code, Vector3i sector) {
         super.run(code, sector);
-        //ModMain.log("RUN PIRATE SCOUT RAID");
         ArrayList<PlayerState> players = Utility.getPlayersByDistance(sector);
         if (players.size()==0)
             return;

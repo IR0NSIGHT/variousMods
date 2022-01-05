@@ -7,7 +7,9 @@ import org.lwjgl.util.vector.Vector;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.catalog.CatalogPermission;
+import org.schema.game.common.data.world.SectorInformation;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
+import org.schema.game.common.data.world.VoidSystem;
 import org.schema.game.server.ai.program.common.TargetProgram;
 import org.schema.game.server.ai.program.common.states.WaitingTimed;
 import org.schema.game.server.ai.program.simpirates.PirateSimulationProgram;
@@ -103,7 +105,6 @@ public class Utility {
                 TargetProgram<SimulationGroup> p = new PirateSimulationProgram(group,false);//new CustomPirateProgram(group,false);
                 group.setCurrentProgram(p);
                 AIManager.groups.add(group);
-                ModMain.log("spawned advanced hunt:"+group.getDebugString());
 
             }
 
@@ -225,10 +226,24 @@ public class Utility {
      * @return
      */
     public static Vector3f getDir(Vector3i sec1, Vector3f pos1, Vector3i sec2, Vector3f pos2) {
-        Vector3f out = sec1.toVector3f();
-        out.sub(sec2.toVector3f());
-        out.add(pos2);
-        out.sub(pos1);
+        float sectorSize = 100/ VoidSystem.SYSTEM_SIZEf*1000*2;
+        Vector3f s1, s2, p1, p2;
+        s1 = sec1.toVector3f(); s1.scale(sectorSize);
+        s2 = sec2.toVector3f(); s2.scale(sectorSize);
+        p1 = new Vector3f(pos1);
+        p2 = new Vector3f(pos2);
+
+        Vector3i sectorOffset = new Vector3i(sec2);
+        sectorOffset.sub(sec1);
+        sectorOffset.scale((int)sectorSize);
+
+        Vector3f p1s1 = p1;p1s1.negate();
+        Vector3f s1s2 = sectorOffset.toVector3f();
+        Vector3f s2p2 = new Vector3f(p2);
+
+        Vector3f out = new Vector3f(p1s1);
+        out.add(s1s2);
+        out.add(s2p2);
         return out;
     }
 

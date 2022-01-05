@@ -15,6 +15,7 @@ import org.schema.game.common.controller.ai.AIGameConfiguration;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.catalog.CatalogPermission;
 import org.schema.game.common.data.world.DrawableRemoteSegment;
+import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.mod.Mod;
 import org.schema.game.server.ai.ShipAIEntity;
@@ -23,10 +24,12 @@ import org.schema.schine.ai.stateMachines.AiEntityState;
 import org.schema.schine.graphicsengine.forms.debug.DebugDrawer;
 import org.schema.schine.graphicsengine.forms.debug.DebugLine;
 import org.schema.schine.graphicsengine.forms.debug.DebugPacket;
+import org.schema.schine.graphicsengine.forms.debug.DebugSphere;
 import org.schema.schine.network.objects.Sendable;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -159,6 +162,48 @@ public class DebugUI implements CommandInterface {
             }
         //    pf.drawRaycasts();
             PacketUtil.sendPacket(playerState,new DebugPacket(lines));
+            return true;
+        }
+
+        if (strings.length>0 && strings[0].equals("circle")) {
+            Sendable obj = GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalUpdatableObjects().get(playerState.getSelectedEntityId());
+            if (!(obj instanceof SimpleTransformableSendableObject)) {
+                ModMain.log("cant select that.");
+            }
+            SimpleTransformableSendableObject s = (SimpleTransformableSendableObject)obj;
+            Vector3f point = s.getWorldTransform().origin;
+            float radius = s.getBoundingSphereTotal().radius;
+            DebugSphere sp = new DebugSphere(point,radius,new Vector4f(0,1,0,1),120*1000);
+            new DebugPacket(sp.getLines()).sendToAll();
+        }
+
+        if (strings.length>0 && strings[0].equals("circle_all")) {
+            float radiusMod = 1;
+            if (strings.length==2) {
+                try {
+                    radiusMod = Integer.parseInt(strings[1]);
+                } catch (NumberFormatException ex) {
+                    ModMain.log(strings[1]+ " is not a number");
+                }
+            }
+            try {
+                Sector s = GameServerState.instance.getUniverse().getSector(playerState.getCurrentSector());
+                LinkedList<DebugLine> lines = new LinkedList<>();
+                for (SimpleTransformableSendableObject obj: s.getEntities()) {
+                    Vector3f point = obj.getWorldTransform().origin;
+                    float radius = obj.getBoundingSphereTotal().radius * radiusMod;
+                    DebugSphere sp = new DebugSphere(point,radius,new Vector4f(0,1,0,1),120*1000);
+                    lines.addAll(sp.getLines());
+                }
+                new DebugPacket(lines).sendToAll();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (strings.length==1&&strings[0].equals("clear_draw")) {
+            DebugDrawer.clearLines();
+            ModMain.log("cleared debug drawer lines.");
             return true;
         }
         return false;

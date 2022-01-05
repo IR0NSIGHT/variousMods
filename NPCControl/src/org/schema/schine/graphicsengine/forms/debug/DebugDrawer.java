@@ -4,6 +4,7 @@ import com.bulletphysics.linearmath.Transform;
 import me.iron.npccontrol.ModMain;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.schema.game.server.data.GameServerState;
 import org.schema.schine.graphicsengine.core.GlUtil;
 import org.schema.schine.graphicsengine.core.settings.EngineSettings;
 import org.schema.schine.graphicsengine.forms.DebugBoundingBox;
@@ -13,6 +14,7 @@ import org.schema.schine.graphicsengine.forms.simple.Box;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.util.LinkedList;
 import java.util.Vector;
 
 public class DebugDrawer {
@@ -30,7 +32,7 @@ public class DebugDrawer {
 	static long lastClearXses = 0;
 
 	public static void debugDraw(int x, int y, int z, int halfDim, Transformable o) {
-		if (EngineSettings.P_PHYSICS_DEBUG_ACTIVE.isOn()) {
+	/*	if (EngineSettings.P_PHYSICS_DEBUG_ACTIVE.isOn()) {
 			float scale = 0.51f;
 			Transform t = new Transform(o.getWorldTransform());
 			Vector3f p = new Vector3f();
@@ -44,11 +46,13 @@ public class DebugDrawer {
 			bo.LIFETIME = 200;
 			DebugDrawer.boxes.add(bo);
 		}
+
+	 */
 	}
 
 	public static void addArrowFromTransform(Transform t) {
 
-		Vector3f up = GlUtil.getUpVector(new Vector3f(), t);
+	/*	Vector3f up = GlUtil.getUpVector(new Vector3f(), t);
 		Vector3f right = GlUtil.getRightVector(new Vector3f(), t);
 		Vector3f forward = GlUtil.getForwardVector(new Vector3f(), t);
 
@@ -88,9 +92,12 @@ public class DebugDrawer {
 			DebugDrawer.lines.add(fLine);
 		}
 
+
+	 */
 	}
 
 	public static void clear() {
+		lines.clear();
 		boundingXses.clear();
 		for (int i = 0; i < boundingBoxes.size(); i++) {
 			DebugGeometry g = boundingBoxes.get(i);
@@ -117,6 +124,7 @@ public class DebugDrawer {
 				i--;
 			}
 		}
+
 		for (int i = 0; i < myLines.size(); i++) {
 			DebugGeometry g = myLines.get(i);
 			if (!g.isAlive()) {
@@ -209,12 +217,19 @@ public class DebugDrawer {
 	}
 
 	public static void drawLines() {
-	//	ModMain.log("draw");
 		clear();
 		synchronized (myLines) {
 			for (DebugLine line : myLines) {
 				line.draw();
 			}
+		}
+	}
+
+	public static void clearLines() {
+		if (GameServerState.instance!=null) {
+			DebugPacket p= new DebugPacket();
+			p.setClear(true);
+			p.sendToAll();
 		}
 	}
 

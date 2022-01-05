@@ -27,6 +27,7 @@ public class Pathfinder {
     private LinkedList<Vector3f[]> raycasts = new LinkedList<>();
     private LinkedList<DebugLine> debugLines = new LinkedList<>();
 
+    //TODO find better and more generic way to filter out specific ships/edit the buindingsphere size of objects
     public Pathfinder(String shipUID) {
         this.shipUID = shipUID;
     }
@@ -45,10 +46,8 @@ public class Pathfinder {
         //TODO take into account that evasive wp might be in different sector
         //TODO assert that evasive wp is not inside another obstacle
         LinkedList<Vector3f> waypoints = new LinkedList<>();
-        Vector3f directPathDir = Utility.getDir(ownSector, ownPos, targetSector, targetPos);
         Raycast.Obstacle obstacle;
         Vector3f currentWP = new Vector3f(ownPos);
-
         waypoints.add(currentWP);
         try {
             //plot until target is reached
@@ -74,25 +73,23 @@ public class Pathfinder {
 
                     //get an intermediate waypoint that avoids the obstacle
                     currentWP = new Vector3f(evasiveWP);
-                    ModMain.log("new evasive waypoint: " + currentWP + " distance to obst: " + Utility.getDistance(currentWP,currentWP));
                     assert !Float.isNaN(currentWP.x) : "currentWP is NaN:"+currentWP;
                 } else {
                     currentWP = new Vector3f(targetPos);
                 }
 
-                if (isPointInObstacle(ownSector,targetPos, corridorRadius)) {
-                    ModMain.log("ERROR: evasive waypoint inside of obstacle!");
-                }
-                //assert !isPointInObstacle(ownSector,targetPos, corridorRadius):"waypoint inside of obstacle";
+                //assert currentWP.equals(targetPos) || !isPointInObstacle(ownSector,currentWP, corridorRadius):"waypoint inside of obstacle";
                 waypoints.add(currentWP);
 
             }
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        if (Utility.getDistance(waypoints.getLast(),targetPos)>0.01f) {
+            ModMain.log("last waypoint is not target pos.");
+        }
+       // assert Utility.getDistance(waypoints.getLast(),targetPos)>0.01f :"last waypoint is not target pos." ;
         return waypoints;
     }
 
@@ -138,9 +135,7 @@ public class Pathfinder {
         RealMatrix pointer = MatrixUtils.createRealMatrix(new double[][]{{1},{0}});
         double sin45 = 0.7071067d;
         RealMatrix rotMatrix45 = MatrixUtils.createRealMatrix(new double[][]{{sin45,-sin45},{sin45,sin45}});
-        System.out.println("Rotation matrix (45°):"+rotMatrix45.toString());
         for (int i = 0; i < 8; i++) { //8 rotations = 1 full rotiation
-            System.out.println("pointer: " + pointer.toString());
             pointer = rotMatrix45.multiply(pointer);
 
             //get offset vector in plane based on rotated pointer
@@ -169,8 +164,6 @@ public class Pathfinder {
         return null; //all raycasts around the center have failed, cant find evasive point
     }
 
-
-
     /**
      * predicate that guarantees that the pos is more than obj.boundingsphereradius+corridorradius away from any object in the sector
      * if false is returned.
@@ -179,7 +172,7 @@ public class Pathfinder {
      * @param corridorRadius
      * @return
      */
-    private boolean isPointInObstacle(Vector3i sector, Vector3f pos, float corridorRadius) {
+    public boolean isPointInObstacle(Vector3i sector, Vector3f pos, float corridorRadius) {
         if (!GameServerState.instance.getUniverse().isSectorLoaded(sector))
             return false; //TODO do unloaded DB access for check
         //test the distance to every single object inside the sector, if its to close, return true
@@ -203,7 +196,6 @@ public class Pathfinder {
         Pathfinder pf = new Pathfinder("");
 
         Vector3f[] plane = pf.getPlaneDirFromNormal(new Vector3f(3,3,3),new Vector3f(1,0,0));
-        System.out.println("plane:"+Arrays.toString(plane));
 
         Vector3f lp,ld,pp,pd1,pd2;
         Vector3f sol = pf.solveLinePlaneIntersection(

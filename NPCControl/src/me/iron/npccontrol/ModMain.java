@@ -43,7 +43,6 @@ public class ModMain extends StarMod {
         super.onEnable();
         StarLoader.registerCommand(new DebugUI());
         PacketUtil.registerPacket(DebugPacket.class);
-        ModMain.log("DebugPacket registered");
     }
 
     @Override
@@ -64,18 +63,6 @@ public class ModMain extends StarMod {
     public void onClientCreated(ClientInitializeEvent event) {
         super.onClientCreated(event);
         DebugFile.log("on client",this);
-        DebugDrawer.lines.add(new DebugLine(new Vector3f(0,0,0),new Vector3f(100,100,100)));
-        FastListenerCommon.segmentDrawListeners.add(new SegmentDrawListener() {
-            @Override
-            public void preDrawSegment(DrawableRemoteSegment drawableRemoteSegment) {
-
-            }
-
-            @Override
-            public void postDrawSegment(DrawableRemoteSegment drawableRemoteSegment) {
-                DebugDrawer.drawLines();
-            }
-        });
     }
 
     public static void log(String mssg) {

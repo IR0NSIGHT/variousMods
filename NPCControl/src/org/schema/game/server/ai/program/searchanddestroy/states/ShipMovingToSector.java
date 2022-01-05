@@ -4,6 +4,7 @@ import api.network.packets.PacketUtil;
 import me.iron.npccontrol.ModMain;
 import me.iron.npccontrol.triggers.Pathfinder;
 import me.iron.npccontrol.triggers.Utility;
+import org.lwjgl.openal.Util;
 import org.lwjgl.util.vector.Vector;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 import org.schema.common.util.linAlg.Vector3i;
@@ -22,15 +23,18 @@ import org.schema.schine.ai.stateMachines.FSMException;
 import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.forms.debug.DebugLine;
 import org.schema.schine.graphicsengine.forms.debug.DebugPacket;
+import org.schema.schine.graphicsengine.forms.debug.DebugSphere;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
+import java.util.Set;
 
 public class ShipMovingToSector extends ShipGameState {
-
+	Vector4f color = new Vector4f();
 	//get movement values from the FSM
 	Vector3i targetSector = new Vector3i();
 	Vector3f targetPos = new Vector3f();
@@ -41,6 +45,7 @@ public class ShipMovingToSector extends ShipGameState {
 	private LinkedList<Vector3f> waypoints = new LinkedList<>(); //internal path waypoints for collision avoidance
 	private Vector3f currentWP;
 	private Iterator<Vector3f> wpIterator;
+	private int wpIdx;
 
 	private long lastLog;
 	public ShipMovingToSector(AiEntityStateInterface gObj) {
@@ -63,8 +68,13 @@ public class ShipMovingToSector extends ShipGameState {
 
 	@Override
 	public boolean onEnter() {
+		//TODO debug why freshly loaded entites get wierd pathing behavior
+		if (getEntity().isDocked() || getEntity().getUniqueIdentifier().contains("GFLT"))
+			return false;
+
 		onTargetReached();
-	//	setMoveTarget(new Vector3i(32,80,0),new Vector3f(500,0,0), new Vector3f());
+		Random r = new Random(getEntity().dbId);
+		color.set(r.nextFloat(),r.nextFloat(),r.nextFloat(),1);
 		return false;
 	}
 
@@ -76,58 +86,108 @@ public class ShipMovingToSector extends ShipGameState {
 	private boolean back;
 	@Override
 	public boolean onUpdate() throws FSMException {
-		//TODO make sure the distance tolerances make sense
-		GameServerState state = (GameServerState) getEntity().getState();
+
+
+		if (waypoints.isEmpty()) {
+			ModMain.log("wps is empty.");
+			onTargetReached();
+			return false;
+		}
+		assert wpIterator!=null&&waypoints!=null;
+
 
 		//get own precise position
 		Vector3i ownSector = getEntity().getSector(new Vector3i());
 		Vector3f ownPos = getEntity().getWorldTransform().origin;
 
 		//test if this waypoint is complete or no currentWP exists. //TODO ships seem to have trouble precisely hitting a waypoint.
-		if (currentWP == null || (Utility.getDistance(ownSector, targetSector)==0&& Utility.getDistance(ownPos,currentWP)<20)) {
-			if (wpIterator == null) {
-				wpIterator = waypoints.iterator();
-			}
-			boolean next = wpIterator.hasNext();
-			if (next) {
-				currentWP = new Vector3f(wpIterator.next());
-			//	ModMain.log("new wp: target pos: " + targetPos + " target sector " + targetSector);
-
-			} else {
-				//final position reached
-				assert Utility.getDistance(getEntity().getWorldTransform().origin, targetPos) < 5;
-				onTargetReached();
-				return false;
-			}
+		if ((Utility.getDistance(ownSector, targetSector)==0&& Utility.getDistance(ownPos,currentWP)<20)) {
+			onNextWaypoint();
+			return false;
 		}
 		targetPos.set(currentWP);
 
-		//get direction to target
-		Vector3i dir = Utility.getDir(ownSector, new Vector3i(targetSector));
-		float sectorSize = ((GameStateInterface) getEntity().getState()).getSectorSize();
-		dir.scale((int)sectorSize); //scale from sector to meters
+		//get direction to target (factoring in different sectors of ship and target.
 
-		//add in-sector-targetPos, sub own-sector-pos (precision might get lost but not important on long journeys)
-		Vector3f thrustDir = dir.toVector3f();
-		if (ownSector.equals(targetSector)) {
-			thrustDir.sub(ownPos);
-			thrustDir.add(targetPos);
-		}
+		Vector3f thrustDir =Utility.getDir(ownSector,ownPos,targetSector,currentWP);
 
 		if (thrustDir.length() < 1) //ignore tiny movements
 			return false;
 
+
 		setMovingDir(thrustDir); //dir the ship will move in (after the AI got updated)
+
+		LinkedList<DebugLine> lines = new LinkedList<>();
+		Vector3f end = new Vector3f(ownPos);
+		end.add(thrustDir);
+		lines.add(new DebugLine(
+				new Vector3f(ownPos),end,new Vector4f(1,1,0,1),10)
+		);
+		lines.add(new DebugLine(new Vector3f(ownPos),new Vector3f(currentWP),new Vector4f(1,0,1,1),10));
+		new DebugPacket(lines).sendToAll();
+	//	ModMain.log("length thrust dir: " + thrustDir.length() + " : " + thrustDir);
+
 		return false;
 	}
 
-	private void onTargetReached() {
-		if (back) {
-			setMoveTarget(new Vector3i(32,80,0), new Vector3f(2000,1000,1000), new Vector3f());
+	private void onNextWaypoint() {
+		ModMain.log("ship reached waypoint. remaining: " + (waypoints.size()-wpIdx));
+		wpIdx++;
+		if (wpIterator.hasNext()) {
+			currentWP = new Vector3f(wpIterator.next());
 		} else {
-			setMoveTarget(new Vector3i(32,80,0), new Vector3f(-2000,1000,1000), new Vector3f());
+			//final position reached
+			assert Utility.getDistance(getEntity().getWorldTransform().origin, targetPos) < 5;
+			ModMain.log(getEntity().getRealName()+" reached target");
+			onTargetReached();
 		}
-		back = !back;
+	}
+	private void onTargetReached() {
+		if (!getEntity().isFullyLoadedWithDock()) {
+			return;
+		}
+		Vector3i sector = new Vector3i(35,59,-5);
+		Random r = new Random();
+		Vector3f nextPos = new Vector3f(
+				r.nextFloat()*(r.nextBoolean()?-1:1),
+				r.nextFloat()*(r.nextBoolean()?-1:1),
+				r.nextFloat()*(r.nextBoolean()?-1:1)
+		);
+		nextPos.normalize();
+		nextPos.scale(2000);
+		setMoveTarget(sector,nextPos, new Vector3f());
+	}
+
+	/**
+	 * gets a random waypoint that is guaranteed to not be inside an obstacle + offset
+	 * @param sector
+	 * @param offset
+	 * @return
+	 */
+	private Vector3f getRandomPointNearObject(Vector3i sector, float offset) {
+
+		Random r = new Random();
+		boolean blocked = true;
+		Vector3f nextPos = null;
+		while (blocked) {
+			//select wp near random object
+			try {
+				Set<SimpleTransformableSendableObject<?>> objs = GameServerState.instance.getUniverse().getSector(getEntity().getSector(new Vector3i())).getEntities();
+				int size = objs.size();
+				int idx = r.nextInt(size)-1;
+				Iterator<SimpleTransformableSendableObject<?>> it = objs.iterator();
+				for (int i = 0; i < idx && it.hasNext(); i++) {
+					it.next();
+				}
+				nextPos = new Vector3f(it.next().getWorldTransform().origin);
+				nextPos.add(new Vector3f(0,offset,0));
+				blocked = new Pathfinder("").isPointInObstacle(sector,nextPos,offset);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return nextPos;
+
 	}
 
 
@@ -159,8 +219,6 @@ public class ShipMovingToSector extends ShipGameState {
 		this.targetPos.set(targetPos);
 		this.targetRot.set(targetRot);
 		waypoints.clear();
-		currentWP = null;
-		wpIterator = null;
 		Pathfinder pf = new Pathfinder(getEntity().getUniqueIdentifier());
 		waypoints.addAll(pf.findPath(
 				getEntity().getSector(new Vector3i()),
@@ -169,24 +227,24 @@ public class ShipMovingToSector extends ShipGameState {
 				targetPos,
 				Math.max(getEntity().getBoundingSphereTotal().radius*2,300)
 		));
+		wpIterator = waypoints.iterator();
+		currentWP = wpIterator.next();
+		wpIdx=0;
+		assert Utility.getDistance(waypoints.getLast(),targetPos)<0.001f;
+		pf.drawRaycasts();
 
-		LinkedList<DebugLine> lines = new LinkedList<>();
-		lines.add(new DebugLine(getEntity().getWorldTransform().origin,targetPos, new Vector4f(1,0,0,1),120*1000));
-		Vector3f previous = new Vector3f(getEntity().getWorldTransform().origin);
+		Random r = new Random();
+		LinkedList<DebugLine> points = new LinkedList<>();
 		for (Vector3f wp: waypoints) {
-			lines.add(new DebugLine(
-					new Vector3f(previous),
-					new Vector3f(wp),
-					new Vector4f(0,1,0,1),
-					45*1000
-			));
-			previous.set(wp);
+			points.addAll(new DebugSphere(
+					wp,
+					100,
+					new Vector4f(0,r.nextFloat(),r.nextFloat(),1),
+					120*1000
+			).getLines());
 		}
-		new DebugPacket(lines).sendToAll();
-
-
-
-	//	ModMain.log("set move target for ship " + getEntity().getName() + "to "+targetSector + "-"+targetPos);
+		new DebugPacket(points).sendToAll();
+		ModMain.log("set move target for ship " + getEntity().getName() + "to "+targetSector + "-"+targetPos);
 		//plotPath(getEntity().getSector(new Vector3i()),getEntity().getWorldTransform().origin,targetSector,targetPos);
 	}
 }
