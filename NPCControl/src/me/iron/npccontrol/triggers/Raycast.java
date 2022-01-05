@@ -79,8 +79,9 @@ public class Raycast {
         //TODO allow constant-speed moving objects
         for (Obstacle obj: obstacles) {
             if (isObjectBlockingLine(point,dir,obj, minDist)) {
+                if (hitObj != null && Utility.getDistance(point,hitObj.pos)< Utility.getDistance(point,obj.pos))
+                    continue; //objects are not sorted by distance, only return the closest one.
                 hitObj = obj;
-                return this;
             }
         }
         //tested all objects in sector, none are obstacles, return null

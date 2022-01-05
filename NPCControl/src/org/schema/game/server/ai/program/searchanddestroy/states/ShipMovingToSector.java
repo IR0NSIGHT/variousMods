@@ -4,12 +4,14 @@ import api.network.packets.PacketUtil;
 import me.iron.npccontrol.ModMain;
 import me.iron.npccontrol.triggers.Pathfinder;
 import me.iron.npccontrol.triggers.Utility;
+import org.lwjgl.Sys;
 import org.lwjgl.openal.Util;
 import org.lwjgl.util.vector.Vector;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.client.data.GameStateInterface;
 import org.schema.game.common.controller.ManagedUsableSegmentController;
+import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.world.*;
@@ -90,6 +92,7 @@ public class ShipMovingToSector extends ShipGameState {
 
 		if (waypoints.isEmpty()) {
 			ModMain.log("wps is empty.");
+			setMovingDir(new Vector3f(0,0,0));
 			onTargetReached(); //TODO this can crash the server is run while the (first) player joins
 			return false;
 		}
@@ -117,16 +120,16 @@ public class ShipMovingToSector extends ShipGameState {
 
 		setMovingDir(thrustDir); //dir the ship will move in (after the AI got updated)
 
-		LinkedList<DebugLine> lines = new LinkedList<>();
-		Vector3f end = new Vector3f(ownPos);
-		end.add(thrustDir);
-		long lt = 50;
-		lines.add(new DebugLine(
-
-				new Vector3f(ownPos),end,new Vector4f(1,1,0,1),lt)
-		);
-		lines.add(new DebugLine(new Vector3f(ownPos),new Vector3f(currentWP),new Vector4f(1,0,1,1),lt));
-		new DebugPacket(lines).sendToAll();
+	//	LinkedList<DebugLine> lines = new LinkedList<>();
+	//	Vector3f end = new Vector3f(ownPos);
+	//	end.add(thrustDir);
+	//	long lt = 50;
+	//	lines.add(new DebugLine(
+//
+	//			new Vector3f(ownPos),end,new Vector4f(1,1,0,1),lt)
+	//	);
+	//	lines.add(new DebugLine(new Vector3f(ownPos),new Vector3f(currentWP),new Vector4f(1,0,1,1),lt));
+	//	new DebugPacket(lines).sendToAll();
 	//	ModMain.log("length thrust dir: " + thrustDir.length() + " : " + thrustDir);
 
 		return false;
@@ -148,8 +151,20 @@ public class ShipMovingToSector extends ShipGameState {
 		if (!getEntity().isFullyLoadedWithDock()) {
 			return;
 		}
+		if (lastLog + 2000> System.currentTimeMillis()) {
+			return;
+		}
+		lastLog = System.currentTimeMillis();
 		Vector3i sector = new Vector3i(35,59,-5);
-		Vector3f nextPos = getRandomSafePoint(sector,2000);
+		back = !back;
+		Vector3f nextPos;
+		if (back) {
+			nextPos = getRandomPointNearObject(sector, getEntity().getBoundingSphereTotal().radius);
+		} else  {
+			nextPos = getRandomSafePoint(sector,2000);
+		}
+		if (nextPos == null)
+			throw new NullPointerException("nextpos is null");
 		setMoveTarget(sector,nextPos, new Vector3f());
 	}
 
@@ -160,26 +175,31 @@ public class ShipMovingToSector extends ShipGameState {
 	 * @return
 	 */
 	private Vector3f getRandomPointNearObject(Vector3i sector, float offset) {
+		Vector3f ownPos = getEntity().getWorldTransform().origin;
+
+
 
 		Random r = new Random();
 		boolean blocked = true;
 		Vector3f nextPos = null;
-		while (blocked) {
-			//select wp near random object
-			try {
-				Set<SimpleTransformableSendableObject<?>> objs = GameServerState.instance.getUniverse().getSector(getEntity().getSector(new Vector3i())).getEntities();
-				int size = objs.size();
-				int idx = r.nextInt(size)-1;
-				Iterator<SimpleTransformableSendableObject<?>> it = objs.iterator();
-				for (int i = 0; i < idx && it.hasNext(); i++) {
-					it.next();
-				}
-				nextPos = new Vector3f(it.next().getWorldTransform().origin);
-				nextPos.add(new Vector3f(0,offset,0));
-				blocked = new Pathfinder("").isPointInObstacle(sector,nextPos,offset);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
+		for (SegmentController s: GameServerState.instance.getSegmentControllersByName().values()) {
+			Vector3i objSector = s.getSector(new Vector3i());
+			if (!objSector.equals(sector))
+				continue;
+
+			if (s.getUniqueIdentifier().equals(getEntity().getUniqueIdentifier()) || s.isDocked())
+				continue;
+
+			nextPos = Utility.getDir(s.getSector(new Vector3i()),s.getWorldTransform().origin,getEntity().getSector(new Vector3i()), ownPos);
+			if (nextPos.length()<1000)
+				continue;
+			nextPos.normalize();
+			nextPos.scale(2000); //nextpos is now vector from ownPos, through obj, behind object
+			nextPos.add(ownPos);
+			blocked = new Pathfinder("").isPointInObstacle(sector,nextPos,offset);
+			if (!blocked)
+				return nextPos;
 		}
 		return nextPos;
 
@@ -250,14 +270,39 @@ public class ShipMovingToSector extends ShipGameState {
 
 		Random r = new Random();
 		LinkedList<DebugLine> points = new LinkedList<>();
+		Vector3f previous = null;
+		if (back) {
+			color.set(0,0,1,1);
+		}else {
+			color.set(0,1,1,1);
+		}
+		//Drawwaypoints
 		for (Vector3f wp: waypoints) {
 			points.addAll(new DebugSphere(
 					wp,
 					100,
-					new Vector4f(0,r.nextFloat(),r.nextFloat(),1),
+					color,
 					45*1000
 			).getLines());
+			if (wp.equals(currentWP)||wp.equals(targetPos)) {
+				points.addAll(new DebugSphere(
+						wp,
+						150,
+						color,
+						45*1000
+				).getLines());
+			}
+			if (previous != null) {
+				points.add(new DebugLine(
+						new Vector3f(previous),
+						new Vector3f(wp),
+						new Vector4f(color),
+						60*1000
+				));
+			}
+			previous = wp;
 		}
+
 		new DebugPacket(points).sendToAll();
 		ModMain.log("set move target for ship " + getEntity().getName() + "to "+targetSector + "-"+targetPos);
 		//plotPath(getEntity().getSector(new Vector3i()),getEntity().getWorldTransform().origin,targetSector,targetPos);

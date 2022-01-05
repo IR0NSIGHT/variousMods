@@ -2,6 +2,7 @@ package me.iron.npccontrol.triggers;
 
 import me.iron.npccontrol.ModMain;
 import org.apache.commons.math3.linear.*;
+import org.lwjgl.Sys;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
@@ -11,6 +12,7 @@ import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Vector;
 
 import org.schema.schine.graphicsengine.forms.debug.DebugLine;
 import org.schema.schine.graphicsengine.forms.debug.DebugPacket;
@@ -55,18 +57,33 @@ public class Pathfinder {
             while (!currentWP.equals(targetPos) && waypoints.size() < 10) {
                 //get obstacle if exists
                 Vector3f rayDir = Utility.getDir(ownSector,currentWP,targetSector,targetPos);
-
+                rayDir.normalize();
                 Raycast r = new Raycast();
                 r.addObjectsFromSector(ownSector, shipUID);
+           //    new DebugLine(
+           //            currentWP,targetPos,
+           //    )
                 r.cast(currentWP, rayDir, corridorRadius);
                 obstacle = r.hitObj;
                 debugLines.add(r.toDebugLine());
                 if (obstacle != null) {
                     //path is blocked
                     Vector3f obstaclePos = new Vector3f(obstacle.pos);
+                    Vector3f[] obstaclePlane = getPlaneDirFromNormal(obstaclePos,rayDir);
 
+                    System.out.println("obstacle plane: " + Arrays.toString(obstaclePlane));
+                //    assert Math.abs(obstaclePlane[1].dot(obstaclePlane[2]))<0.01f; //plane vectors are orthogonal to eachother
+                    assert Math.abs(rayDir.dot(obstaclePlane[1]))<0.99f &&  Math.abs(rayDir.dot(obstaclePlane[2]))<0.99f:"line is parallel to plane.";
+                    System.out.println(String.format("raycast: p:%s, d:%s",currentWP, rayDir));
+
+                                        Vector3f closestPointToObj =solveLinePlaneIntersection(currentWP,rayDir,obstaclePlane[0],obstaclePlane[1],obstaclePlane[2]);
+
+
+
+                    Vector3f off = new Vector3f(obstaclePos); off.sub(closestPointToObj);
+                    float dist = off.length();
                     //find a evasive WP near the obstacle to go around it.
-                    Vector3f evasiveWP = this.findPointOnPlaneWithoutObstacle(ownSector,currentWP,obstaclePos, rayDir, corridorRadius, shipUID);
+                    Vector3f evasiveWP = this.findPointOnPlaneWithoutObstacle(ownSector,currentWP,closestPointToObj, rayDir, corridorRadius, shipUID);
                     if (evasiveWP == null) {
                         drawRaycasts();
                         throw new NullPointerException("was not able to find a path.");
@@ -247,6 +264,16 @@ public class Pathfinder {
      * @return (x,y,z) solution
      */
     private Vector3f solveLinePlaneIntersection(Vector3f linePoint, Vector3f lineDir, Vector3f planePoint, Vector3f planeVec1, Vector3f planeVec2) {
+        if (Math.abs(planeVec1.dot(planeVec2))<0.001f) {
+            System.out.println("plane vectors are not orthogonal to eachother:"+planeVec1+","+planeVec2);
+        }
+        System.out.println(String.format("lengths lD: %s, pV1: %s, pV2: %s",lineDir.length(),planeVec1.length(),planeVec2.length()) );
+
+        assert lineDir.length()<1.001f&&lineDir.length()>0.999f;
+        assert planeVec1.length()<1.001f&&planeVec1.length()>0.999f;
+        assert planeVec2.length()<1.001f&&planeVec2.length()>0.999f;
+
+        //assert planeVec1.dot(planeVec2)<0.001f:"plane vectors are not orthogonal to eachother:"+planeVec1+","+planeVec2;
         //matrix with Linear equation system
         double[][]matrixData = {
                 {-lineDir.x,planeVec1.x,planeVec2.x},
@@ -260,7 +287,9 @@ public class Pathfinder {
                 linePoint.y-planePoint.y,
                 linePoint.z-planePoint.z},false);
         DecompositionSolver solver = new LUDecomposition(coefficients).getSolver();
-        RealVector solution = solver.solve(constants);
+        System.out.println("matrix:" + coefficients.toString());
+        System.out.println("constants: " + constants.toString());
+        RealVector solution = solver.solve(constants); //throws error "singularmatrix exc"
         Vector3f out = new Vector3f((float)solution.getEntry(0),(float)solution.getEntry(1),(float)solution.getEntry(2));
         return out;
     }
