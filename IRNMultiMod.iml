@@ -7,38 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../server testarea/client/StarMade/StarMade.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/../server testarea/client/StarMade/lib" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../server testarea/client/StarMade/lib" />
-        </SOURCES>
-        <jarDirectory url="file://$MODULE_DIR$/../server testarea/client/StarMade/lib" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/../server testarea/client/StarMade/lib" recursive="false" type="SOURCES" />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../server testarea/client/StarMade/starloader.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/../server testarea/client/StarMade/starloader.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
+    <orderEntry type="library" name="sm_libs" level="application" />
+    <orderEntry type="library" name="StarMade" level="application" />
   </component>
 </module>

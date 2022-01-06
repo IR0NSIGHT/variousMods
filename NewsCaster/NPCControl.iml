@@ -5,10 +5,9 @@
     <content url="file://$MODULE_DIR$/../NPCControl">
       <sourceFolder url="file://$MODULE_DIR$/../NPCControl/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="1.7" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="lwjgl" level="application" />
     <orderEntry type="library" name="StarMade" level="application" />
-    <orderEntry type="library" name="ModGlossar" level="application" />
+    <orderEntry type="library" name="sm_libs" level="application" />
   </component>
 </module>
