@@ -61,10 +61,17 @@ public class Pathfinder {
 
     public LinkedList<Vector3f> findPath(AbstractScene scene, Vector3f start, Vector3f end, float corridorRadius) {
         //System.out.println("find path from "+start + " to " +end);
+
+
         LinkedList<Vector3f> waypoints = new LinkedList<>();
         AbstractSceneObject hitObj;
         Vector3f currentWP = new Vector3f(start);
         waypoints.add(currentWP);
+        Raycast raycast = new Raycast(scene);
+
+        //abort if target can not be reached.
+        if (raycast.isPointInObject(end,corridorRadius,true))
+            return waypoints;
 
         //plot until target is reached
         while (!currentWP.equals(end) && waypoints.size() < 100) {
@@ -73,7 +80,7 @@ public class Pathfinder {
             rayDir.normalize();
             System.out.println("raycast from current waypoint towards target.");
             Raycast r = new Raycast(scene);
-            r.cast(currentWP, rayDir, corridorRadius, false);
+            r.cast(currentWP, rayDir, corridorRadius, false, (int) Utility.getDistance(currentWP, end));
 
             debugLines.add(r.toDebugLine());
             if (r.isHit()) {
@@ -181,7 +188,7 @@ public class Pathfinder {
 
             Raycast r = new Raycast(scene);
             ModMain.log("raycast to evade object with dir: " + newCastDir);
-            r.cast(pointPos, newCastDir, corridorRadius, false);
+            r.cast(pointPos, newCastDir, corridorRadius, false, (int) Utility.getDistance(pointPos, evasivePoint));
             debugLines.add(r.toDebugLine());
             if (!r.isHit()) {
                 //unobstructed path, return point
@@ -324,18 +331,18 @@ public class Pathfinder {
         Vector3f p1 = new Vector3f(plane[1]), p2 = new Vector3f(plane[2]);
         p1.scale(500); p2.scale(500);
         p1.add(point); p2.add(point);
-        debugLines.add(new DebugLine(
-                new Vector3f(point),
-                p1,
-                new Vector4f(0,0,1,1),
-                debugLineLifeTime
-        ));
-        debugLines.add(new DebugLine(
-                new Vector3f(point),
-                p2,
-                new Vector4f(0,0,1,1),
-                debugLineLifeTime
-        ));
+       //debugLines.add(new DebugLine(
+       //        new Vector3f(point),
+       //        p1,
+       //        new Vector4f(0,0,1,1),
+       //        debugLineLifeTime
+       //));
+       //debugLines.add(new DebugLine(
+       //        new Vector3f(point),
+       //        p2,
+       //        new Vector4f(0,0,1,1),
+       //        debugLineLifeTime
+       //));
         return plane;
     }
 

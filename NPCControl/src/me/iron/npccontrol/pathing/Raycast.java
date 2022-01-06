@@ -25,7 +25,7 @@ public class Raycast {
     AbstractSceneObject hitObj;
     Vector3f point;
     Vector3f dir;
-
+    float range;
     /**
      * instantiate a raycast. give it a scene, and cast rays to use object detection in that scene.
      * @param scene abstracted scene with obstacles to cast the ray in.
@@ -45,7 +45,8 @@ public class Raycast {
      * @param firstHit abort on the first (closest) hit. if false, all hits are registered.
      * @return hit obstacle with position, boundingsphere radius and name
      */
-    public void cast(Vector3f pos, Vector3f dir, float minDist, boolean firstHit) {
+    public void cast(Vector3f pos, Vector3f dir, float minDist, boolean firstHit, int range) {
+        this.range = range;
         hitObjs.clear();
         hitObj = null;
         dir = new Vector3f(dir);
@@ -58,7 +59,7 @@ public class Raycast {
         //TODO replace ownUID with a filter object
         //TODO allow constant-speed moving objects
         for (AbstractSceneObject obj : scene.getObstacles()) {
-            if (isObjectBlockingLine(point, dir, obj, minDist)) {
+            if (isObjectBlockingLine(point, dir, obj, minDist) && (range<0 || Utility.getDistance(pos,obj.pos)<range)) {
                 if (firstHit) {
                     if (hitObj != null && Utility.getDistance(point, hitObj.pos) < Utility.getDistance(point, obj.pos))
                         continue; //objects are not sorted by distance, only return the closest one.
@@ -133,7 +134,7 @@ public class Raycast {
         Vector4f color = new Vector4f();
         end.set(dir);
         if (!isHit()) {
-            end.scale(5000);
+            end.scale(range);
             color.set(0,1,0,1);
         } else {
             Vector3f endP;

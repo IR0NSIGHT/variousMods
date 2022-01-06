@@ -33,15 +33,10 @@
   <component name="ChangeListManager">
     <list default="true" id="18a6eb1c-1600-4f6d-b29d-99a5684d217a" name="Changes" comment="dbms ++">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/ModMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/ModMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/AbstractScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/AbstractScene.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Obstacle.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/AbstractSceneObject.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Pathfinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Pathfinder.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Raycast.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Raycast.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/DebugUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/DebugUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/TODO.md" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/TODO.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/Utility.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/Utility.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NPCControl/src/org/schema/game/server/ai/program/searchanddestroy/states/ShipMovingToSector.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/org/schema/game/server/ai/program/searchanddestroy/states/ShipMovingToSector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/ModMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/ModMain.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -163,7 +158,14 @@
       <option name="project" value="LOCAL" />
       <updated>1640720548062</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="laboratory-working pathing">
+      <created>1641495375252</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1641495375252</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -171,7 +173,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -180,7 +194,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="dbms ++" />
-    <option name="LAST_COMMIT_MESSAGE" value="dbms ++" />
+    <MESSAGE value="laboratory-working pathing" />
+    <option name="LAST_COMMIT_MESSAGE" value="laboratory-working pathing" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2540" y="452" key="#BuildArtifactsBeforeRunChooser" timestamp="1641491511741">
@@ -203,50 +218,54 @@
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state x="2540" y="462" key="FileChooserDialogImpl/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641491180100" />
-    <state width="1637" height="397" key="GridCell.Tab.0.bottom" timestamp="1641494714696">
+    <state width="1637" height="310" key="GridCell.Tab.0.bottom" timestamp="1641496326986">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="332" key="GridCell.Tab.0.bottom/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
-    <state width="1637" height="397" key="GridCell.Tab.0.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494714696" />
-    <state width="1637" height="397" key="GridCell.Tab.0.center" timestamp="1641494714696">
+    <state width="1637" height="310" key="GridCell.Tab.0.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326986" />
+    <state width="1637" height="310" key="GridCell.Tab.0.center" timestamp="1641496326986">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="332" key="GridCell.Tab.0.center/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
-    <state width="1637" height="397" key="GridCell.Tab.0.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494714696" />
-    <state width="1637" height="397" key="GridCell.Tab.0.left" timestamp="1641494714696">
+    <state width="1637" height="310" key="GridCell.Tab.0.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326986" />
+    <state width="1637" height="310" key="GridCell.Tab.0.left" timestamp="1641496326985">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="332" key="GridCell.Tab.0.left/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
-    <state width="1637" height="397" key="GridCell.Tab.0.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494714696" />
-    <state width="1637" height="397" key="GridCell.Tab.0.right" timestamp="1641494714696">
+    <state width="1637" height="310" key="GridCell.Tab.0.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326985" />
+    <state width="1637" height="310" key="GridCell.Tab.0.right" timestamp="1641496326986">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="332" key="GridCell.Tab.0.right/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
-    <state width="1637" height="397" key="GridCell.Tab.0.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494714696" />
-    <state width="1637" height="365" key="GridCell.Tab.1.bottom" timestamp="1641494908905">
+    <state width="1637" height="310" key="GridCell.Tab.0.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326986" />
+    <state width="1637" height="310" key="GridCell.Tab.1.bottom" timestamp="1641496326928">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="529" key="GridCell.Tab.1.bottom/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
-    <state width="1637" height="365" key="GridCell.Tab.1.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494908905" />
-    <state width="1637" height="365" key="GridCell.Tab.1.center" timestamp="1641494908905">
+    <state width="1637" height="310" key="GridCell.Tab.1.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326928" />
+    <state width="1637" height="310" key="GridCell.Tab.1.center" timestamp="1641496326928">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="529" key="GridCell.Tab.1.center/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
-    <state width="1637" height="365" key="GridCell.Tab.1.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494908905" />
-    <state width="1637" height="365" key="GridCell.Tab.1.left" timestamp="1641494908905">
+    <state width="1637" height="310" key="GridCell.Tab.1.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326928" />
+    <state width="1637" height="310" key="GridCell.Tab.1.left" timestamp="1641496326928">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="529" key="GridCell.Tab.1.left/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
-    <state width="1637" height="365" key="GridCell.Tab.1.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494908905" />
-    <state width="1637" height="365" key="GridCell.Tab.1.right" timestamp="1641494908905">
+    <state width="1637" height="310" key="GridCell.Tab.1.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326928" />
+    <state width="1637" height="310" key="GridCell.Tab.1.right" timestamp="1641496326928">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="529" key="GridCell.Tab.1.right/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
-    <state width="1637" height="365" key="GridCell.Tab.1.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494908905" />
+    <state width="1637" height="310" key="GridCell.Tab.1.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326928" />
     <state x="2240" y="209" key="SettingsEditor" timestamp="1641491531704">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state x="2240" y="209" key="SettingsEditor/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641491531704" />
+    <state x="2576" y="550" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1641496656578">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state x="2576" y="550" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496656578" />
     <state x="461" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1641487317913">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -256,6 +275,10 @@
     </state>
     <state x="676" y="260" width="713" height="520" key="find.popup/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641486026146" />
     <state x="2512" y="383" width="796" height="520" key="find.popup/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641493705089" />
+    <state x="2416" y="298" key="run.anything.popup" timestamp="1641495895312">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state x="2416" y="298" key="run.anything.popup/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641495895312" />
     <state x="2423" y="347" width="672" height="678" key="search.everywhere.popup" timestamp="1641494695468">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
@@ -266,7 +289,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Pathfinder.java</url>
-          <line>152</line>
+          <line>159</line>
           <properties class="me.iron.npccontrol.pathing.Pathfinder" method="findPointOnPlaneWithoutObstacle">
             <option name="EMULATED" value="true" />
           </properties>

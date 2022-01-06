@@ -147,29 +147,32 @@ public class DebugUI implements CommandInterface {
             AbstractScene s = new AbstractScene("scene01");
             Vector3f systemOffset = new Vector3f(100,-300,55);
             Vector3f a,b,S;
-            a = new Vector3f(700,0,0);
+            a = new Vector3f(200,0,0);
             //a = new Vector3f(-56.568546f, 0, -395.9798f);
-            b = new Vector3f(-700,0,200);
+            b = new Vector3f(0,0,0);
             S = new Vector3f(0,0,0);
 
             a.add(systemOffset);
             b.add(systemOffset);
             S.add(systemOffset);
 
-            float r = 200;
-            s.addObjectToScene(S,r,"station_A");
-            Random random = new Random(420);
-            int rangeObstacles = 600;
-            for (int i = 0; i < 3; i++) {
+            float r = 10f;
+        //    s.addObjectToScene(S,r,"station_A");
+            Random random = new Random(); //420
+            int rangeObstacles = 170;
+            int hollow = 10;
+            for (int i = 0; i < 100; i++) {
+                float radius = (float) (r*Math.pow(1.2f,random.nextInt(10)));
                 S = new Vector3f(
-                        random.nextInt(rangeObstacles)*(random.nextBoolean()?-1:1),
-                        random.nextInt(rangeObstacles)*(random.nextBoolean()?-1:1),
-                        random.nextInt(rangeObstacles)*(random.nextBoolean()?-1:1)
+                        random.nextFloat()*(random.nextBoolean()?-1:1),
+                        random.nextFloat()*(random.nextBoolean()?-1:1),
+                        random.nextFloat()*(random.nextBoolean()?-1:1)
                         );
+                S.normalize();
+                S.scale((hollow+radius+random.nextInt(rangeObstacles)));
                 S.add(systemOffset);
 
-                r = random.nextInt(100)+100;
-                s.addObjectToScene(S,r,"station_"+i);
+                s.addObjectToScene(S,radius,"station_"+i);
             }
 
 
@@ -187,7 +190,7 @@ public class DebugUI implements CommandInterface {
             while (it.hasNext()) {
                 Vector3f wp = it.next();
                 if (previous != null) {
-                    lines.add(new DebugLine(previous,wp,new Vector4f(1,0,1,1),120*1000));
+                //    lines.add(new DebugLine(previous,wp,new Vector4f(1,0,1,1),120*1000));
                 }
                 ModMain.log("wP:" + wp);
 
@@ -196,8 +199,8 @@ public class DebugUI implements CommandInterface {
             for (AbstractSceneObject obj: s.getObstacles()) {
                 lines.addAll(new DebugSphere(obj.pos, obj.bbsRadius ,new Vector4f(1,1,1,1),120*1000).getLines());
             }
-            lines.addAll(new DebugSphere(a,10,new Vector4f(1,0,0,1),120*1000).getLines()); //start
-            lines.addAll(new DebugSphere(b,10,new Vector4f(0,1,0,1),120*1000).getLines()); //end
+            lines.addAll(new DebugSphere(a,1,new Vector4f(1,0,0,1),120*1000).getLines()); //start
+            lines.addAll(new DebugSphere(b,1,new Vector4f(0,1,0,1),120*1000).getLines()); //end
             //    pf.drawRaycasts();
             DebugDrawer.myLines.addAll(lines);
             PacketUtil.sendPacket(playerState,new DebugPacket(lines));
