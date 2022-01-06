@@ -245,8 +245,7 @@ public class ShipMovingToSector extends ShipGameState {
 		waypoints.clear();
 		Pathfinder pf = new Pathfinder(getEntity().getUniqueIdentifier());
 		waypoints.addAll(pf.findPath(
-				getEntity().getSector(new Vector3i()),
-				getEntity().getWorldTransform().origin,
+				getEntity(),
 				targetSector,
 				targetPos,
 				Math.max(getEntity().getBoundingSphereTotal().radius*2,300)

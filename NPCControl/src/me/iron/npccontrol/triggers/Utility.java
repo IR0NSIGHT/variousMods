@@ -1,5 +1,6 @@
 package me.iron.npccontrol.triggers;
 
+import com.google.common.base.Verify;
 import me.iron.npccontrol.ModMain;
 import me.iron.npccontrol.triggers.FSM.GoToRandomInSystem;
 import org.lwjgl.Sys;
@@ -247,6 +248,12 @@ public class Utility {
         return out;
     }
 
+    public static Vector3f getDir(Vector3f from, Vector3f to) {
+        Vector3f out = new Vector3f(to);
+        out.sub(from);
+        return out;
+    }
+
     public static void main(String[] args) {
         Vector3f a = new Vector3f(3,2,1);
         Vector3f b = new Vector3f(-3,4,-1);
@@ -266,5 +273,13 @@ public class Utility {
         out.sub(a); //p-a
         out.cross(out,b);
         return out.length()/b.length();
+    }
+
+    public static String vecsToString(LinkedList<Vector3f> list) {
+        StringBuilder b = new StringBuilder();
+        for (Vector3f v: list) {
+            b.append(v.toString()).append("\n");
+        }
+        return b.toString();
     }
 }

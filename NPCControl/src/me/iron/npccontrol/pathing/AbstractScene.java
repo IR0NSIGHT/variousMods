@@ -1,33 +1,43 @@
 package me.iron.npccontrol.pathing;
 
+import me.iron.npccontrol.triggers.Utility;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
+import org.schema.game.common.data.world.VoidSystem;
 import org.schema.game.server.data.GameServerState;
 
 import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Random;
+import java.util.Vector;
 
 public class AbstractScene {
     private String name; //for soft identification
-    private LinkedList<Obstacle> obstacles = new LinkedList<>();
+    private LinkedList<AbstractSceneObject> abstractSceneObjects = new LinkedList<>();
+    private Vector3i sector = new Vector3i(0,0,0);
 
     public AbstractScene(String name) {
         this.name = name;
     }
 
-    public AbstractScene(String name, LinkedList<Obstacle> objects) {
+    public AbstractScene(String name, LinkedList<AbstractSceneObject> objects) {
         this.name = name;
-        this.obstacles.addAll(objects);
+        this.abstractSceneObjects.addAll(objects);
+    }
+
+    public AbstractScene(Vector3i sector) {
+        this.name = "Sector"+sector;
+        this.sector.set(sector);
     }
 
     public void addObjectToScene(Vector3f pos, float radius, String name) {
-        obstacles.add(new Obstacle(pos,radius,name));
+        abstractSceneObjects.add(new AbstractSceneObject(pos,radius,name));
     }
 
-    public void addObjectsToScene(LinkedList<Obstacle> objects) {
-        obstacles.addAll(objects);
+    public void addObjectsToScene(LinkedList<AbstractSceneObject> objects) {
+        abstractSceneObjects.addAll(objects);
     }
 
     /**
@@ -49,7 +59,7 @@ public class AbstractScene {
                     continue;
                 }
 
-                obstacles.add(new Obstacle(obj.getWorldTransform().origin, obj.getBoundingSphereTotal().radius*5, obj.getRealName()));
+                abstractSceneObjects.add(new AbstractSceneObject(obj.getWorldTransform().origin, obj.getBoundingSphereTotal().radius*5, obj.getRealName()));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -57,8 +67,73 @@ public class AbstractScene {
 
     }
 
+    public LinkedList<AbstractSceneObject> getObstacles() {
+        return abstractSceneObjects;
+    }
 
-    public LinkedList<Obstacle> getObstacles() {
-        return obstacles;
+    /**
+     * formatted string with list of objects in scene+pos+size
+     * @return
+     */
+    public String getSceneObjectsName() {
+        StringBuilder b = new StringBuilder("AbstractScene "+name+"\n");
+        int i = 0;
+        for (AbstractSceneObject o: abstractSceneObjects) {
+            b.append(i).append(": ").append(String.format("%s, pos=%s, r=%sm",o.name,o.pos,o.bbsRadius)).append("\n");
+            i++;
+        }
+        return b.toString();
+    }
+
+    /**
+     * convert starmade sector+insector pos into scene pos.
+     * @param sector
+     * @param sectorPos
+     * @return
+     */
+    public Vector3f getScenePos(Vector3i sector, Vector3f sectorPos) {
+        return Utility.getDir(this.sector,new Vector3f(0,0,0),sector,sectorPos);
+    }
+
+    //GETTERS AND SETTERS
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public LinkedList<AbstractSceneObject> getAbstractSceneObjects() {
+        return abstractSceneObjects;
+    }
+
+    public void setAbstractSceneObjects(LinkedList<AbstractSceneObject> abstractSceneObjects) {
+        this.abstractSceneObjects = abstractSceneObjects;
+    }
+
+    public Vector3i getSector() {
+        return sector;
+    }
+
+    public void setSector(Vector3i sector) {
+        this.sector = sector;
+    }
+
+    public static void main(String[] args) {
+        AbstractScene s = new AbstractScene("scene01");
+        Vector3f a,b,S;
+        a = new Vector3f(5,0,0);
+        b = new Vector3f(-5,0,0);
+        S = new Vector3f(0,-1,0);
+        float r = 2;
+        s.addObjectToScene(S,r,"station_A");
+
+        Pathfinder f = new Pathfinder("");
+        LinkedList<Vector3f> wps = f.findPath(s,a,b,0);
+
+        System.out.println(s.getSceneObjectsName());
+        System.out.println(Utility.vecsToString(wps));
     }
 }

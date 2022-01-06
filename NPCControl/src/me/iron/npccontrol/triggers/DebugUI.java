@@ -5,6 +5,8 @@ import api.network.packets.PacketUtil;
 import api.utils.game.chat.CommandInterface;
 import com.sun.istack.internal.Nullable;
 import me.iron.npccontrol.ModMain;
+import me.iron.npccontrol.pathing.AbstractScene;
+import me.iron.npccontrol.pathing.AbstractSceneObject;
 import me.iron.npccontrol.pathing.Pathfinder;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.controller.ai.AIGameConfiguration;
@@ -26,6 +28,7 @@ import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
 
 /**
  * STARMADE MOD
@@ -134,27 +137,69 @@ public class DebugUI implements CommandInterface {
         }
 
         if (strings.length>0 && strings[0].equals("path")) {
+            DebugDrawer.myLines.clear();
 
-            Sendable s = GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalUpdatableObjects().get( playerState.getSelectedEntityId());
+            Sendable sendable = GameServerState.instance.getLocalAndRemoteObjectContainer().getLocalUpdatableObjects().get( playerState.getSelectedEntityId());
             String uid = "";
-            if (s != null && s instanceof SimpleTransformableSendableObject)
-                uid = ((SimpleTransformableSendableObject<?>) s).getUniqueIdentifier();
+            if (sendable != null && sendable instanceof SimpleTransformableSendableObject)
+                uid = ((SimpleTransformableSendableObject<?>) sendable).getUniqueIdentifier();
 
-            Pathfinder pf = new Pathfinder(uid);
-            LinkedList<Vector3f> wps = pf.findPath(playerState.getCurrentSector(),new Vector3f(2000,1000,1000),playerState.getCurrentSector(),new Vector3f(-2000,1000,1000),200f);
+            AbstractScene s = new AbstractScene("scene01");
+            Vector3f systemOffset = new Vector3f(100,-300,55);
+            Vector3f a,b,S;
+            a = new Vector3f(700,0,0);
+            //a = new Vector3f(-56.568546f, 0, -395.9798f);
+            b = new Vector3f(-700,0,200);
+            S = new Vector3f(0,0,0);
+
+            a.add(systemOffset);
+            b.add(systemOffset);
+            S.add(systemOffset);
+
+            float r = 200;
+            s.addObjectToScene(S,r,"station_A");
+            Random random = new Random(420);
+            int rangeObstacles = 600;
+            for (int i = 0; i < 3; i++) {
+                S = new Vector3f(
+                        random.nextInt(rangeObstacles)*(random.nextBoolean()?-1:1),
+                        random.nextInt(rangeObstacles)*(random.nextBoolean()?-1:1),
+                        random.nextInt(rangeObstacles)*(random.nextBoolean()?-1:1)
+                        );
+                S.add(systemOffset);
+
+                r = random.nextInt(100)+100;
+                s.addObjectToScene(S,r,"station_"+i);
+            }
+
+
+            Pathfinder f = new Pathfinder("");
+            Pathfinder.debugLineLifeTime = 120*1000;
+            LinkedList<Vector3f> wps = f.findPath(s,a,b,0);
+            f.drawRaycasts();
+
+            System.out.println(s.getSceneObjectsName());
+            System.out.println(Utility.vecsToString(wps));
+
             Iterator<Vector3f> it = wps.iterator();
             Vector3f previous = null;
             LinkedList<DebugLine> lines = new LinkedList<>();
             while (it.hasNext()) {
                 Vector3f wp = it.next();
                 if (previous != null) {
-                    lines.add(new DebugLine(previous,wp,new Vector4f(1,0,0,1),60*1000));
+                    lines.add(new DebugLine(previous,wp,new Vector4f(1,0,1,1),120*1000));
                 }
                 ModMain.log("wP:" + wp);
 
                 previous = wp;
             }
-        //    pf.drawRaycasts();
+            for (AbstractSceneObject obj: s.getObstacles()) {
+                lines.addAll(new DebugSphere(obj.pos, obj.bbsRadius ,new Vector4f(1,1,1,1),120*1000).getLines());
+            }
+            lines.addAll(new DebugSphere(a,10,new Vector4f(1,0,0,1),120*1000).getLines()); //start
+            lines.addAll(new DebugSphere(b,10,new Vector4f(0,1,0,1),120*1000).getLines()); //end
+            //    pf.drawRaycasts();
+            DebugDrawer.myLines.addAll(lines);
             PacketUtil.sendPacket(playerState,new DebugPacket(lines));
             return true;
         }

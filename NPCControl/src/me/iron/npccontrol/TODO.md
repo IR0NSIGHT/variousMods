@@ -136,3 +136,5 @@ Technicality:
     - => a pirate raid should have identification so players can tell which FOB they come from
   - 
 
+# pathing
+find a safe path/corridor with 1 or more waypoints through the scene to the target position.

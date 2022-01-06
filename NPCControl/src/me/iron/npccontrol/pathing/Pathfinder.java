@@ -3,6 +3,7 @@ package me.iron.npccontrol.pathing;
 import me.iron.npccontrol.ModMain;
 import me.iron.npccontrol.triggers.Utility;
 import org.apache.commons.math3.linear.*;
+import org.lwjgl.Sys;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
@@ -12,6 +13,7 @@ import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Vector;
 
 import org.schema.schine.graphicsengine.forms.debug.DebugLine;
 import org.schema.schine.graphicsengine.forms.debug.DebugPacket;
@@ -36,78 +38,82 @@ public class Pathfinder {
 
     /**
      * plot a multi-waypoint path to the target avoiding any obstacles/collisions, with a corridor that has the desired radius.
-     * @param ownSector
-     * @param ownPos
      * @param targetSector
      * @param targetPos
      * @param corridorRadius radius of safety corridor where no obstacles are.
      */
-    public LinkedList<Vector3f> findPath(Vector3i ownSector, Vector3f ownPos, Vector3i targetSector, Vector3f targetPos, float corridorRadius) {
+    public LinkedList<Vector3f> findPath(SimpleTransformableSendableObject ship, Vector3i targetSector, Vector3f targetPos, float corridorRadius) {
+        return findPath(ship.getSector(new Vector3i()), ship.getWorldTransform().origin, targetSector,targetPos, corridorRadius, ship.getUniqueIdentifier());
+    }
+
+    public LinkedList<Vector3f> findPath(Vector3i sectorStart, Vector3f startPos, Vector3i sectorEnd, Vector3f end, float corridorRadius, String excludeUID) {
+        AbstractScene scene = new AbstractScene(sectorStart);
+        scene.addObjectsFromSector(scene.getSector(), excludeUID);
+        Vector3f scenePosA = scene.getScenePos(sectorStart,startPos);
+        Vector3f scenePosB = scene.getScenePos(sectorEnd, end);
+
+        return findPath(scene,scenePosA,scenePosB, corridorRadius); //positions in scene, revert back to sector+sectorpos
         //TODO star avoidance, long distance plotting, jumping
         //TODO allow filter, take into account neighbour-sector objs that might be big enough to obstruct into this sector
         //TODO take into account that evasive wp might be in different sector
         //TODO assert that evasive wp is not inside another obstacle
+    }
+
+    public LinkedList<Vector3f> findPath(AbstractScene scene, Vector3f start, Vector3f end, float corridorRadius) {
+        //System.out.println("find path from "+start + " to " +end);
         LinkedList<Vector3f> waypoints = new LinkedList<>();
-        Obstacle obstacle;
-        Vector3f currentWP = new Vector3f(ownPos);
+        AbstractSceneObject hitObj;
+        Vector3f currentWP = new Vector3f(start);
         waypoints.add(currentWP);
-        try {
-            //plot until target is reached
-            while (!currentWP.equals(targetPos) && waypoints.size() < 10) {
-                //get obstacle if exists
-                Vector3f rayDir = Utility.getDir(ownSector,currentWP,targetSector,targetPos);
-                rayDir.normalize();
-                AbstractScene scene = new AbstractScene("Sector_"+ownSector.toStringPure());
-                scene.addObjectsFromSector(ownSector,shipUID);
-                Raycast r = new Raycast(scene);
-           //    new DebugLine(
-           //            currentWP,targetPos,
-           //    )
-                r.cast(currentWP, rayDir, corridorRadius);
-                obstacle = r.hitObj;
-                debugLines.add(r.toDebugLine());
-                if (obstacle != null) {
-                    //path is blocked
-                    Vector3f obstaclePos = new Vector3f(obstacle.pos);
-                    Vector3f[] obstaclePlane = getPlaneDirFromNormal(obstaclePos,rayDir);
 
-                    System.out.println("obstacle plane: " + Arrays.toString(obstaclePlane));
-                //    assert Math.abs(obstaclePlane[1].dot(obstaclePlane[2]))<0.01f; //plane vectors are orthogonal to eachother
-                    assert Math.abs(rayDir.dot(obstaclePlane[1]))<0.99f &&  Math.abs(rayDir.dot(obstaclePlane[2]))<0.99f:"line is parallel to plane.";
-                    System.out.println(String.format("raycast: p:%s, d:%s",currentWP, rayDir));
+        //plot until target is reached
+        while (!currentWP.equals(end) && waypoints.size() < 100) {
+            //get obstacle if exists
+            Vector3f rayDir = Utility.getDir(currentWP,end);
+            rayDir.normalize();
+            System.out.println("raycast from current waypoint towards target.");
+            Raycast r = new Raycast(scene);
+            r.cast(currentWP, rayDir, corridorRadius, false);
 
-                                        Vector3f closestPointToObj =solveLinePlaneIntersection(currentWP,rayDir,obstaclePlane[0],obstaclePlane[1],obstaclePlane[2]);
+            debugLines.add(r.toDebugLine());
+            if (r.isHit()) {
+                hitObj = r.hitObjs.getFirst();
+                System.out.println("raycast hit obj " + hitObj.name + ", try pathing around.");
+                //path is blocked
+                Vector3f obstaclePos = new Vector3f(hitObj.pos);
+                Vector3f planeNormal = new Vector3f(rayDir); planeNormal.negate();
+                Vector3f[] obstaclePlane = getPlaneDirFromNormal(obstaclePos,planeNormal);
 
+                assert Math.abs(obstaclePlane[1].dot(obstaclePlane[2]))<0.01f; //plane vectors are orthogonal to eachother
+                assert Math.abs(rayDir.dot(obstaclePlane[1]))<0.99f &&  Math.abs(rayDir.dot(obstaclePlane[2]))<0.99f:"line is parallel to plane.";
 
+                //find where the casted ray interects the plane defined by object and ray direction.
+                Vector3f solution = solveLinePlaneIntersection(currentWP,rayDir,obstaclePlane[0],obstaclePlane[1],obstaclePlane[2]);
+                Vector3f closestPointToObj = new Vector3f(rayDir); closestPointToObj.scale(solution.x); closestPointToObj.add(currentWP);
+                Vector3f off = new Vector3f(obstaclePos); off.sub(closestPointToObj);
 
-                    Vector3f off = new Vector3f(obstaclePos); off.sub(closestPointToObj);
-                    float dist = off.length();
-                    //find a evasive WP near the obstacle to go around it.
-                    Vector3f evasiveWP = this.findPointOnPlaneWithoutObstacle(ownSector,currentWP,closestPointToObj, rayDir, corridorRadius, shipUID);
-                    if (evasiveWP == null) {
-                        drawRaycasts();
-                        throw new NullPointerException("was not able to find a path.");
-                    }
-
-                    //get an intermediate waypoint that avoids the obstacle
-                    currentWP = new Vector3f(evasiveWP);
-                    assert !Float.isNaN(currentWP.x) : "currentWP is NaN:"+currentWP;
-                } else {
-                    currentWP = new Vector3f(targetPos);
+                //find a evasive WP near the obstacle to go around it.
+                Vector3f evasiveWP = this.findPointOnPlaneWithoutObstacle(scene,currentWP,closestPointToObj, planeNormal,hitObj.bbsRadius,corridorRadius);
+                if (evasiveWP == null) {
+                    drawRaycasts();
+                    throw new NullPointerException("was not able to find a path.");
                 }
 
-                //assert currentWP.equals(targetPos) || !isPointInObstacle(ownSector,currentWP, corridorRadius):"waypoint inside of obstacle";
-                waypoints.add(currentWP);
-
+                //get an intermediate waypoint that avoids the obstacle
+                ModMain.log(" next waypoint: "+evasiveWP);
+                currentWP = new Vector3f(evasiveWP);
+                assert !Float.isNaN(currentWP.x) : "currentWP is NaN:"+currentWP;
+            } else {
+                currentWP = new Vector3f(end);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            assert !r.isPointInObject(currentWP,corridorRadius,true);
+        //    assert currentWP.equals(end) || !isPointInObstacle(s,currentWP, corridorRadius):"waypoint inside of obstacle";
+            waypoints.add(currentWP);
+
         }
 
-        if (Utility.getDistance(waypoints.getLast(),targetPos)>0.01f) {
-            ModMain.log("last waypoint is not target pos.");
-        }
-       // assert Utility.getDistance(waypoints.getLast(),targetPos)>0.01f :"last waypoint is not target pos." ;
+        assert waypoints.size()>=2; //start and end at least.
+        assert Utility.getDistance(waypoints.getLast(),end)>0.01f :"last waypoint is not target pos." ;
         return waypoints;
     }
 
@@ -141,44 +147,49 @@ public class Pathfinder {
      * @param pointPos position from where to raycast
      * @param planePoint any point on the plane
      * @param planeNormal plane normal
-     * @param minDist
-     * @param ownUID
+     * @param corridorRadius
      * @return
      */
-    private Vector3f findPointOnPlaneWithoutObstacle(Vector3i pointSector, Vector3f pointPos, Vector3f planePoint, Vector3f planeNormal, float minDist, String ownUID) throws IOException {
+    private Vector3f findPointOnPlaneWithoutObstacle(AbstractScene scene, Vector3f pointPos, Vector3f planePoint, Vector3f planeNormal, float obstacleSize, float corridorRadius) {
+        assert planeNormal.length()>0.999f && planeNormal.length()<1.001f; //is it normalized?
         //while raycast failed
         Vector3f[] plane = getPlaneDirFromNormal(planePoint,planeNormal);
-
+        System.out.println("find evade point on plane: "+Arrays.toString(plane));
         //rotate pointer by 45° each iteration
         RealMatrix pointer = MatrixUtils.createRealMatrix(new double[][]{{1},{0}});
         double sin45 = 0.7071067d;
         RealMatrix rotMatrix45 = MatrixUtils.createRealMatrix(new double[][]{{sin45,-sin45},{sin45,sin45}});
         for (int i = 0; i < 8; i++) { //8 rotations = 1 full rotiation
-            pointer = rotMatrix45.multiply(pointer);
-
             //get offset vector in plane based on rotated pointer
-            Vector3f d1 = new Vector3f(plane[1]), d2 =  new Vector3f(plane[2]);
+            Vector3f d1 = new Vector3f(plane[1]);
+            Vector3f d2 =  new Vector3f(plane[2]);
+
             d1.scale((float) pointer.getEntry(0,0));
             d2.scale((float) pointer.getEntry(1,0));
             d1.add(d2);
-            d1.scale(2*minDist); //d1 is direction from planePoint to evasive point
-            Vector3f evasiveP = new Vector3f(d1);
-            evasiveP.add(plane[0]); //evasiveP is now the position in the plane offset from the plane center.
+            d1.normalize();
+            d1.scale(obstacleSize*2); //d1 is direction from planePoint to evasive point
+            //here d1 is the star building vector inside the plane.
 
-            Vector3f newCastDir =new Vector3f(evasiveP); //connection vector between pointPos and evasivePoint
-            newCastDir.sub(pointPos);
-            newCastDir.normalize();
-            //    d1.sub(pointPos); //d1 is now raycast direction from pointPos to new evasive point
-            AbstractScene scene = new AbstractScene("evade");
-            scene.addObjectsFromSector(pointSector, ownUID);
+            //offset towards raypoint by radius (cheap tangent alternativ) to ensure not hitting the same obj again.
+           // d2.set(planeNormal);d2.scale(obstacleSize); d1.add(d2);
+            d1.add(plane[0]);
+
+            Vector3f evasivePoint = new Vector3f(d1); //evasiveP is now the position in the plane offset from the plane center.
+            //System.out.println("evasive point: " +evasivePoint);
+            Vector3f newCastDir = Utility.getDir(pointPos, evasivePoint); //connection vector between pointPos and evasivePoint
+
             Raycast r = new Raycast(scene);
-            r.cast(pointPos, newCastDir, minDist);
-            Obstacle obj = r.hitObj;
+            ModMain.log("raycast to evade object with dir: " + newCastDir);
+            r.cast(pointPos, newCastDir, corridorRadius, false);
             debugLines.add(r.toDebugLine());
-            if (obj == null) {
+            if (!r.isHit()) {
                 //unobstructed path, return point
-                return evasiveP;
+                ModMain.log("no hit, returning evasive point: " +evasivePoint);
+                return evasivePoint;
             }
+            pointer = rotMatrix45.multiply(pointer);
+
         }
         return null; //all raycasts around the center have failed, cant find evasive point
     }
@@ -231,15 +242,15 @@ public class Pathfinder {
         plane[2].scale(sol.z);
         toPlaneCenter.add(plane[1]);
         toPlaneCenter.add(plane[2]);
-        System.out.println("sol:"+sol+" point:"+lp + "vec to planecenter:"+toPlaneCenter);
+        //System.out.println("sol:"+sol+" point:"+lp + "vec to planecenter:"+toPlaneCenter);
 
         //rotate pointer by 45° each iteration
         RealMatrix pointer = MatrixUtils.createRealMatrix(new double[][]{{1},{0}});
         double sin45 = 0.7071067d;
         RealMatrix rotMatrix45 = MatrixUtils.createRealMatrix(new double[][]{{sin45,-sin45},{sin45,sin45}});
-        System.out.println("Rotation matrix (45°):"+rotMatrix45.toString());
+        //System.out.println("Rotation matrix (45°):"+rotMatrix45.toString());
         for (int i = 0; i < 10; i++) {
-            System.out.println("pointer: " + pointer.toString());
+            //System.out.println("pointer: " + pointer.toString());
             pointer = rotMatrix45.multiply(pointer);
 
             //get offset vector in plane based on rotated pointer
@@ -248,7 +259,7 @@ public class Pathfinder {
             d2.scale((float) pointer.getEntry(1,0));
             d1.add(d2);
             Vector3f off = d1;
-            System.out.println(off);
+            //System.out.println(off);
         }
 
 
@@ -265,10 +276,8 @@ public class Pathfinder {
      * @return (x,y,z) solution
      */
     private Vector3f solveLinePlaneIntersection(Vector3f linePoint, Vector3f lineDir, Vector3f planePoint, Vector3f planeVec1, Vector3f planeVec2) {
-        if (Math.abs(planeVec1.dot(planeVec2))<0.001f) {
-            System.out.println("plane vectors are not orthogonal to eachother:"+planeVec1+","+planeVec2);
-        }
-        System.out.println(String.format("lengths lD: %s, pV1: %s, pV2: %s",lineDir.length(),planeVec1.length(),planeVec2.length()) );
+        assert Math.abs(planeVec1.dot(planeVec2))>0.001f:"plane vectors are not orthogonal to eachother:"+planeVec1+","+planeVec2;
+        ////System.out.println(String.format("lengths lD: %s, pV1: %s, pV2: %s",lineDir.length(),planeVec1.length(),planeVec2.length()) );
 
         assert lineDir.length()<1.001f&&lineDir.length()>0.999f;
         assert planeVec1.length()<1.001f&&planeVec1.length()>0.999f;
@@ -288,11 +297,11 @@ public class Pathfinder {
                 linePoint.y-planePoint.y,
                 linePoint.z-planePoint.z},false);
         DecompositionSolver solver = new LUDecomposition(coefficients).getSolver();
-        System.out.println("matrix:" + coefficients.toString());
-        System.out.println("constants: " + constants.toString());
+        ////System.out.println("matrix:" + coefficients.toString());
+        ////System.out.println("constants: " + constants.toString());
         RealVector solution = solver.solve(constants); //throws error "singularmatrix exc"
-        Vector3f out = new Vector3f((float)solution.getEntry(0),(float)solution.getEntry(1),(float)solution.getEntry(2));
-        return out;
+        ////System.out.println("solution: " + solution);
+        return new Vector3f((float)solution.getEntry(0),(float)solution.getEntry(1),(float)solution.getEntry(2));
     }
 
     /**
@@ -331,6 +340,8 @@ public class Pathfinder {
     }
 
     public void drawRaycasts() {
+        if (GameServerState.instance==null)
+            return;
         LinkedList<DebugLine> lines = debugLines;
         Vector3f from, to, hit;
         for (Vector3f[] raycast: raycasts) {

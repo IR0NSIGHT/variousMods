@@ -2,141 +2,46 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="NewsCaster" />
+      <artifact name="NPCControlClient" />
     </artifacts-to-build>
+  </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:origin/main" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="18a6eb1c-1600-4f6d-b29d-99a5684d217a" name="Changes" comment="dbms ++">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/NPCControlDedicated.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/NewsCaster.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/NewsCasterDedicated.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/PVE_rand.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/SpaceFarm.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IRNMultiMod.iml" beforeDir="false" afterPath="$PROJECT_DIR$/IRNMultiMod.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NewsCaster/NPCControl.iml" beforeDir="false" afterPath="$PROJECT_DIR$/NewsCaster/NPCControl.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/FleetCommander/me/iron/fleetCommander/project outline.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/FleetCommander/mod.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/ChatUI$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/ChatUI.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/Debug$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/Debug.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/Miner.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningConfig.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningCylce.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningUtil$1$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningUtil$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningUtil.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/ModMain.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/PersistentContainer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/StationManager$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/StationManager$2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/StationManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/mod.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/ModMain.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/TestCommand.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationFactionContainer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationHelper$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationHelper.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationReplacer$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationReplacer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/ChatCmds.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/CommandCommander$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/CommandCommander.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/StationCommand$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/StationCommand.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/mod.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/CommandUI$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/CommandUI.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/ModMain.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/commandUI/CommandBroadcast.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/commandUI/CommandGenerate.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/commandUI/CommandUI$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/commandUI/CommandUI.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/configManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/debugUI$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/debugUI.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/defaultConfig.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$3.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$4.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$5.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/broadcasting/Broadcaster$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/broadcasting/Broadcaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/NewsContainer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/NewsManager$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/NewsManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/EntityInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/FactionInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/FactionRelationInfo$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/FactionRelationInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/FactionSystemClaimInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/GenericInfo$EventType.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/GenericInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/ShipCreatedInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/ShipDestroyedInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/objectTypes/FactionObject.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/objectTypes/FleetObject.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/objectTypes/ShipObject.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/objectTypes/StationObject.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/project outline.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/testing/main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/mod.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/ChatAction.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/ConditionAction.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/SpawnAction$1$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/SpawnAction$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/SpawnAction.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/checks/BooleanAction.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/checks/SystemCheck.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomAction.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomCode$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomCode.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomScript.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomTrigger.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/ScriptTemplates.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIElementTable$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIElementTable$ElementRow.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIElementTable.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIScrollabeElementList$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIScrollabeElementList$2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIScrollabeElementList.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptControlManager$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptControlManager$2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptControlManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptMenuPanel$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptMenuPanel.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ActionController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ListenerManager$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ListenerManager$2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ListenerManager$3.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ListenerManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/PlayerInterface$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/PlayerInterface.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/ModMain$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/ModMain.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Persistence/PersistentContainer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/mod.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/ModMain.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$3.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$4.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$5.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantObject.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/mod.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-database/.lck" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-database/.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-database/.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-database/.script" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/ModMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/ModMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/AbstractScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/AbstractScene.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Obstacle.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/AbstractSceneObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Pathfinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Pathfinder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Raycast.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Raycast.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/DebugUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/DebugUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/TODO.md" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/TODO.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/Utility.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/Utility.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/org/schema/game/server/ai/program/searchanddestroy/states/ShipMovingToSector.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/org/schema/game/server/ai/program/searchanddestroy/states/ShipMovingToSector.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,6 +62,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="22sQxgyUeefUg5ukuabE2LXI28c" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -165,7 +71,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$/Desktop/SM/client/StarMade/mods" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
@@ -173,8 +79,24 @@
     <key name="MoveInnerDialog.RECENTS_KEY">
       <recent name="me.iron.npccontrol.triggers" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Max1M\IdeaProjects\IRNMultiMod\NPCControl\src\me\iron\npccontrol" />
+    </key>
   </component>
-  <component name="RunManager" selected="JAR Application.client">
+  <component name="RunManager" selected="JAR Application.client_npc">
+    <configuration name="AbstractScene" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="me.iron.npccontrol.pathing.AbstractScene" />
+      <module name="NPCControl" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="me.iron.npccontrol.pathing.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Manager" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="me.iron.newscaster.DBMS.Manager" />
       <module name="NewsCaster" />
@@ -188,24 +110,39 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="client" type="JarApplication">
-      <option name="JAR_PATH" value="$USER_HOME$/Desktop/SM/client/StarMade/StarMade.jar" />
-      <option name="PROGRAM_PARAMETERS" value="-uplink localhost 4242 -1,8252 -force" />
-      <option name="WORKING_DIRECTORY" value="C:\Users\Max\Desktop\SM\client\StarMade" />
+    <configuration name="client_npc" type="JarApplication">
+      <option name="JAR_PATH" value="$USER_HOME$/Desktop/Starmade/server testarea/client/StarMade/StarMade.jar" />
+      <option name="PROGRAM_PARAMETERS" value="-uplink localhost 4242 -1,8258 -force" />
+      <option name="WORKING_DIRECTORY" value="C:\Users\Max1M\Desktop\Starmade\server testarea\client\StarMade" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
       <method v="2">
         <option name="BuildArtifacts" enabled="true">
-          <artifact name="NewsCaster" />
+          <artifact name="NPCControlClient" />
+        </option>
+      </method>
+    </configuration>
+    <configuration name="server_npc" type="JarApplication">
+      <option name="JAR_PATH" value="$USER_HOME$/Desktop/Starmade/server testarea/server/StarMade/StarMade.jar" />
+      <option name="PROGRAM_PARAMETERS" value="-server -1,8258" />
+      <option name="WORKING_DIRECTORY" value="C:\Users\Max1M\Desktop\Starmade\server testarea\server\StarMade" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+      <method v="2">
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="NPCControlDedicated" />
         </option>
       </method>
     </configuration>
     <list>
       <item itemvalue="Application.Manager" />
-      <item itemvalue="JAR Application.client" />
+      <item itemvalue="Application.AbstractScene" />
+      <item itemvalue="JAR Application.server_npc" />
+      <item itemvalue="JAR Application.client_npc" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.AbstractScene" />
         <item itemvalue="Application.Manager" />
       </list>
     </recent_temporary>
@@ -239,35 +176,109 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="dbms ++" />
     <option name="LAST_COMMIT_MESSAGE" value="dbms ++" />
   </component>
+  <component name="WindowStateProjectService">
+    <state x="2540" y="452" key="#BuildArtifactsBeforeRunChooser" timestamp="1641491511741">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state x="2540" y="452" key="#BuildArtifactsBeforeRunChooser/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641491511741" />
+    <state x="2214" y="290" width="1092" height="834" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1641491513113">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state x="2214" y="290" width="1092" height="834" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641491513113" />
+    <state x="765" y="221" key="#com.intellij.ide.util.MemberChooser" timestamp="1641484857767">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="765" y="221" key="#com.intellij.ide.util.MemberChooser/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641484857767" />
+    <state x="169" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1641480828639">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="169" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641480828639" />
+    <state x="2540" y="462" key="FileChooserDialogImpl" timestamp="1641491180100">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state x="2540" y="462" key="FileChooserDialogImpl/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641491180100" />
+    <state width="1637" height="397" key="GridCell.Tab.0.bottom" timestamp="1641494714696">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state width="1877" height="332" key="GridCell.Tab.0.bottom/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
+    <state width="1637" height="397" key="GridCell.Tab.0.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494714696" />
+    <state width="1637" height="397" key="GridCell.Tab.0.center" timestamp="1641494714696">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state width="1877" height="332" key="GridCell.Tab.0.center/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
+    <state width="1637" height="397" key="GridCell.Tab.0.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494714696" />
+    <state width="1637" height="397" key="GridCell.Tab.0.left" timestamp="1641494714696">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state width="1877" height="332" key="GridCell.Tab.0.left/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
+    <state width="1637" height="397" key="GridCell.Tab.0.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494714696" />
+    <state width="1637" height="397" key="GridCell.Tab.0.right" timestamp="1641494714696">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state width="1877" height="332" key="GridCell.Tab.0.right/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
+    <state width="1637" height="397" key="GridCell.Tab.0.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494714696" />
+    <state width="1637" height="365" key="GridCell.Tab.1.bottom" timestamp="1641494908905">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state width="1877" height="529" key="GridCell.Tab.1.bottom/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
+    <state width="1637" height="365" key="GridCell.Tab.1.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494908905" />
+    <state width="1637" height="365" key="GridCell.Tab.1.center" timestamp="1641494908905">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state width="1877" height="529" key="GridCell.Tab.1.center/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
+    <state width="1637" height="365" key="GridCell.Tab.1.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494908905" />
+    <state width="1637" height="365" key="GridCell.Tab.1.left" timestamp="1641494908905">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state width="1877" height="529" key="GridCell.Tab.1.left/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
+    <state width="1637" height="365" key="GridCell.Tab.1.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494908905" />
+    <state width="1637" height="365" key="GridCell.Tab.1.right" timestamp="1641494908905">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state width="1877" height="529" key="GridCell.Tab.1.right/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
+    <state width="1637" height="365" key="GridCell.Tab.1.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494908905" />
+    <state x="2240" y="209" key="SettingsEditor" timestamp="1641491531704">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state x="2240" y="209" key="SettingsEditor/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641491531704" />
+    <state x="461" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1641487317913">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641487317913" />
+    <state x="2512" y="383" width="796" height="520" key="find.popup" timestamp="1641493705089">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state x="676" y="260" width="713" height="520" key="find.popup/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641486026146" />
+    <state x="2512" y="383" width="796" height="520" key="find.popup/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641493705089" />
+    <state x="2423" y="347" width="672" height="678" key="search.everywhere.popup" timestamp="1641494695468">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
+    <state x="2423" y="347" width="672" height="678" key="search.everywhere.popup/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494695468" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/NewsCaster/src/me/iron/newscaster/eventListening/ListenerManager.java</url>
-          <line>143</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/NewsCaster/src/me/iron/newscaster/eventListening/ListenerManager.java</url>
-          <line>109</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/NewsCaster/src/me/iron/newscaster/eventListening/ListenerManager.java</url>
-          <line>93</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/NewsCaster/src/me/iron/newscaster/eventListening/ListenerManager.java</url>
-          <line>88</line>
-          <option name="timeStamp" value="6" />
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Pathfinder.java</url>
+          <line>152</line>
+          <properties class="me.iron.npccontrol.pathing.Pathfinder" method="findPointOnPlaneWithoutObstacle">
+            <option name="EMULATED" value="true" />
+          </properties>
+          <option name="timeStamp" value="419" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="me.iron.pve_rand.Persistence.TriggerList" memberName="triggers" />
+        <PinnedItemInfo parentTag="org.schema.game.common.controller.ElementCountMap" memberName="oreCounts" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
 </project>
