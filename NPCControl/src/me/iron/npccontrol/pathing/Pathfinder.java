@@ -1,8 +1,8 @@
-package me.iron.npccontrol.triggers;
+package me.iron.npccontrol.pathing;
 
 import me.iron.npccontrol.ModMain;
+import me.iron.npccontrol.triggers.Utility;
 import org.apache.commons.math3.linear.*;
-import org.lwjgl.Sys;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
@@ -12,7 +12,6 @@ import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.Vector;
 
 import org.schema.schine.graphicsengine.forms.debug.DebugLine;
 import org.schema.schine.graphicsengine.forms.debug.DebugPacket;
@@ -49,7 +48,7 @@ public class Pathfinder {
         //TODO take into account that evasive wp might be in different sector
         //TODO assert that evasive wp is not inside another obstacle
         LinkedList<Vector3f> waypoints = new LinkedList<>();
-        Raycast.Obstacle obstacle;
+        Obstacle obstacle;
         Vector3f currentWP = new Vector3f(ownPos);
         waypoints.add(currentWP);
         try {
@@ -58,8 +57,9 @@ public class Pathfinder {
                 //get obstacle if exists
                 Vector3f rayDir = Utility.getDir(ownSector,currentWP,targetSector,targetPos);
                 rayDir.normalize();
-                Raycast r = new Raycast();
-                r.addObjectsFromSector(ownSector, shipUID);
+                AbstractScene scene = new AbstractScene("Sector_"+ownSector.toStringPure());
+                scene.addObjectsFromSector(ownSector,shipUID);
+                Raycast r = new Raycast(scene);
            //    new DebugLine(
            //            currentWP,targetPos,
            //    )
@@ -169,10 +169,11 @@ public class Pathfinder {
             newCastDir.sub(pointPos);
             newCastDir.normalize();
             //    d1.sub(pointPos); //d1 is now raycast direction from pointPos to new evasive point
-            Raycast r = new Raycast();
-            r.addObjectsFromSector(pointSector, ownUID);
+            AbstractScene scene = new AbstractScene("evade");
+            scene.addObjectsFromSector(pointSector, ownUID);
+            Raycast r = new Raycast(scene);
             r.cast(pointPos, newCastDir, minDist);
-            Raycast.Obstacle obj = r.hitObj;
+            Obstacle obj = r.hitObj;
             debugLines.add(r.toDebugLine());
             if (obj == null) {
                 //unobstructed path, return point

@@ -1,8 +1,7 @@
-package me.iron.npccontrol.triggers;
+package me.iron.npccontrol.pathing;
 
-import me.iron.npccontrol.ModMain;
+import me.iron.npccontrol.triggers.Utility;
 import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.server.data.GameServerState;
@@ -11,8 +10,6 @@ import org.schema.schine.graphicsengine.forms.debug.DebugLine;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Vector;
 
 /**
  * STARMADE MOD
@@ -22,51 +19,27 @@ import java.util.Vector;
  * very simple raycast functionality
  */
 public class Raycast {
+    AbstractScene scene;
     Obstacle hitObj;
-    LinkedList<Obstacle> obstacles = new LinkedList<>();
     Vector3f point;
     Vector3f dir;
-    public Raycast(){
 
-    }
-
-    /**
-     * adds all loaded objects from the sector to the raycasts obstacles (which the raycast can detect)
-     * @param sector
-     */
-    public void addObjectsFromSector(Vector3i sector, String excludeUID) {
-        try {
-            for (SimpleTransformableSendableObject obj: GameServerState.instance.getUniverse().getSector(sector).getEntities()) {
-                if ((obj instanceof Ship && ((Ship) obj).isDocked()) || obj.getUniqueIdentifier().equals(excludeUID))
-                    continue;
-
-                if (!(obj instanceof SimpleTransformableSendableObject)) { //playerstates have a fucked up worldtransform getter.
-                    continue;
-                }
-
-                //avoid stationary objects (roids and stations)
-                if (obj.getSpeedCurrent() > 5) {
-                    continue;
-                }
-
-                obstacles.add(new Obstacle(obj.getWorldTransform().origin, obj.getBoundingSphereTotal().radius*5, obj.getRealName()));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public Raycast(AbstractScene scene) {
+        this.scene = scene;
     }
 
     /**
      * determine if any entity in this sector is an obstacle on the path of "pos+x*dir".
      * entities are obstacles if their distance to the path is smaller than minDist+their bounding sphere.
      * returns the position and bounding sphere radius of the first obstacle.
-     * @param pos cast ray from here
-     * @param dir in this direction
+     *
+     * @param pos     cast ray from here
+     * @param dir     in this direction
      * @param minDist minimal distance required to be away from path
      * @return hit obstacle with position, boundingsphere radius and name
      */
     public Raycast cast(Vector3f pos, Vector3f dir, float minDist) {
+
         hitObj = null;
         dir = new Vector3f(dir);
         dir.normalize();
@@ -77,9 +50,9 @@ public class Raycast {
         //TODO ignore if startpos is inside obstacle
         //TODO replace ownUID with a filter object
         //TODO allow constant-speed moving objects
-        for (Obstacle obj: obstacles) {
-            if (isObjectBlockingLine(point,dir,obj, minDist)) {
-                if (hitObj != null && Utility.getDistance(point,hitObj.pos)< Utility.getDistance(point,obj.pos))
+        for (Obstacle obj : scene.getObstacles()) {
+            if (isObjectBlockingLine(point, dir, obj, minDist)) {
+                if (hitObj != null && Utility.getDistance(point, hitObj.pos) < Utility.getDistance(point, obj.pos))
                     continue; //objects are not sorted by distance, only return the closest one.
                 hitObj = obj;
             }
@@ -134,14 +107,4 @@ public class Raycast {
         );
     }
 
-    class Obstacle{
-        Vector3f pos;
-        float bbsRadius;
-        String name;
-        public Obstacle(Vector3f pos, float bbsRadius, String name) {
-            this.pos = pos;
-            this.bbsRadius = bbsRadius;
-            this.name = name;
-        }
-    }
 }

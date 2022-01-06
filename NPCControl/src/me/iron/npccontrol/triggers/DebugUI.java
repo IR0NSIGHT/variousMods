@@ -1,23 +1,17 @@
 package me.iron.npccontrol.triggers;
 
-import api.listener.fastevents.FastListenerCommon;
-import api.listener.fastevents.SegmentDrawListener;
-import api.mod.StarLoader;
 import api.mod.StarMod;
 import api.network.packets.PacketUtil;
 import api.utils.game.chat.CommandInterface;
-import com.bulletphysics.linearmath.Transform;
 import com.sun.istack.internal.Nullable;
 import me.iron.npccontrol.ModMain;
-import org.schema.common.util.linAlg.Vector3i;
+import me.iron.npccontrol.pathing.Pathfinder;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.controller.ai.AIGameConfiguration;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.player.catalog.CatalogPermission;
-import org.schema.game.common.data.world.DrawableRemoteSegment;
 import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
-import org.schema.game.mod.Mod;
 import org.schema.game.server.ai.ShipAIEntity;
 import org.schema.game.server.data.GameServerState;
 import org.schema.schine.ai.stateMachines.AiEntityState;

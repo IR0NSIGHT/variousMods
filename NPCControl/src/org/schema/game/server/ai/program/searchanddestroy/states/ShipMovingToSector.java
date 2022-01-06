@@ -1,24 +1,14 @@
 package org.schema.game.server.ai.program.searchanddestroy.states;
 
-import api.network.packets.PacketUtil;
 import me.iron.npccontrol.ModMain;
-import me.iron.npccontrol.triggers.Pathfinder;
+import me.iron.npccontrol.pathing.Pathfinder;
 import me.iron.npccontrol.triggers.Utility;
-import org.lwjgl.Sys;
-import org.lwjgl.openal.Util;
-import org.lwjgl.util.vector.Vector;
-import org.newdawn.slick.util.pathfinding.PathFinder;
 import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.client.data.GameStateInterface;
-import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.Ship;
-import org.schema.game.common.data.player.PlayerState;
-import org.schema.game.common.data.world.*;
 import org.schema.game.server.ai.AIShipControllerStateUnit;
 import org.schema.game.server.ai.ShipAIEntity;
 import org.schema.game.server.ai.program.common.states.ShipGameState;
-import org.schema.game.server.ai.program.searchanddestroy.SimpleSearchAndDestroyMachine;
 import org.schema.game.server.data.GameServerState;
 import org.schema.schine.ai.AiEntityStateInterface;
 import org.schema.schine.ai.stateMachines.FSMException;
@@ -33,7 +23,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
-import java.util.Set;
 
 public class ShipMovingToSector extends ShipGameState {
 	Vector4f color = new Vector4f();
