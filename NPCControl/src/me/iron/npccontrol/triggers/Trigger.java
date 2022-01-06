@@ -28,7 +28,6 @@ public class Trigger {
             segConLoaded();
 
         addEvents();
-        //ModMain.log("trigger init");
     }
 
     /**
@@ -51,16 +50,15 @@ public class Trigger {
         //spawn pirates in asteroid belt
         code = Utility.add8bit(code,0b1,0); //neutral faction
         code = Utility.add8bit(code,0b10000100,1); //roid or planet
-        scLoadedEvents.add(new PirateScoutRaid(code,100,120, "belter pirates"));
+    //    scLoadedEvents.add(new PirateScoutRaid(code,100,120, "belter pirates"));
 
         //spawn pirates at pirate stations and neutral stations (derelicts)
         code = Utility.add8bit(code,0b1,0); //neutral faction
         code = Utility.add8bit(code,0b00000010,1); //roid or planet
-        scLoadedEvents.add(new PirateScoutRaid(code,100,120,"station lurkers"));
+    //    scLoadedEvents.add(new PirateScoutRaid(code,100,120,"station lurkers"));
     }
 
     private void segConLoaded() {
-        //ModMain.log("added SC-loaded EH");
         Listener l = new Listener<SegmentControllerFullyLoadedEvent>() {
             @Override
             public void onEvent(SegmentControllerFullyLoadedEvent event) {
@@ -76,7 +74,6 @@ public class Trigger {
     }
 
     private void triggerList(ArrayList<Event> events, long code, Vector3i position) {
-        //ModMain.log(String.format("trigger list with input %s\npos %s",toBin(code),position.toStringPure()));
         for (Event e: events) {
             e.trigger(code,position);
         }

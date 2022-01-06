@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="NewsCaster" />
+    </artifacts-to-build>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="18a6eb1c-1600-4f6d-b29d-99a5684d217a" name="Changes" comment="dbms ++">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/NPCControlDedicated.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/NewsCaster.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/NewsCasterDedicated.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/PVE_rand.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/SpaceFarm.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/IRNMultiMod.iml" beforeDir="false" afterPath="$PROJECT_DIR$/IRNMultiMod.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NewsCaster/NPCControl.iml" beforeDir="false" afterPath="$PROJECT_DIR$/NewsCaster/NPCControl.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/FleetCommander/me/iron/fleetCommander/project outline.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/FleetCommander/mod.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/ChatUI$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/ChatUI.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/Debug$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/Debug.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/Miner.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningCylce.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningUtil$1$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningUtil$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/MiningUtil.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/ModMain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/PersistentContainer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/StationManager$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/StationManager$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/me/iron/mining_stations/StationManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MiningStations/mod.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/ModMain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/TestCommand.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationFactionContainer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationHelper$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationHelper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationReplacer$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/StationReplacer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/ChatCmds.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/CommandCommander$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/CommandCommander.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/StationCommand$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/stationReplacement/commands/StationCommand.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/mod.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/CommandUI$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/CommandUI.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/ModMain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/commandUI/CommandBroadcast.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/commandUI/CommandGenerate.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/commandUI/CommandUI$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/commandUI/CommandUI.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/configManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/debugUI$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/debugUI.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/defaultConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$3.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$4.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager$5.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/eventListening/ListenerManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/broadcasting/Broadcaster$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/broadcasting/Broadcaster.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/NewsContainer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/NewsManager$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/NewsManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/EntityInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/FactionInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/FactionRelationInfo$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/FactionRelationInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/FactionSystemClaimInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/GenericInfo$EventType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/GenericInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/ShipCreatedInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/infoTypes/ShipDestroyedInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/objectTypes/FactionObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/objectTypes/FleetObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/objectTypes/ShipObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/notification/infoGeneration/objectTypes/StationObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/project outline.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/me/iron/newscaster/testing/main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/NewsCaster/mod.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/ChatAction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/ConditionAction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/SpawnAction$1$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/SpawnAction$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/SpawnAction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/checks/BooleanAction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/Action/checks/SystemCheck.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomAction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomCode$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomCode.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomScript.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/CustomTrigger.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/CodeElements/ScriptTemplates.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIElementTable$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIElementTable$ElementRow.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIElementTable.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIScrollabeElementList$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIScrollabeElementList$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/GUIScrollabeElementList.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptControlManager$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptControlManager$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptControlManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptMenuPanel$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/GUI/ScriptMenuPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ActionController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ListenerManager$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ListenerManager$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ListenerManager$3.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/ListenerManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/PlayerInterface$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Managers/PlayerInterface.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/ModMain$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/ModMain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/me/iron/pve_rand/Persistence/PersistentContainer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/PVE_rand/mod.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/ModMain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$3.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$4.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager$5.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/me/iron/spacefarm/PlantObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SpaceFarm/mod.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-database/.lck" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-database/.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-database/.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-database/.script" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="22sQxgyUeefUg5ukuabE2LXI28c" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/SM/client/StarMade/mods" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveInnerDialog.RECENTS_KEY">
+      <recent name="me.iron.npccontrol.triggers" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JAR Application.client">
+    <configuration name="Manager" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="me.iron.newscaster.DBMS.Manager" />
+      <module name="NewsCaster" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="me.iron.newscaster.DBMS.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="client" type="JarApplication">
+      <option name="JAR_PATH" value="$USER_HOME$/Desktop/SM/client/StarMade/StarMade.jar" />
+      <option name="PROGRAM_PARAMETERS" value="-uplink localhost 4242 -1,8252 -force" />
+      <option name="WORKING_DIRECTORY" value="C:\Users\Max\Desktop\SM\client\StarMade" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+      <method v="2">
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="NewsCaster" />
+        </option>
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.Manager" />
+      <item itemvalue="JAR Application.client" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Manager" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="18a6eb1c-1600-4f6d-b29d-99a5684d217a" name="Changes" comment="" />
+      <created>1640624062729</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1640624062729</updated>
+    </task>
+    <task id="LOCAL-00001" summary="dbms ++">
+      <created>1640720548062</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1640720548062</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="dbms ++" />
+    <option name="LAST_COMMIT_MESSAGE" value="dbms ++" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NewsCaster/src/me/iron/newscaster/eventListening/ListenerManager.java</url>
+          <line>143</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NewsCaster/src/me/iron/newscaster/eventListening/ListenerManager.java</url>
+          <line>109</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NewsCaster/src/me/iron/newscaster/eventListening/ListenerManager.java</url>
+          <line>93</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NewsCaster/src/me/iron/newscaster/eventListening/ListenerManager.java</url>
+          <line>88</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="NewsCaster">
+    <output-path>$USER_HOME$/Desktop/SM/client/StarMade/mods</output-path>
+    <root id="archive" name="NewsCaster.jar">
+      <element id="module-output" name="NewsCaster" />
+    </root>
+  </artifact>
+</component>

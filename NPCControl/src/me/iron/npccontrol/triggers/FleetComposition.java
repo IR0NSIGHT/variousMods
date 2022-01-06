@@ -72,7 +72,6 @@ public class FleetComposition {
         for (CatalogPermission p: out) {
             b.append(p.getUid()).append(",");
         }
-        ModMain.log(b.toString());
 
         return out;
     }

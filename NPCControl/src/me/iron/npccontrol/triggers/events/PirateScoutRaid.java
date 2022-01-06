@@ -36,7 +36,6 @@ public class PirateScoutRaid extends Event {
     @Override
     protected void run(long code, Vector3i sector) {
         super.run(code, sector);
-        //ModMain.log("RUN PIRATE SCOUT RAID");
         ArrayList<PlayerState> players = Utility.getPlayersByDistance(sector);
         if (players.size()==0)
             return;
@@ -49,9 +48,9 @@ public class PirateScoutRaid extends Event {
         //TODO select a better target than just players ship: slowest, biggest and weakest ship.
         SimpleTransformableSendableObject s = p.getFirstControlledTransformableWOExc();
         if (s != null) {
-            Utility.spawnAdvancedHunt(sector,s,f.toFlatArray(), -2);
+            Utility.spawnAdvancedHunt(sector,s,f.toFlatArray(), -1);
         }
-        ModMain.log(String.format("pirate scout raid ran with code: "+Utility.toBin(code));
+        ModMain.log(String.format("pirate scout raid ran with code: %s",Utility.toBin(code)));
     }
 
     @Override

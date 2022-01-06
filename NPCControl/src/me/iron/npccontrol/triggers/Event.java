@@ -40,14 +40,11 @@ public class Event {
      */
     protected boolean triggerCheck(long inputCode, Vector3i pos) {
         if (Math.random()*100>=chance) {
-        //    ModMain.log("abort random chance");
             return false;
         }
         if (cooldown > 0 && System.currentTimeMillis()<last+cooldown) {
-            ModMain.log("abort cooldown, wait: " + (last+cooldown- System.currentTimeMillis())/1000);
             return false;
         }
-    //    ModMain.log(String.format("%s input\n%s code\n%s differece\n\n",Utility.toBin(inputCode),Utility.toBin(code),Utility.toBin(inputCode&code)));
         for (int i = 0; i < 8; i++) {
             long in = Utility.get8bit(inputCode,i);
             long own = Utility.get8bit(code,i);
@@ -64,7 +61,6 @@ public class Event {
      * internal method that runs when the event successfully triggers
      */
     protected void run(long code, Vector3i sector) {
-        ModMain.log(String.format("event %s was run with c=%s, pos=%s",getName(),Long.toBinaryString(code),sector.toStringPure()));
         last = System.currentTimeMillis();
     }
 

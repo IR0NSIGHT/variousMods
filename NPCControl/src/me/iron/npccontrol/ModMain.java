@@ -4,15 +4,24 @@ import api.DebugFile;
 import api.ModPlayground;
 import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.controller.ServerInitializeEvent;
+import api.listener.fastevents.FastListenerCommon;
+import api.listener.fastevents.SegmentDrawListener;
 import api.mod.StarLoader;
 import api.mod.StarMod;
+import api.network.packets.PacketUtil;
 import me.iron.npccontrol.stationReplacement.*;
 import me.iron.npccontrol.stationReplacement.commands.CommandCommander;
 import me.iron.npccontrol.triggers.AIManager;
 import me.iron.npccontrol.triggers.DebugUI;
 import me.iron.npccontrol.triggers.Trigger;
 import org.junit.Test;
+import org.schema.game.common.data.world.DrawableRemoteSegment;
 import org.schema.game.server.data.GameServerState;
+import org.schema.schine.graphicsengine.forms.debug.DebugDrawer;
+import org.schema.schine.graphicsengine.forms.debug.DebugLine;
+import org.schema.schine.graphicsengine.forms.debug.DebugPacket;
+
+import javax.vecmath.Vector3f;
 
 
 /**
@@ -33,6 +42,7 @@ public class ModMain extends StarMod {
     public void onEnable() {
         super.onEnable();
         StarLoader.registerCommand(new DebugUI());
+        PacketUtil.registerPacket(DebugPacket.class);
     }
 
     @Override
@@ -53,7 +63,6 @@ public class ModMain extends StarMod {
     public void onClientCreated(ClientInitializeEvent event) {
         super.onClientCreated(event);
         DebugFile.log("on client",this);
-
     }
 
     public static void log(String mssg) {

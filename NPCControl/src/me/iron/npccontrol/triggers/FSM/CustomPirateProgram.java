@@ -1,4 +1,4 @@
-package me.iron.npccontrol.triggers;
+package me.iron.npccontrol.triggers.FSM;
 
 import org.schema.game.server.ai.program.common.TargetProgram;
 import org.schema.game.server.data.simulation.groups.SimulationGroup;
@@ -27,6 +27,6 @@ class CustomPirateProgram extends TargetProgram<SimulationGroup> {
 
     @Override
     protected void initializeMachines(HashMap<String, FiniteStateMachine<?>> hashMap) {
-        machines.put(PROGRAM, new CustomPirateMachine(getEntityState(), this));
+        machines.put(PROGRAM, new CustomFleetMachine(getEntityState(), this));
     }
 }
