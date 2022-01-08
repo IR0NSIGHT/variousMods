@@ -1,35 +1,59 @@
 package org.schema.schine.graphicsengine.forms.debug;
 
+import api.network.PacketReadBuffer;
+import api.network.PacketWriteBuffer;
 import com.bulletphysics.linearmath.Transform;
+import me.iron.npccontrol.pathing.sm.StellarPosition;
 import org.lwjgl.opengl.GL11;
 import org.schema.common.util.linAlg.TransformTools;
 import org.schema.common.util.linAlg.Vector3fTools;
+import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.client.data.GameClientState;
 import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.core.GlUtil;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.io.IOException;
 
 public class DebugLine extends DebugGeometry {
 	public Vector3f pointA;
 	public Vector3f pointB;
+	public StellarPosition spointA = new StellarPosition();
+	public StellarPosition spointB= new StellarPosition();
 
 	public DebugLine(Vector3f pointA, Vector3f pointB) {
 		this.pointA = pointA;
 		this.pointB = pointB;
 	}
 
+	public DebugLine(PacketReadBuffer buffer) throws IOException {
+		readFromBuffer(buffer);
+	}
+
 	public DebugLine(Vector3f pointA, Vector3f pointB, Vector4f color) {
 		this(pointA, pointB);
 		this.color = color;
 	}
+
 	public DebugLine(Vector3f pointA, Vector3f pointB, Vector4f color, long lifetime) {
 		this(pointA, pointB);
 		this.LIFETIME = lifetime;
 		this.color = color;
 	}
 
+	public DebugLine(StellarPosition pointA, StellarPosition pointB, Vector4f color, long lifetime) {
+		this(pointA.getPosition(), pointB.getPosition());
+		this.spointA = pointA;
+		this.spointB = pointB;
+		this.LIFETIME = lifetime;
+		this.color = color;
+	}
+
 	public void drawRaw() {
+		Vector3i playerSector = GameClientState.instance.getPlayer().getCurrentSector();
+		pointA = spointA.getRelativePosition(playerSector);
+		pointB = spointB.getRelativePosition(playerSector);
 		if (color != null) {
 			GlUtil.glColor4f(color.x, color.y, color.z, color.w * getAlpha());
 		} else {
@@ -55,6 +79,43 @@ public class DebugLine extends DebugGeometry {
 		GlUtil.glEnable(GL11.GL_TEXTURE_2D);
 	}
 
+	public StellarPosition getSpointA() {
+		return spointA;
+	}
+
+	public StellarPosition getSpointB() {
+		return spointB;
+	}
+
+	public void writeToBuffer(PacketWriteBuffer buffer) throws IOException {
+		if (spointA == null) {
+			spointA = new StellarPosition(new Vector3i(0,0,0),pointA);
+		}
+		if (spointB == null) {
+			spointB = new StellarPosition(new Vector3i(0,0,0),pointB);
+		}
+		buffer.writeVector(spointA.getSector());
+		buffer.writeVector3f(spointA.getPosition());
+		buffer.writeVector(spointB.getSector());
+		buffer.writeVector3f(spointB.getPosition());
+		buffer.writeVector4f(color);
+		buffer.writeLong(LIFETIME);
+	}
+
+	/**
+	 * will create spehere and generate lines (if on client) from buffer.
+	 * @param buffer
+	 * @throws IOException
+	 */
+	public void readFromBuffer(PacketReadBuffer buffer) throws IOException {
+		this.spointA.setSector(buffer.readVector());
+		this.spointA.setPosition(buffer.readVector3f());
+		this.spointB.setSector(buffer.readVector());
+		this.spointB.setPosition(buffer.readVector3f());
+		this.color = buffer.readVector4f();
+		this.LIFETIME = buffer.readLong();
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -70,6 +131,7 @@ public class DebugLine extends DebugGeometry {
 	public boolean equals(Object obj) {
 		return ((DebugLine) obj).pointA.equals(pointA) && ((DebugLine) obj).pointB.equals(pointB);
 	}
+
 
 	
 	public static DebugLine[] getCross(Transform where, Vector3f local, float scaleX, float scaleY, float scaleZ, boolean fullCross) {
@@ -195,4 +257,6 @@ public class DebugLine extends DebugGeometry {
 		
 		return new DebugLine[]{base, tipA, tipB};
 	}
+
+
 }

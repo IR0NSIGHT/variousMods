@@ -70,11 +70,6 @@ public class Raycast {
 
             }
         }
-        LinkedList<DebugLine> list = new LinkedList<DebugLine>();
-        list.add(toDebugLine());
-
-        new DebugPacket(list).sendToAll();
-
         ModMain.log(String.format("raycast: p=%s d=%s hit %s",pos,dir, (isHit())?hitObjs.getFirst().name:"none"));
         //tested all objects in sector.
     }
@@ -145,17 +140,7 @@ public class Raycast {
             }
             end.scale((float) Utility.getDistance(endP,point));
             color.set(1,0,0,1);
-            LinkedList<DebugLine> list = new LinkedList<>();
-            list.add(new DebugLine(
-                    end,
-                    endP,
-                    new Vector4f(1,0,1,1),
-                    Pathfinder.debugLineLifeTime
-                    ));
-            new DebugPacket(list).sendToAll();
-        //    point.set(endP);
         }
-        ModMain.log("isHit:"+isHit()+" hitObj:"+hitObj+" hitObjs:"+hitObjs.size());
         end.add(point);
         return new DebugLine(
             point,

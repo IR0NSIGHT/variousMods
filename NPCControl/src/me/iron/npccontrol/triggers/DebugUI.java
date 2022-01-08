@@ -8,6 +8,8 @@ import me.iron.npccontrol.ModMain;
 import me.iron.npccontrol.pathing.AbstractScene;
 import me.iron.npccontrol.pathing.AbstractSceneObject;
 import me.iron.npccontrol.pathing.Pathfinder;
+import me.iron.npccontrol.pathing.sm.StellarPosition;
+import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.controller.ai.AIGameConfiguration;
 import org.schema.game.common.data.player.PlayerState;
@@ -37,6 +39,7 @@ import java.util.Random;
  * TIME: 13:04
  */
 public class DebugUI implements CommandInterface {
+    public static AbstractScene debugScene = new AbstractScene("debugScene");
     public DebugUI() {
 
     }
@@ -143,67 +146,8 @@ public class DebugUI implements CommandInterface {
             String uid = "";
             if (sendable != null && sendable instanceof SimpleTransformableSendableObject)
                 uid = ((SimpleTransformableSendableObject<?>) sendable).getUniqueIdentifier();
+            generateDebugScene(debugScene);
 
-            AbstractScene s = new AbstractScene("scene01");
-            Vector3f systemOffset = new Vector3f(100,-300,55);
-            Vector3f a,b,S;
-            a = new Vector3f(200,0,0);
-            //a = new Vector3f(-56.568546f, 0, -395.9798f);
-            b = new Vector3f(0,0,0);
-            S = new Vector3f(0,0,0);
-
-            a.add(systemOffset);
-            b.add(systemOffset);
-            S.add(systemOffset);
-
-            float r = 10f;
-        //    s.addObjectToScene(S,r,"station_A");
-            Random random = new Random(); //420
-            int rangeObstacles = 170;
-            int hollow = 10;
-            for (int i = 0; i < 100; i++) {
-                float radius = (float) (r*Math.pow(1.2f,random.nextInt(10)));
-                S = new Vector3f(
-                        random.nextFloat()*(random.nextBoolean()?-1:1),
-                        random.nextFloat()*(random.nextBoolean()?-1:1),
-                        random.nextFloat()*(random.nextBoolean()?-1:1)
-                        );
-                S.normalize();
-                S.scale((hollow+radius+random.nextInt(rangeObstacles)));
-                S.add(systemOffset);
-
-                s.addObjectToScene(S,radius,"station_"+i);
-            }
-
-
-            Pathfinder f = new Pathfinder("");
-            Pathfinder.debugLineLifeTime = 120*1000;
-            LinkedList<Vector3f> wps = f.findPath(s,a,b,0);
-            f.drawRaycasts();
-
-            System.out.println(s.getSceneObjectsName());
-            System.out.println(Utility.vecsToString(wps));
-
-            Iterator<Vector3f> it = wps.iterator();
-            Vector3f previous = null;
-            LinkedList<DebugLine> lines = new LinkedList<>();
-            while (it.hasNext()) {
-                Vector3f wp = it.next();
-                if (previous != null) {
-                //    lines.add(new DebugLine(previous,wp,new Vector4f(1,0,1,1),120*1000));
-                }
-                ModMain.log("wP:" + wp);
-
-                previous = wp;
-            }
-            for (AbstractSceneObject obj: s.getObstacles()) {
-                lines.addAll(new DebugSphere(obj.pos, obj.bbsRadius ,new Vector4f(1,1,1,1),120*1000).getLines());
-            }
-            lines.addAll(new DebugSphere(a,1,new Vector4f(1,0,0,1),120*1000).getLines()); //start
-            lines.addAll(new DebugSphere(b,1,new Vector4f(0,1,0,1),120*1000).getLines()); //end
-            //    pf.drawRaycasts();
-            DebugDrawer.myLines.addAll(lines);
-            PacketUtil.sendPacket(playerState,new DebugPacket(lines));
             return true;
         }
 
@@ -215,8 +159,15 @@ public class DebugUI implements CommandInterface {
             SimpleTransformableSendableObject s = (SimpleTransformableSendableObject)obj;
             Vector3f point = s.getWorldTransform().origin;
             float radius = s.getBoundingSphereTotal().radius;
-            DebugSphere sp = new DebugSphere(point,radius,new Vector4f(0,1,0,1),120*1000);
-            new DebugPacket(sp.getLines()).sendToAll();
+            DebugSphere sp = new DebugSphere(new StellarPosition(s.getSector(new Vector3i()),point),radius,new Vector4f(0,1,0,1),120*1000);
+            DebugPacket p = new DebugPacket();
+            LinkedList<DebugSphere> sps = new LinkedList<>();
+            sps.add(sp);
+            p.addSpheres(sps);
+            p.sendToAll();
+            new DebugPacket().sendToAll();
+            ModMain.log("circeling " + s.getRealName());
+            return true;
         }
 
         if (strings.length>0 && strings[0].equals("circle_all")) {
@@ -230,17 +181,21 @@ public class DebugUI implements CommandInterface {
             }
             try {
                 Sector s = GameServerState.instance.getUniverse().getSector(playerState.getCurrentSector());
-                LinkedList<DebugLine> lines = new LinkedList<>();
+                LinkedList<DebugSphere> spheres = new LinkedList<>();
                 for (SimpleTransformableSendableObject obj: s.getEntities()) {
                     Vector3f point = obj.getWorldTransform().origin;
                     float radius = obj.getBoundingSphereTotal().radius * radiusMod;
-                    DebugSphere sp = new DebugSphere(point,radius,new Vector4f(0,1,0,1),500*1000);
-                    lines.addAll(sp.getLines());
+
+                    DebugSphere sp = new DebugSphere(new StellarPosition(obj.getSector(new Vector3i()),point),radius,new Vector4f(0,1,0,1),500*1000);
+                    spheres.add(sp);
                 }
-                new DebugPacket(lines).sendToAll();
+                DebugPacket p = new DebugPacket();
+                p.addSpheres(spheres);
+                p.sendToAll();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return true;
         }
 
         if (strings.length==1&&strings[0].equals("clear_draw")) {
@@ -249,6 +204,52 @@ public class DebugUI implements CommandInterface {
             return true;
         }
         return false;
+    }
+    private void generateDebugScene(AbstractScene s) {
+        s.getObstacles().clear();
+        s.setSector(new Vector3i(136,54,10));
+        Vector3f systemOffset = new Vector3f(100,-300,55);
+        Vector3f a,b,S;
+        a = new Vector3f(5000,0,0);
+        b = new Vector3f(0,0,0);
+        S = new Vector3f(0,0,0);
+
+        a.add(systemOffset);
+        b.add(systemOffset);
+        S.add(systemOffset);
+
+        float r = 200f;
+    //    s.addObjectToScene(S,r,"station_A");
+        Random random = new Random(); //420
+        int rangeObstacles = 1700;
+        int hollow = 300;
+        for (int i = 0; i < 20; i++) {
+            float radius = (float) (r*Math.pow(1.2f,random.nextInt(10)));
+            S = new Vector3f(
+                    random.nextFloat()*(random.nextBoolean()?-1:1),
+                    random.nextFloat()*(random.nextBoolean()?-1:1),
+                    random.nextFloat()*(random.nextBoolean()?-1:1)
+            );
+            S.normalize();
+            S.scale((hollow+radius+random.nextInt(rangeObstacles)));
+            S.add(systemOffset);
+
+            s.addObjectToScene(S,radius,"station_"+i);
+        }
+
+        Pathfinder.debugLineLifeTime = 120*1000;
+        System.out.println(s.getSceneObjectsName());
+
+        LinkedList<DebugLine> lines = new LinkedList<>();
+
+        for (AbstractSceneObject obj: s.getObstacles()) {
+            lines.addAll(new DebugSphere(new StellarPosition(s.getSector(),obj.pos), obj.bbsRadius ,new Vector4f(1,1,1,1),1200*1000).getLines());
+        }
+        lines.addAll(new DebugSphere(new StellarPosition(s.getSector(),a),10,new Vector4f(1,0,0,1),1200*1000).getLines()); //start
+        lines.addAll(new DebugSphere(new StellarPosition(s.getSector(),b),10,new Vector4f(0,1,0,1),1200*1000).getLines()); //end
+        //    pf.drawRaycasts();
+        //DebugDrawer.myLines.addAll(lines);
+        new DebugPacket(lines).sendToAll();
     }
 
     @Override

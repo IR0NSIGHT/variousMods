@@ -19,48 +19,50 @@ import java.util.LinkedList;
  */
 public class DebugPacket extends Packet {
     private LinkedList<DebugLine> lines = new LinkedList<>();
+    private LinkedList<DebugSphere> spheres = new LinkedList<>();
     private boolean clear;
 
     public void setClear(boolean clear) {
         this.clear = clear;
     }
 
-    public DebugPacket(LinkedList<DebugLine> lines) {
-        this.lines.addAll(lines);
+    public DebugPacket() { //defautl empty constructor for packet util
     }
 
-    public DebugPacket() { //defautl empty constructor for packet util
+    public DebugPacket(LinkedList<DebugLine> lines) {
+        this.lines.addAll(lines);
     }
 
     @Override
     public void readPacketData(PacketReadBuffer packetReadBuffer) throws IOException {
         clear = packetReadBuffer.readBoolean();
+
+        int sphereCount = packetReadBuffer.readInt();
+        for (int i = 0; i < sphereCount; i++) {
+            DebugSphere s = new DebugSphere(packetReadBuffer);
+            spheres.add(s);
+        }
+
        int size = packetReadBuffer.readInt();
        DebugDrawer.clear();
        for (int i = 0; i < size; i++) {
-           DebugLine l =new DebugLine(
-                   packetReadBuffer.readVector3f(),
-                   packetReadBuffer.readVector3f(),
-                   packetReadBuffer.readVector4f()
-           );
-           l.LIFETIME = packetReadBuffer.readLong();
+           DebugLine l =new DebugLine(packetReadBuffer);
            lines.add(l);
-
        }
-
-
     }
 
     @Override
     public void writePacketData(PacketWriteBuffer packetWriteBuffer) throws IOException {
-    //    ModMain.log("sending debug packet to client with " + lines.size() + " lines.");
         packetWriteBuffer.writeBoolean(clear);
+
+        packetWriteBuffer.writeInt(spheres.size());
+        for (DebugSphere sphere: spheres) {
+            sphere.writeToBuffer(packetWriteBuffer);
+        }
+
         packetWriteBuffer.writeInt(lines.size());
         for (DebugLine l: lines) {
-            packetWriteBuffer.writeVector3f(l.pointA);
-            packetWriteBuffer.writeVector3f(l.pointB);
-            packetWriteBuffer.writeVector4f(l.color);
-            packetWriteBuffer.writeLong(l.LIFETIME);
+            l.writeToBuffer(packetWriteBuffer);
         }
     }
 
@@ -70,6 +72,9 @@ public class DebugPacket extends Packet {
             DebugDrawer.myLines.clear();
         synchronized (DebugDrawer.myLines) {
             DebugDrawer.myLines.addAll(lines);
+            for (DebugSphere s: spheres) {
+                DebugDrawer.myLines.addAll(s.getLines());
+            }
         }
     }
 
@@ -82,5 +87,13 @@ public class DebugPacket extends Packet {
         for (PlayerState p: GameServerState.instance.getPlayerStatesByName().values()) {
             PacketUtil.sendPacket(p,this);
         }
+    }
+
+    public void addLines(LinkedList<DebugLine> lines) {
+        this.lines.addAll(lines);
+    }
+
+    public void addSpheres(LinkedList<DebugSphere> spheres) {
+        this.spheres.addAll(spheres);
     }
 }

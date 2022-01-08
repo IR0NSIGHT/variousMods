@@ -130,8 +130,9 @@ public class AbstractScene {
         float r = 2;
         s.addObjectToScene(S,r,"station_A");
 
-        Pathfinder f = new Pathfinder("");
-        LinkedList<Vector3f> wps = f.findPath(s,a,b,0);
+        Pathfinder f = new Pathfinder();
+        f.setScene(s);
+        LinkedList<Vector3f> wps = f.findPath(a,b,0);
 
         System.out.println(s.getSceneObjectsName());
         System.out.println(Utility.vecsToString(wps));

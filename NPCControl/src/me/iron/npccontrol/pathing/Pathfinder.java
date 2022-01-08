@@ -1,9 +1,11 @@
 package me.iron.npccontrol.pathing;
 
 import me.iron.npccontrol.ModMain;
+import me.iron.npccontrol.pathing.sm.StellarPosition;
 import me.iron.npccontrol.triggers.Utility;
 import org.apache.commons.math3.linear.*;
 import org.lwjgl.Sys;
+import org.newdawn.slick.geom.Path;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
@@ -27,14 +29,16 @@ import org.schema.schine.graphicsengine.forms.debug.DebugPacket;
  */
 public class Pathfinder {
     public static long debugLineLifeTime = 15*1000;
-    private String shipUID;
+    private AbstractScene scene;
     private LinkedList<Vector3f[]> raycasts = new LinkedList<>();
     private LinkedList<DebugLine> debugLines = new LinkedList<>();
 
     //TODO find better and more generic way to filter out specific ships/edit the buindingsphere size of objects
-    public Pathfinder(String shipUID) {
-        this.shipUID = shipUID;
+    public Pathfinder(AbstractScene scene) {
+        this.setScene(scene);
     }
+
+    public Pathfinder() {}
 
     /**
      * plot a multi-waypoint path to the target avoiding any obstacles/collisions, with a corridor that has the desired radius.
@@ -43,23 +47,27 @@ public class Pathfinder {
      * @param corridorRadius radius of safety corridor where no obstacles are.
      */
     public LinkedList<Vector3f> findPath(SimpleTransformableSendableObject ship, Vector3i targetSector, Vector3f targetPos, float corridorRadius) {
-        return findPath(ship.getSector(new Vector3i()), ship.getWorldTransform().origin, targetSector,targetPos, corridorRadius, ship.getUniqueIdentifier());
+        StellarPosition start = new StellarPosition(ship.getSector(new Vector3i()), ship.getWorldTransform().origin);
+        StellarPosition end = new StellarPosition(targetSector,targetPos);
+        return findPath(start, end, corridorRadius, ship.getUniqueIdentifier());
     }
 
-    public LinkedList<Vector3f> findPath(Vector3i sectorStart, Vector3f startPos, Vector3i sectorEnd, Vector3f end, float corridorRadius, String excludeUID) {
-        AbstractScene scene = new AbstractScene(sectorStart);
+    public LinkedList<Vector3f> findPath(StellarPosition start, StellarPosition end, float corridorRadius, String excludeUID) {
+        //generate scene
+        AbstractScene scene = new AbstractScene(start.getSector());
         scene.addObjectsFromSector(scene.getSector(), excludeUID);
-        Vector3f scenePosA = scene.getScenePos(sectorStart,startPos);
-        Vector3f scenePosB = scene.getScenePos(sectorEnd, end);
+        Vector3f scenePosA = scene.getScenePos(start.getSector(),start.getPosition());
+        Vector3f scenePosB = scene.getScenePos(end.getSector(),end.getPosition());
+        setScene(scene);
 
-        return findPath(scene,scenePosA,scenePosB, corridorRadius); //positions in scene, revert back to sector+sectorpos
+        return findPath(scenePosA,scenePosB, corridorRadius); //positions in scene, revert back to sector+sectorpos
         //TODO star avoidance, long distance plotting, jumping
         //TODO allow filter, take into account neighbour-sector objs that might be big enough to obstruct into this sector
         //TODO take into account that evasive wp might be in different sector
         //TODO assert that evasive wp is not inside another obstacle
     }
 
-    public LinkedList<Vector3f> findPath(AbstractScene scene, Vector3f start, Vector3f end, float corridorRadius) {
+    public LinkedList<Vector3f> findPath(Vector3f start, Vector3f end, float corridorRadius) {
         //System.out.println("find path from "+start + " to " +end);
 
 
@@ -100,7 +108,7 @@ public class Pathfinder {
                 Vector3f off = new Vector3f(obstaclePos); off.sub(closestPointToObj);
 
                 //find a evasive WP near the obstacle to go around it.
-                Vector3f evasiveWP = this.findPointOnPlaneWithoutObstacle(scene,currentWP,closestPointToObj, planeNormal,hitObj.bbsRadius,corridorRadius);
+                Vector3f evasiveWP = this.findPointOnPlaneWithoutObstacle(currentWP,closestPointToObj, planeNormal,hitObj.bbsRadius,corridorRadius);
                 if (evasiveWP == null) {
                     drawRaycasts();
                     throw new NullPointerException("was not able to find a path.");
@@ -157,7 +165,7 @@ public class Pathfinder {
      * @param corridorRadius
      * @return
      */
-    private Vector3f findPointOnPlaneWithoutObstacle(AbstractScene scene, Vector3f pointPos, Vector3f planePoint, Vector3f planeNormal, float obstacleSize, float corridorRadius) {
+    private Vector3f findPointOnPlaneWithoutObstacle(Vector3f pointPos, Vector3f planePoint, Vector3f planeNormal, float obstacleSize, float corridorRadius) {
         assert planeNormal.length()>0.999f && planeNormal.length()<1.001f; //is it normalized?
         //while raycast failed
         Vector3f[] plane = getPlaneDirFromNormal(planePoint,planeNormal);
@@ -230,7 +238,7 @@ public class Pathfinder {
     }
 
     public static void main(String args[]) {
-        Pathfinder pf = new Pathfinder("");
+        Pathfinder pf = new Pathfinder();
 
         Vector3f[] plane = pf.getPlaneDirFromNormal(new Vector3f(3,3,3),new Vector3f(1,0,0));
 
@@ -270,6 +278,14 @@ public class Pathfinder {
         }
 
 
+    }
+
+    public AbstractScene getScene() {
+        return scene;
+    }
+
+    public void setScene(AbstractScene scene) {
+        this.scene = scene;
     }
 
     /**
@@ -346,6 +362,14 @@ public class Pathfinder {
         return plane;
     }
 
+    public LinkedList<StellarPosition> relativeToStellar(LinkedList<Vector3f> waypoints) {
+        Vector3i sector = getScene().getSector();
+        LinkedList<StellarPosition> out = new LinkedList<>();
+        for (Vector3f waypoint: waypoints) {
+            out.add(new StellarPosition(sector, waypoint));
+        }
+        return out;
+    }
     public void drawRaycasts() {
         if (GameServerState.instance==null)
             return;

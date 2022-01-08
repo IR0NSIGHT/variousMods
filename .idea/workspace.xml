@@ -32,11 +32,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="18a6eb1c-1600-4f6d-b29d-99a5684d217a" name="Changes" comment="dbms ++">
+      <change afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Overview.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/sm/StarPathFinder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/sm/StellarPosition.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/ModMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/ModMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/AbstractScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/AbstractScene.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Pathfinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Pathfinder.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Raycast.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Raycast.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/DebugUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/triggers/DebugUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/ModMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/NPCControl/me/iron/npccontrol/ModMain.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/org/schema/game/server/ai/program/searchanddestroy/states/ShipMovingToSector.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/org/schema/game/server/ai/program/searchanddestroy/states/ShipMovingToSector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugLine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java" beforeDir="false" afterPath="$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,6 +100,19 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="DebugSphere" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.schema.schine.graphicsengine.forms.debug.DebugSphere" />
+      <module name="NPCControl" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.schema.schine.graphicsengine.forms.debug.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Manager" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="me.iron.newscaster.DBMS.Manager" />
       <module name="NewsCaster" />
@@ -134,9 +155,11 @@
       <item itemvalue="Application.AbstractScene" />
       <item itemvalue="JAR Application.server_npc" />
       <item itemvalue="JAR Application.client_npc" />
+      <item itemvalue="Application.DebugSphere" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.DebugSphere" />
         <item itemvalue="Application.AbstractScene" />
         <item itemvalue="Application.Manager" />
       </list>
@@ -165,7 +188,14 @@
       <option name="project" value="LOCAL" />
       <updated>1641495375252</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="pretty much working pathing.">
+      <created>1641499354307</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1641499354307</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -195,7 +225,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="dbms ++" />
     <MESSAGE value="laboratory-working pathing" />
-    <option name="LAST_COMMIT_MESSAGE" value="laboratory-working pathing" />
+    <MESSAGE value="pretty much working pathing." />
+    <option name="LAST_COMMIT_MESSAGE" value="pretty much working pathing." />
   </component>
   <component name="WindowStateProjectService">
     <state x="2540" y="452" key="#BuildArtifactsBeforeRunChooser" timestamp="1641491511741">
@@ -206,10 +237,10 @@
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state x="2214" y="290" width="1092" height="834" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641491513113" />
-    <state x="765" y="221" key="#com.intellij.ide.util.MemberChooser" timestamp="1641484857767">
+    <state x="765" y="221" key="#com.intellij.ide.util.MemberChooser" timestamp="1641642103763">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="765" y="221" key="#com.intellij.ide.util.MemberChooser/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641484857767" />
+    <state x="765" y="221" key="#com.intellij.ide.util.MemberChooser/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641642103763" />
     <state x="169" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1641480828639">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -218,58 +249,60 @@
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state x="2540" y="462" key="FileChooserDialogImpl/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641491180100" />
-    <state width="1637" height="310" key="GridCell.Tab.0.bottom" timestamp="1641496326986">
+    <state width="1637" height="388" key="GridCell.Tab.0.bottom" timestamp="1641651515174">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
-    <state width="1877" height="332" key="GridCell.Tab.0.bottom/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
-    <state width="1637" height="310" key="GridCell.Tab.0.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326986" />
-    <state width="1637" height="310" key="GridCell.Tab.0.center" timestamp="1641496326986">
+    <state width="1877" height="343" key="GridCell.Tab.0.bottom/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641646959945" />
+    <state width="1637" height="388" key="GridCell.Tab.0.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641651515174" />
+    <state width="1637" height="388" key="GridCell.Tab.0.center" timestamp="1641651515173">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
-    <state width="1877" height="332" key="GridCell.Tab.0.center/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
-    <state width="1637" height="310" key="GridCell.Tab.0.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326986" />
-    <state width="1637" height="310" key="GridCell.Tab.0.left" timestamp="1641496326985">
+    <state width="1877" height="343" key="GridCell.Tab.0.center/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641646959945" />
+    <state width="1637" height="388" key="GridCell.Tab.0.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641651515173" />
+    <state width="1637" height="388" key="GridCell.Tab.0.left" timestamp="1641651515173">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
-    <state width="1877" height="332" key="GridCell.Tab.0.left/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
-    <state width="1637" height="310" key="GridCell.Tab.0.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326985" />
-    <state width="1637" height="310" key="GridCell.Tab.0.right" timestamp="1641496326986">
+    <state width="1877" height="343" key="GridCell.Tab.0.left/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641646959945" />
+    <state width="1637" height="388" key="GridCell.Tab.0.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641651515173" />
+    <state width="1637" height="388" key="GridCell.Tab.0.right" timestamp="1641651515174">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
-    <state width="1877" height="332" key="GridCell.Tab.0.right/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641490236156" />
-    <state width="1637" height="310" key="GridCell.Tab.0.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326986" />
-    <state width="1637" height="310" key="GridCell.Tab.1.bottom" timestamp="1641496326928">
+    <state width="1877" height="343" key="GridCell.Tab.0.right/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641646959945" />
+    <state width="1637" height="388" key="GridCell.Tab.0.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641651515174" />
+    <state width="1637" height="388" key="GridCell.Tab.1.bottom" timestamp="1641651515095">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="529" key="GridCell.Tab.1.bottom/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
-    <state width="1637" height="310" key="GridCell.Tab.1.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326928" />
-    <state width="1637" height="310" key="GridCell.Tab.1.center" timestamp="1641496326928">
+    <state width="1637" height="388" key="GridCell.Tab.1.bottom/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641651515095" />
+    <state width="1637" height="388" key="GridCell.Tab.1.center" timestamp="1641651515095">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="529" key="GridCell.Tab.1.center/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
-    <state width="1637" height="310" key="GridCell.Tab.1.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326928" />
-    <state width="1637" height="310" key="GridCell.Tab.1.left" timestamp="1641496326928">
+    <state width="1637" height="388" key="GridCell.Tab.1.center/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641651515095" />
+    <state width="1637" height="388" key="GridCell.Tab.1.left" timestamp="1641651515095">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="529" key="GridCell.Tab.1.left/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
-    <state width="1637" height="310" key="GridCell.Tab.1.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326928" />
-    <state width="1637" height="310" key="GridCell.Tab.1.right" timestamp="1641496326928">
+    <state width="1637" height="388" key="GridCell.Tab.1.left/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641651515095" />
+    <state width="1637" height="388" key="GridCell.Tab.1.right" timestamp="1641651515095">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state width="1877" height="529" key="GridCell.Tab.1.right/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641489194014" />
-    <state width="1637" height="310" key="GridCell.Tab.1.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496326928" />
+    <state width="1637" height="388" key="GridCell.Tab.1.right/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641651515095" />
     <state x="2240" y="209" key="SettingsEditor" timestamp="1641491531704">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state x="2240" y="209" key="SettingsEditor/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641491531704" />
-    <state x="2576" y="550" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1641496656578">
-      <screen x="1920" y="130" width="1680" height="1010" />
-    </state>
-    <state x="2576" y="550" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496656578" />
-    <state x="461" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1641487317913">
+    <state x="750" y="432" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1641642608849">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
+    <state x="750" y="432" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641642608849" />
+    <state x="2576" y="550" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641496656578" />
+    <state x="2323" y="372" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1641647877972">
+      <screen x="1920" y="130" width="1680" height="1010" />
+    </state>
     <state x="461" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641487317913" />
+    <state x="2323" y="372" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641647877972" />
     <state x="2512" y="383" width="796" height="520" key="find.popup" timestamp="1641493705089">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
@@ -279,21 +312,72 @@
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
     <state x="2416" y="298" key="run.anything.popup/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641495895312" />
-    <state x="2423" y="347" width="672" height="678" key="search.everywhere.popup" timestamp="1641494695468">
+    <state x="2423" y="347" width="672" height="678" key="search.everywhere.popup" timestamp="1641648728847">
       <screen x="1920" y="130" width="1680" height="1010" />
     </state>
-    <state x="2423" y="347" width="672" height="678" key="search.everywhere.popup/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641494695468" />
+    <state x="575" y="223" width="768" height="699" key="search.everywhere.popup/1920.130.1680.1010/0.0.1920.1040@0.0.1920.1040" timestamp="1641644380466" />
+    <state x="2423" y="347" width="672" height="678" key="search.everywhere.popup/1920.130.1680.1010/0.0.1920.1040@1920.130.1680.1010" timestamp="1641648728847" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugPacket.java</url>
+          <line>75</line>
+          <option name="timeStamp" value="438" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>83</line>
+          <option name="timeStamp" value="440" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>90</line>
+          <option name="timeStamp" value="441" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>123</line>
+          <option name="timeStamp" value="443" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>124</line>
+          <option name="timeStamp" value="444" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>128</line>
+          <option name="timeStamp" value="445" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>131</line>
+          <option name="timeStamp" value="446" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>134</line>
+          <option name="timeStamp" value="447" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>136</line>
+          <option name="timeStamp" value="448" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>138</line>
+          <option name="timeStamp" value="449" />
+        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/NPCControl/src/me/iron/npccontrol/pathing/Pathfinder.java</url>
-          <line>159</line>
-          <properties class="me.iron.npccontrol.pathing.Pathfinder" method="findPointOnPlaneWithoutObstacle">
+          <url>file://$PROJECT_DIR$/NPCControl/src/org/schema/schine/graphicsengine/forms/debug/DebugSphere.java</url>
+          <line>118</line>
+          <properties class="org.schema.schine.graphicsengine.forms.debug.DebugSphere" method="generateStar">
             <option name="EMULATED" value="true" />
           </properties>
-          <option name="timeStamp" value="419" />
+          <option name="timeStamp" value="442" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

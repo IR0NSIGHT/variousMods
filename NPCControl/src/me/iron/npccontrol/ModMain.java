@@ -66,11 +66,11 @@ public class ModMain extends StarMod {
     }
 
     public static void log(String mssg) {
-        return;
-      // System.out.println(mssg);
-      // if (GameServerState.instance != null) {
-      //     DebugFile.log(mssg);
-      //     ModPlayground.broadcastMessage(mssg);
-      // }
+
+       System.out.println(mssg);
+       if (GameServerState.instance != null) {
+           DebugFile.log(mssg);
+           ModPlayground.broadcastMessage(mssg);
+       }
     }
 }
